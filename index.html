@@ -205,6 +205,32 @@ td select{max-width:150px}
 .empty{padding:28px 16px;text-align:center;color:var(--muted)}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(92px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;font-weight:600;font-size:14px;z-index:20;max-width:calc(100% - 32px)}
 @media (prefers-reduced-motion: no-preference){.toast{animation:pop .18s ease-out}@keyframes pop{from{opacity:0;transform:translate(-50%,6px)}}}
+.feed{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding:2px 2px 8px;margin-bottom:4px}
+.fc{flex:0 0 min(82%,300px);scroll-snap-align:start;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:8px;align-items:flex-start}
+.fc p{margin:0;font-size:14px}
+.fc .row-btns{margin-top:auto}
+.sm{padding:7px 12px;font-size:13px;border-radius:9px}
+.sups{display:grid;gap:10px}
+.supc{display:grid;gap:4px;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;width:100%}
+.supc-h{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.supc-h b{font-size:16px;min-width:0}
+.supc .meta{font-size:13px;color:var(--muted)}
+.tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.back{background:none;border:0;color:var(--accent);font-weight:700;padding:14px 0 0;font-size:14px}
+.sup-title{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:6px}
+.sup-title h2{font-size:22px}
+.deals{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding:2px 2px 8px}
+.deal{flex:0 0 min(72%,240px);scroll-snap-align:start;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:6px}
+.deal-top{display:flex;justify-content:space-between;align-items:center;gap:6px}
+.pct{background:var(--bad);color:var(--surface);font-weight:800;border-radius:8px;padding:2px 8px;font-size:14px}
+.dprice b{font-size:17px}
+.dprice s{color:var(--muted);font-size:13px;margin-left:4px}
+.deal .sub{margin:0}
+.deal .add{align-self:flex-start}
+.meter{height:8px;border-radius:4px;background:var(--bg);box-shadow:inset 0 0 0 1px var(--line);overflow:hidden;margin:6px 0}
+.meter i{display:block;height:100%;background:var(--accent)}
+.code{font-family:ui-monospace,Menlo,monospace;font-size:24px;font-weight:800;letter-spacing:.08em}
+.dealrow{display:grid;gap:4px}
 </style>
 
 <header class="top">
@@ -225,27 +251,43 @@ const DAY = 864e5;
 const T0 = (() => { const d = new Date(); d.setHours(12,0,0,0); return d.getTime(); })();
 const dateOf = d => new Date(T0 + d * DAY);
 const DOW = ['dom','lun','mar','mié','jue','vie','sáb'];
+const DOWL = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
 const MON = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
 const fDate = d => { const x = dateOf(d); return `${DOW[x.getDay()]} ${x.getDate()} ${MON[x.getMonth()]}`; };
 const fDow = d => DOW[dateOf(d).getDay()];
-const relDay = d => d === 1 ? 'mañana' : d === 2 ? 'pasado mañana' : `el ${fDate(d)}`;
+const wd = d => dateOf(d).getDay();
+const relDay = d => d === 0 ? 'hoy' : d === 1 ? 'mañana' : d === 2 ? 'pasado mañana' : `el ${fDate(d)}`;
 const money = n => '$' + Math.round(n).toLocaleString('es-CO');
 const median = a => { if (!a.length) return 0; const s = [...a].sort((x,y)=>x-y), m = s.length >> 1; return s.length % 2 ? s[m] : (s[m-1]+s[m]) / 2; };
 const STEP = { kg: 0.5, und: 1, atado: 1 };
 const roundStep = (q,u) => Math.max(STEP[u], Math.round(q / STEP[u]) * STEP[u]);
 const fQty = (q,u) => u === 'kg' ? `${q.toLocaleString('es-CO',{maximumFractionDigits:1})} kg` : u === 'und' ? `${q} und` : `${q} ${q === 1 ? 'atado' : 'atados'}`;
+const fApprox = (q,u) => fQty(u === 'kg' ? Math.round(q * 2) / 2 : Math.round(q), u);
+const fRate = (r,u) => `${r.toLocaleString('es-CO',{maximumFractionDigits:1})} ${u === 'atado' ? 'atados' : u}/día`;
 const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const norm = s => String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').trim();
 const digits = s => String(s || '').replace(/\D/g, '');
 const fPhone = p => { const d = digits(p); return d.length === 10 ? `${d.slice(0,3)} ${d.slice(3,6)} ${d.slice(6)}` : d; };
+const fHour = t => { const [h,m] = t.split(':').map(Number); return `${h % 12 || 12}:${String(m).padStart(2,'0')} ${h < 12 ? 'a. m.' : 'p. m.'}`; };
+const toMin = t => { const [h,m] = t.split(':').map(Number); return h * 60 + m; };
+const addMin = (t, m) => { const x = (toMin(t) + m) % 1440; return `${String(Math.floor(x / 60)).padStart(2,'0')}:${String(x % 60).padStart(2,'0')}`; };
+function minsNow(){ const n = new Date(); return n.getHours() * 60 + n.getMinutes(); }
+const plural = w => w.endsWith('s') ? w : w + 's';
 let seed = 20261025; const rnd = () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
 
-/* ---------- proveedor y catálogo (ejemplo) ---------- */
-const SUPPLIER = { name: 'Fruver La Cosecha', days: [1,2,3,4,5,6], cutoff: '20:00' };
-const fCut = () => { const [h,m] = SUPPLIER.cutoff.split(':').map(Number); return `${h % 12 || 12}:${String(m).padStart(2,'0')} ${h < 12 ? 'a. m.' : 'p. m.'}`; };
-function cutoffPassed(){ const [h,m] = SUPPLIER.cutoff.split(':').map(Number), n = new Date(); return n.getHours() * 60 + n.getMinutes() >= h * 60 + m; }
-function nextDelivery(){ let d = cutoffPassed() ? 2 : 1; for (let k = 0; k < 14; k++, d++) if (SUPPLIER.days.includes(dateOf(d).getDay())) return d; return 1; }
+/* ---------- proveedores ---------- */
+const SUPPLIERS = [
+  {id:'fv', name:'Fruver La Cosecha', kind:'Frutas y verduras', inApp:true, phone:'3001112233', days:[1,2,3,4,5,6], cutoff:'20:00'},
+  {id:'cr', name:'Carnes El Corral', kind:'Carnes y pollo', inApp:true, phone:'3002223344', days:[2,4,6], cutoff:'18:00'},
+  {id:'pj', name:'Panadería Don Julio', kind:'Panadería', inApp:false, owner:'gd', phone:'3013334455', days:[0,2,3,4,5,6], cutoff:'21:00'},
+  {id:'lp', name:'Lácteos La Pradera', kind:'Lácteos', inApp:false, owner:'sg', phone:'3024445566', days:[1,3,5], cutoff:'17:00'}
+];
+const sup = id => SUPPLIERS.find(s => s.id === id);
+const fCut = sid => fHour(sup(sid).cutoff);
+const cutoffPassed = sid => minsNow() >= toMin(sup(sid).cutoff);
+function nextDelivery(sid){ const s = sup(sid); let d = cutoffPassed(sid) ? 2 : 1; for (let k = 0; k < 14; k++, d++) if (s.days.includes(wd(d))) return d; return 1; }
 
+/* ---------- catálogos (ejemplo) ---------- */
 const PRODUCTS = [
   ['tom','Tomate chonto','Verduras','kg',3200],['ceb','Cebolla cabezona blanca','Verduras','kg',2800],['cel','Cebolla larga','Verduras','atado',2500],
   ['pim','Pimentón rojo','Verduras','kg',4500],['lec','Lechuga crespa','Verduras','und',2200],['zan','Zanahoria','Verduras','kg',2000],
@@ -254,26 +296,35 @@ const PRODUCTS = [
   ['lim','Limón tahití','Frutas','kg',3000],['ban','Banano','Frutas','kg',2500],['fre','Fresa','Frutas','kg',9500],
   ['man','Mango tommy','Frutas','kg',4800],['pin','Piña oro miel','Frutas','und',5500],['mar','Maracuyá','Frutas','kg',6000],
   ['mor','Mora de Castilla','Frutas','kg',7000],['pay','Papaya','Frutas','kg',3000]
-].map(([id,n,c,u,pr]) => ({id,n,c,u,pr,active:true}));
+].map(([id,n,c,u,pr]) => ({id,n,c,u,pr,s:'fv',active:true})).concat([
+  ['pol','Pechuga de pollo','Pollo','kg',16500],['mus','Muslo contramuslo','Pollo','kg',11000],['mol','Carne molida de res','Res','kg',22000],
+  ['lom','Lomo de cerdo','Cerdo','kg',21000],['cos','Costilla de cerdo','Cerdo','kg',15000],['hue','Huevos AA (cubeta x30)','Huevos','und',16000]
+].map(([id,n,c,u,pr]) => ({id,n,c,u,pr,s:'cr',active:true}))).concat([
+  ['tor','Tortillas para wrap (x10)','Panadería','und',9800],['pha','Pan de hamburguesa (x6)','Panadería','und',6500],['pta','Pan tajado','Panadería','und',7500]
+].map(([id,n,c,u,pr]) => ({id,n,c,u,pr,s:'pj',active:true}))).concat([
+  ['yog','Yogur griego (1 kg)','Lácteos','und',14000],['lev','Leche entera (1 l)','Lácteos','und',4200],['qcp','Queso campesino','Lácteos','kg',18000]
+].map(([id,n,c,u,pr]) => ({id,n,c,u,pr,s:'lp',active:true})));
 const PR = {}; const syncPR = () => { for (const k in PR) delete PR[k]; PRODUCTS.forEach(p => PR[p.id] = p); }; syncPR();
-const categories = () => [...new Set(PRODUCTS.map(p => p.c))];
+const productsOf = sid => PRODUCTS.filter(p => p.s === sid);
+const categories = sid => [...new Set(productsOf(sid).map(p => p.c))];
 
-/* ---------- restaurantes, cuentas e historial (ejemplo) ---------- */
+/* ---------- restaurantes (ejemplo) ---------- */
 const BUYERS = [
-  {id:'gd', name:'GAINS Diamante', kind:'Restaurante', every:2, off:1, phone:'3004445566',
-   prof:{tom:[8,4],ceb:[5,4],pim:[3,4],lec:[12,2],agu:[6,2],cil:[4,2],lim:[4,4],esp:[3,4],bro:[4,4],zan:[3,6],pep:[3,4]}},
-  {id:'sg', name:'Sweet Gains', kind:'Heladería', every:3, off:1, phone:'3157778899',
-   prof:{fre:[6,3],man:[5,6],ban:[8,3],mor:[4,6],mar:[3,6]}},
-  {id:'ca', name:'Café Altamira', kind:'Cafetería', every:3, off:2, phone:'3201234567',
+  {id:'gd', name:'GAINS Diamante', kind:'Restaurante', every:2, off:1, phone:'3004445566', sups:['fv','cr','pj'],
+   prof:{tom:[8,4],ceb:[5,4],pim:[3,4],lec:[12,2],agu:[6,2],cil:[4,2],lim:[4,4],esp:[3,4],bro:[4,4],zan:[3,6],pep:[3,4],pol:[30,4],mol:[5,4],tor:[10,4]}},
+  {id:'sg', name:'Sweet Gains', kind:'Heladería', every:3, off:1, phone:'3157778899', sups:['fv','lp'],
+   prof:{fre:[6,3,1.35],man:[5,6],ban:[8,3],mor:[4,6],mar:[3,6],yog:[4,6],lev:[10,3]}},
+  {id:'ca', name:'Café Altamira', kind:'Cafetería', every:3, off:2, phone:'3201234567', sups:['fv'], invitedBy:'fv',
    prof:{ban:[3,3],pay:[4,6],pin:[3,3],fre:[2,6],lim:[1,6],man:[2,6]}},
-  {id:'ef', name:'Asadero El Fogón', kind:'Restaurante', every:7, off:3, stopAfter:-14, phone:'3109876543',
-   prof:{pap:[20,7],tom:[6,7],cel:[6,7],ceb:[6,7],lim:[5,7],cil:[3,7],agu:[3,7]}}
+  {id:'ef', name:'Asadero El Fogón', kind:'Restaurante', every:7, off:3, stopAfter:-14, phone:'3109876543', sups:['fv','cr'], invitedBy:'fv',
+   prof:{pap:[20,7],tom:[6,7],cel:[6,7],ceb:[6,7],lim:[5,7],cil:[3,7],agu:[3,7],cos:[10,7],mol:[6,7]}}
 ];
 const BY = {}; const syncBY = () => BUYERS.forEach(b => BY[b.id] = b); syncBY();
-const SUPPLIER_PHONE = '3001112233';
-function accountFor(phone){ const d = digits(phone); if (d === SUPPLIER_PHONE) return {role:'supplier'}; const b = BUYERS.find(x => x.phone === d); return b ? {role:'buyer', bid:b.id} : null; }
+function accountFor(phone){ const d = digits(phone); const s = SUPPLIERS.find(x => x.inApp && x.phone === d); if (s) return {role:'supplier', sid:s.id}; const b = BUYERS.find(x => x.phone === d); return b ? {role:'buyer', bid:b.id} : null; }
 const INVITES = [];
 
+/* ---------- historial: 8 semanas de pedidos, uno por proveedor ---------- */
+const DRIFT = {tom:0.93, agu:1.1, pol:0.95};   // precio de antes ÷ precio de hoy
 const ORDERS = [];
 let oid = 1000;
 for (const b of BUYERS) {
@@ -281,37 +332,38 @@ for (const b of BUYERS) {
   for (let d = -56; d <= -1; d++) {
     if ((((d + b.off) % b.every) + b.every) % b.every !== 0) continue;
     if (b.stopAfter != null && d > b.stopAfter) continue;
-    const items = [];
-    for (const [pid,[q,i]] of Object.entries(b.prof)) {
+    const bySup = {};
+    for (const [pid,[q,i,trend]] of Object.entries(b.prof)) {
       const inc = last[pid] == null ? rnd() < b.every / i : (d - last[pid]) >= i - 0.5;
       if (!inc) continue;
-      const p = PR[pid], qty = roundStep(q * (0.85 + 0.3 * rnd()), p.u);
+      const p = PR[pid], qty = roundStep(q * (trend && d > -28 ? trend : 1) * (0.85 + 0.3 * rnd()), p.u);
       const del = p.u === 'kg' && rnd() < 0.2 ? roundStep(qty * (0.92 + 0.12 * rnd()), p.u) : qty;
-      items.push({p:pid, qty, del, price:p.pr, sug:false}); last[pid] = d;
+      (bySup[p.s] ||= []).push({p:pid, qty, del, price: Math.round(p.pr * (DRIFT[pid] || 1) / 50) * 50, sug:false}); last[pid] = d;
     }
-    if (items.length) ORDERS.push({id:++oid, b:b.id, day:d, deliver:d, status:'Entregado', items});
+    for (const [sid, items] of Object.entries(bySup)) ORDERS.push({id:++oid, b:b.id, s:sid, day:d, deliver:d, status:'Entregado', items});
   }
 }
 
-/* ---------- estadísticas (las fórmulas del plan) ---------- */
-const delivered = bid => ORDERS.filter(o => o.b === bid && o.status === 'Entregado').sort((a,b) => a.day - b.day);
-function cadence(bid){ const ds = delivered(bid).map(o => o.day); const diffs = ds.slice(1).map((d,i) => d - ds[i]); return diffs.length ? median(diffs) : 7; }
+/* ---------- estadísticas ---------- */
+const delivered = (bid, sid) => ORDERS.filter(o => o.b === bid && o.status === 'Entregado' && (!sid || o.s === sid)).sort((a,b) => a.day - b.day);
+function cadence(bid, sid){ const ds = delivered(bid, sid).map(o => o.day); const diffs = ds.slice(1).map((d,i) => d - ds[i]); return diffs.length ? median(diffs) : 7; }
 function pstats(bid, pid){
   const rows = []; for (const o of delivered(bid)) for (const it of o.items) if (it.p === pid) rows.push({day:o.day, q:it.del});
   if (!rows.length) return null;
   const n = rows.length, last = rows[n-1];
   const ints = rows.slice(1).map((r,i) => r.day - rows[i].day);
-  const intTyp = Math.max(1, ints.length ? median(ints.slice(-6)) : cadence(bid));
+  const intTyp = Math.max(1, ints.length ? median(ints.slice(-6)) : 3);
   const qtyTyp = median(rows.slice(-6).map(r => r.q));
   return { n, last:last.day, lastQ:last.q, daysSince:-last.day, intTyp, qtyTyp, rate: qtyTyp / intTyp, next: last.day + intTyp };
 }
-function boughtSet(bid){ const s = new Set(); delivered(bid).forEach(o => o.items.forEach(it => { if (PR[it.p] && PR[it.p].active) s.add(it.p); })); return s; }
+function boughtSet(bid, sid){ const s = new Set(); delivered(bid).forEach(o => o.items.forEach(it => { const p = PR[it.p]; if (p && p.active && (!sid || p.s === sid)) s.add(it.p); })); return s; }
+const pendingOrders = sid => ORDERS.filter(o => o.status !== 'Entregado' && (!sid || o.s === sid));
+
 /* ---------- memoria del negocio: movimiento diario y best sellers ---------- */
 const LEVELS = {suave:{f:0.7, l:'Suave', c:'mute'}, normal:{f:1, l:'Normal', c:'ok'}, alto:{f:1.4, l:'Alto', c:'warn'}, cerrado:{f:0, l:'Cerrado', c:'bad'}};
-const DOWL = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+const NOTIF_DELAY = 30, NOTIF_REMIND = 60;
 const BIZ = {};
 const biz = bid => BIZ[bid] ||= {open:[0,1,2,3,4,5,6], close:'22:00', log:{}, menu:[]};
-const wd = d => dateOf(d).getDay();
 function wdFactor(bid, w){
   const b = biz(bid); if (!b.open.includes(w)) return 0;
   const v = Object.entries(b.log).filter(([d,l]) => +d <= 0 && l !== 'cerrado' && wd(+d) === w).map(([,l]) => LEVELS[l].f);
@@ -322,20 +374,15 @@ function consume(bid, rate, a, b){ let t = 0; for (let k = Math.floor(a); k < b;
 function runout(bid, rate, stock, from){ let t = from, left = stock; for (let i = 0; i < 90; i++) { const k = Math.floor(t), r = rate * mult(bid,k), c = r * (k + 1 - t); if (r > 0 && c >= left) return t + left / r; left -= c; t = k + 1; } return t; }
 const nowT = bid => biz(bid).log[0] ? 1 : 0.5;
 function theo(bid, pid, useBase){ return biz(bid).menu.reduce((t,d) => t + (useBase ? d.base : d.perDay) * d.ing.filter(i => i.p === pid).reduce((s,i) => s + i.q, 0), 0); }
-function menuProducts(bid){ const s = new Set(); biz(bid).menu.forEach(d => d.ing.forEach(i => { if (PR[i.p] && PR[i.p].active) s.add(i.p); })); return s; }
-const NOTIF_DELAY = 30, NOTIF_REMIND = 60;   // minutos después del cierre del servicio
-const addMin = (t, m) => { const [h,mi] = t.split(':').map(Number), x = (h * 60 + mi + m) % 1440; return `${String(Math.floor(x / 60)).padStart(2,'0')}:${String(x % 60).padStart(2,'0')}`; };
-function minsNow(){ const n = new Date(); return n.getHours() * 60 + n.getMinutes(); }
+function menuProducts(bid, sid){ const s = new Set(); biz(bid).menu.forEach(d => d.ing.forEach(i => { const p = PR[i.p]; if (p && p.active && (!sid || p.s === sid)) s.add(i.p); })); return s; }
 function checkinDay(bid){
-  const b = biz(bid), [h,m] = b.close.split(':').map(Number), sent = minsNow() >= h * 60 + m + NOTIF_DELAY;
+  const b = biz(bid), sent = minsNow() >= toMin(b.close) + NOTIF_DELAY;
   for (const d of [0,-1,-2]) { if (d === 0 && !sent) continue; if (b.open.includes(wd(d)) && b.log[d] !== 'cerrado') return b.log[d] ? null : d; }
   return null;
 }
 
-/* ---------- inventario predictivo del restaurante ---------- */
+/* ---------- inventario predictivo ---------- */
 const CORR = {};
-const fApprox = (q,u) => { const v = u === 'kg' ? Math.round(q * 2) / 2 : Math.round(q); return u === 'kg' ? `${v.toLocaleString('es-CO',{maximumFractionDigits:1})} kg` : u === 'und' ? `${v} und` : `${v} ${v === 1 ? 'atado' : 'atados'}`; };
-const fRate = (r,u) => `${r.toLocaleString('es-CO',{maximumFractionDigits:1})} ${u === 'atado' ? 'atados' : u}/día`;
 function deliveriesOf(bid,pid){ const r = []; for (const o of delivered(bid)) for (const it of o.items) if (it.p === pid) r.push({day:o.day, q:it.del}); return r; }
 function invModel(bid, pid){
   const all = deliveriesOf(bid,pid), th = theo(bid,pid), thBase = theo(bid,pid,true);
@@ -357,15 +404,15 @@ function invModel(bid, pid){
   const noise = w.length >= 2 ? (cv(ints) + cv(qs)) / 2 : 1;
   const conf = all.length >= 6 && noise < 0.25 ? 'alta' : all.length >= 3 && noise < 0.5 ? 'media' : 'baja';
   return {pid, p, rate, rate0, current, out: current > 0 ? runout(bid, rate, current, now) : now, now, last, stockAtLast: stock, incoming, conf,
-    intTyp: s && s.n >= 2 ? s.intTyp : 3, share: th ? Math.min(1, th / rate) : 0, menuDelta: th - thBase, onlyMenu: w.length < 2,
-    corrected: c.f !== 1 || anchored};
+    intTyp: s && s.n >= 2 ? s.intTyp : 3, share: th ? Math.min(1, th / rate) : 0, menuDelta: th - thBase, onlyMenu: w.length < 2, corrected: c.f !== 1 || anchored};
 }
 const URG = {bad:0, warn:1, info:2, ok:3};
-function inventory(bid){
-  const D = nextDelivery(), cad = delivered(bid).length >= 2 ? cadence(bid) : 3;
-  const pids = new Set([...boughtSet(bid), ...menuProducts(bid)]);
+function inventory(bid, sid){
+  const pids = new Set([...boughtSet(bid, sid), ...menuProducts(bid, sid)]);
   return [...pids].map(pid => invModel(bid,pid)).filter(Boolean).map(m => {
+    const ps = m.p.s, D = nextDelivery(ps), cad = delivered(bid, ps).length >= 2 ? cadence(bid, ps) : 3;
     const inc = m.incoming.length ? Math.min(...m.incoming.map(x => x.day)) : null, out = m.out, u = m.p.u, H = Math.max(cad, m.intTyp);
+    m.D = D;
     if (m.current < STEP[u] / 2 && inc == null) Object.assign(m, {cls:'bad', label:'Agotado'});
     else if (inc != null) Object.assign(m, out < inc ? {cls:'bad', label:'Se acaba antes de que llegue'} : {cls:'info', label:`Llega ${relDay(inc)}`});
     else if (out < D) Object.assign(m, {cls:'bad', label:'No alcanza a la entrega'});
@@ -377,18 +424,20 @@ function inventory(bid){
     return m;
   }).sort((a,b) => URG[a.cls] - URG[b.cls] || a.out - b.out);
 }
-function suggestions(bid){
-  const inv = inventory(bid), due = [], later = [], known = new Set(inv.map(m => m.pid)), D = nextDelivery();
+function suggestions(bid, sid){
+  const inv = inventory(bid, sid), due = [], later = [], known = new Set(inv.map(m => m.pid)), D = nextDelivery(sid);
   for (const m of inv) { const s = pstats(bid, m.pid); if ((m.cls === 'bad' || m.cls === 'warn') && !m.incoming.length) due.push({pid:m.pid, q:m.need, m, s}); else later.push({pid:m.pid, m, s}); }
-  for (const pid of boughtSet(bid)) if (!known.has(pid)) { const s = pstats(bid,pid); if (s.daysSince + D >= 0.8 * cadence(bid)) due.push({pid, q:s.lastQ, s}); else later.push({pid, s}); }
-  for (const pid of menuProducts(bid)) if (!known.has(pid) && !boughtSet(bid).has(pid)) { const q = roundStep(consume(bid, theo(bid,pid), D, D + 3), PR[pid].u); due.push({pid, q, menuOnly:true}); }
+  for (const pid of boughtSet(bid, sid)) if (!known.has(pid)) { const s = pstats(bid,pid); if (s.daysSince + D >= 0.8 * cadence(bid, sid)) due.push({pid, q:s.lastQ, s}); else later.push({pid, s}); }
+  const bought = boughtSet(bid, sid);
+  for (const pid of menuProducts(bid, sid)) if (!known.has(pid) && !bought.has(pid)) due.push({pid, q: roundStep(consume(bid, theo(bid,pid), D, D + 3), PR[pid].u), menuOnly:true});
   return {due, later};
 }
-function buyerStats(){
-  const rows = BUYERS.map(b => {
-    const os = delivered(b.id), last30 = os.filter(o => o.day >= -30);
+function clientsOf(sid){ return BUYERS.filter(b => b.sups.includes(sid)); }
+function buyerStats(sid){
+  const rows = clientsOf(sid).map(b => {
+    const os = delivered(b.id, sid), last30 = os.filter(o => o.day >= -30);
     const sales = last30.reduce((t,o) => t + o.items.reduce((s,it) => s + it.del * it.price, 0), 0);
-    const perWeek = last30.length / (30/7), daysSince = os.length ? -os[os.length-1].day : null, cad = cadence(b.id);
+    const perWeek = last30.length / (30/7), daysSince = os.length ? -os[os.length-1].day : null, cad = cadence(b.id, sid);
     return { b, sales, orders:last30.length, perWeek, ticket: last30.length ? sales / last30.length : 0, daysSince, cad, isNew: os.length < 2, risk: os.length >= 2 && daysSince > 1.5 * cad };
   }).sort((a,b) => b.sales - a.sales);
   const total = rows.reduce((t,r) => t + r.sales, 0) || 1; let cum = 0;
@@ -397,36 +446,127 @@ function buyerStats(){
   return rows;
 }
 const SEGCLS = {'Clave':'ok','Por desarrollar':'info','Fiel':'mute','Ocasional':'mute','Nuevo':'warn'};
+function clientToday(sid, bid){
+  const pend = ORDERS.find(o => o.s === sid && o.b === bid && o.status !== 'Entregado');
+  if (pend) return {cls:'ok', label:`Pidió para el ${fDate(pend.deliver)}`, k:'ok'};
+  const os = delivered(bid, sid); if (!os.length) return {cls:'mute', label:'Sin pedidos todavía', k:'new'};
+  const cad = cadence(bid, sid), lastD = os[os.length-1].day, since = -lastD;
+  if (os.length >= 2 && since > 1.5 * cad) return {cls:'bad', label:`${since} días sin pedir`, k:'risk'};
+  if (lastD + cad - 1 <= 0) return {cls:'warn', label:'Le toca pedir hoy', k:'due'};
+  return {cls:'mute', label:`Próximo pedido ≈ ${fDate(Math.round(lastD + cad - 1))}`, k:'later'};
+}
+function growth(sid, bid){
+  const tot = (a, b) => { const r = {}; delivered(bid, sid).filter(o => o.day >= a && o.day < b).forEach(o => o.items.forEach(it => r[it.p] = (r[it.p] || 0) + it.del)); return r; };
+  const now = tot(-28, 1), before = tot(-56, -28), out = [];
+  for (const [pid, q] of Object.entries(now)) { const p0 = before[pid]; if (p0 && q / p0 - 1 >= 0.2) out.push({pid, ch: q / p0 - 1}); }
+  return out.sort((a,b) => b.ch - a.ch);
+}
 
-/* memoria de ejemplo: GAINS Diamante abre de martes a domingo y ya reportó su movimiento varias semanas */
+/* ---------- ofertas del proveedor ---------- */
+const REASONS = {vence:{l:'Vence pronto', c:'warn', d:'Consumir en 1 a 2 días'}, defecto:{l:'Detalle visual', c:'info', d:'Forma o color irregular, mismo sabor y calidad'}, excedente:{l:'Excedente', c:'ok', d:'Producto en buen estado que sobró'}};
+const DEALS = [
+  {id:'k1', s:'fv', p:'man', r:'vence', pct:30, qty:8, sold:3, until:1, note:'Bien maduro, ideal para jugos y salsas', on:true},
+  {id:'k2', s:'fv', p:'pim', r:'defecto', pct:25, qty:5, sold:0, until:2, note:'Forma irregular, mismo sabor', on:true},
+  {id:'k3', s:'cr', p:'cos', r:'excedente', pct:20, qty:10, sold:2, until:3, note:'Corte del día, empacado al vacío', on:true}
+];
+const dealPrice = d => Math.round(PR[d.p].pr * (1 - d.pct / 100) / 50) * 50;
+const dealLeft = d => Math.max(0, d.qty - d.sold);
+const activeDeals = sid => DEALS.filter(d => d.s === sid && d.on && d.until >= 0 && dealLeft(d) > 0 && PR[d.p].active);
+const untilTxt = u => u === 0 ? 'Solo hoy' : u === 1 ? 'Hasta mañana' : `Hasta el ${fDate(u)}`;
+
+/* ---------- invita y gana ---------- */
+const REF_PCT = 10, REF_CAP = 50;   // valores de prueba
+const REF = {};
+const refKey = () => S.session.role === 'buyer' ? 'b:' + S.session.bid : 's:' + S.session.sid;
+const accName = key => key.startsWith('b:') ? BY[key.slice(2)].name : sup(key.slice(2)).name;
+const ref = key => REF[key] ||= {code: norm(accName(key)).replace(/[^a-z]/g, '').slice(0, 6).toUpperCase() + String(key.length * 7 + 3), list:[]};
+function refCalc(R){
+  const cr = {}, add = (m, v) => cr[m] = (cr[m] || 0) + v;
+  R.list.filter(x => x.status === 'Activo').forEach(x => add(x.month, REF_PCT)); if (R.welcome) add(R.welcome.month, REF_PCT);
+  let carry = 0; const use = {};
+  for (let m = -6; m <= 6; m++) { carry += cr[m] || 0; use[m] = Math.min(REF_CAP, carry); carry -= use[m]; }
+  return {now: use[0], next: use[1]};
+}
+function refMsg(key, to){ return `${to ? `Hola, ${to}. ` : ''}${accName(key)} te invita a Surtido para manejar los pedidos entre restaurantes y proveedores. Si te unes con este link, los dos tenemos ${REF_PCT}% de descuento en la mensualidad: surtido.app/r/${ref(key).code}`; }
+function activateRef(key, phone){ const x = ref(key).list.find(i => i.phone === phone && i.status === 'Pendiente'); if (x) { x.status = 'Activo'; x.month = 0; } return x; }
+
+/* ---------- datos de ejemplo adicionales ---------- */
 { const b = biz('gd'); b.open = [0,2,3,4,5,6]; b.close = '21:30';
   const pat = {0:'normal', 2:'suave', 3:'suave', 4:'normal', 5:'alto', 6:'alto'};
   for (let d = -21; d <= -2; d++) { const w = wd(d); if (b.open.includes(w)) b.log[d] = rnd() < 0.2 ? 'normal' : pat[w]; }
   b.menu = [
-    {id:'m1', name:'Bowl de pollo y aguacate', perDay:30, base:30, ing:[{p:'agu',q:0.05},{p:'tom',q:0.03},{p:'lec',q:0.08},{p:'ceb',q:0.02}]},
-    {id:'m2', name:'Wrap de pollo', perDay:25, base:25, ing:[{p:'agu',q:0.03},{p:'tom',q:0.02},{p:'lec',q:0.06},{p:'pim',q:0.02}]},
+    {id:'m1', name:'Bowl de pollo y aguacate', perDay:30, base:30, ing:[{p:'pol',q:0.15},{p:'agu',q:0.05},{p:'tom',q:0.03},{p:'lec',q:0.08},{p:'ceb',q:0.02}]},
+    {id:'m2', name:'Wrap de pollo', perDay:25, base:25, ing:[{p:'pol',q:0.12},{p:'tor',q:0.1},{p:'agu',q:0.03},{p:'tom',q:0.02},{p:'lec',q:0.06},{p:'pim',q:0.02}]},
     {id:'m3', name:'Ensalada verde con espinaca', perDay:15, base:15, ing:[{p:'esp',q:0.04},{p:'lec',q:0.12},{p:'pep',q:0.03},{p:'lim',q:0.02}]}];
 }
-/* pedidos de otros clientes para la próxima entrega (ejemplo) */
-{ const D = nextDelivery();
-  for (const bid of ['sg','ca']) { const {due} = suggestions(bid);
-    if (due.length) ORDERS.push({id:++oid, b:bid, day:0, deliver:D, status:'Recibido', created:'7:42 a. m.', items: due.map(x => ({p:x.pid, qty:x.q, del:x.q, price:PR[x.pid].pr, sug:true}))}); } }
+REF['b:gd'] = {code:'GAINS13', list:[
+  {name:'Panadería Don Julio', kind:'Proveedor', phone:'3013334455', status:'Pendiente'},
+  {name:'Restaurante Mar y Tierra', kind:'Restaurante', phone:'3115556677', status:'Activo', month:0}]};
+REF['s:fv'] = {code:'COSECHA17', list:[
+  {name:'Café Altamira', kind:'Restaurante', phone:'3201234567', status:'Activo', month:-1},
+  {name:'Asadero El Fogón', kind:'Restaurante', phone:'3109876543', status:'Activo', month:0},
+  {name:'Pizzería Forno', kind:'Restaurante', phone:'3126667788', status:'Pendiente'}]};
+ref('b:ca').welcome = {from:'Fruver La Cosecha', month:-1};
+ref('b:ef').welcome = {from:'Fruver La Cosecha', month:0};
+for (const [bid, sid] of [['sg','fv'],['ca','fv'],['gd','cr']]) { const D = nextDelivery(sid), {due} = suggestions(bid, sid);
+  if (due.length) ORDERS.push({id:++oid, b:bid, s:sid, day:0, deliver:D, status:'Recibido', created:'7:42 a. m.', items: due.map(x => ({p:x.pid, qty:x.q, del:x.q, price:PR[x.pid].pr, sug:true}))}); }
 
 /* ---------- estado ---------- */
 const S = { session:null, login:{step:'phone', phone:'', err:''}, inviteCode:null, obErr:'',
-  btab:'pedir', stab:'pedidos', cart:{}, sugQ:{}, cat:'Todos', q:'', placed:null, open:{}, det:{},
-  inviteForm:false, inviteErr:'', lastInvite:null, newProd:false, imp:null };
-try { const r = JSON.parse(localStorage.getItem('surtido-session') || 'null'); if (r && (r.role === 'supplier' || BY[r.bid])) S.session = r; } catch(e) {}
-const saveSession = () => { try { localStorage.setItem('surtido-session', JSON.stringify(S.session)); } catch(e) {} };
-function resetCart(){ if (!S.session || S.session.role !== 'buyer') return; const {due} = suggestions(S.session.bid); S.cart = {}; S.sugQ = {}; due.forEach(x => { S.cart[x.pid] = x.q; S.sugQ[x.pid] = x.q; }); S.placed = null; }
-resetCart();
+  btab:'prov', stab:'clientes', sid:null, carts:{}, cat:'Todos', q:'', placed:null, open:{}, det:{},
+  inviteForm:false, inviteErr:'', lastInvite:null, newProd:false, imp:null, supForm:false, nsDays:[1,2,3,4,5,6], dealForm:false, refLast:null };
+try { const r = JSON.parse(localStorage.getItem('surtido-session2') || 'null'); if (r && ((r.role === 'supplier' && sup(r.sid) && sup(r.sid).inApp) || (r.role === 'buyer' && BY[r.bid]))) S.session = r; } catch(e) {}
+const saveSession = () => { try { localStorage.setItem('surtido-session2', JSON.stringify(S.session)); } catch(e) {} };
+const cart = (sid = S.sid) => S.carts[sid] ||= {items:{}, sugQ:{}};
+function resetCart(sid = S.sid){ if (!S.session || S.session.role !== 'buyer' || !sid) return; const {due} = suggestions(S.session.bid, sid), c = cart(sid); c.items = {}; c.sugQ = {}; due.forEach(x => { c.items[x.pid] = x.q; c.sugQ[x.pid] = x.q; }); }
+function cartUntouched(sid){ const c = cart(sid), a = Object.entries(c.items).filter(([,q]) => q > 0), k = Object.keys(c.sugQ); return a.length === k.length && a.every(([p,q]) => c.sugQ[p] === q); }
+function bizChanged(){ if (S.session.role !== 'buyer') return; for (const sid of BY[S.session.bid].sups) if (S.carts[sid] && cartUntouched(sid)) resetCart(sid); }
+function openSup(sid){ S.sid = sid; S.btab = 'prov'; S.placed = null; S.q = ''; S.cat = 'Todos'; if (!S.carts[sid]) resetCart(sid); window.scrollTo(0,0); }
 
 const $ = id => document.getElementById(id);
-function toast(msg){ const t = $('toast'); t.textContent = msg; t.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => t.hidden = true, 2400); }
+function toast(msg){ const t = $('toast'); t.textContent = msg; t.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => t.hidden = true, 2600); }
+function copyText(txt, okMsg){ const ok = () => toast(okMsg || 'Copiado'), fail = () => toast('No se pudo copiar. Mantén presionado el texto para copiarlo.'); try { navigator.clipboard.writeText(txt).then(ok, fail); } catch(e) { fail(); } }
 const orderTotal = (o, f='del') => o.items.reduce((t,it) => t + it[f] * it.price, 0);
-const STATUS = ['Recibido','Confirmado','En camino','Entregado'];
-const stepsHtml = st => `<div class="steps">${STATUS.map((s,i) => `<div class="${i <= STATUS.indexOf(st) ? 'on' : ''}">${s}</div>`).join('')}</div>`;
-const pendingOrders = () => ORDERS.filter(o => o.status !== 'Entregado');
+const STATUS = ['Recibido','Confirmado','En camino','Entregado'], STATUS_X = ['Enviado','Entregado'];
+const stepsHtml = (st, ext) => { const L = ext ? STATUS_X : STATUS; return `<div class="steps">${L.map((s,i) => `<div class="${i <= L.indexOf(st) ? 'on' : ''}">${s === 'Enviado' ? 'Enviado por WhatsApp' : s}</div>`).join('')}</div>`; };
+const whenTxt = d => d === 0 ? 'hoy' : d === -1 ? 'ayer' : `el ${DOWL[wd(d)]}`;
+function waText(o){ const b = BY[o.b]; return `Hola, pedido de ${b.name} para el ${fDate(o.deliver)}:\n` + o.items.map(it => `• ${PR[it.p].n}: ${fQty(it.qty, PR[it.p].u)}${it.deal ? ' (oferta)' : ''}`).join('\n') + `\nTotal aprox: ${money(orderTotal(o,'qty'))}`; }
+
+/* ---------- novedades ---------- */
+function feedHtml(items, title = 'Novedades'){
+  if (!items.length) return '';
+  return `<div class="sec-h"><h2>${title}</h2></div><div class="feed" role="list">${items.map(x => `<div class="fc" role="listitem"><span class="tag ${x.cls}">${x.k}</span><p>${x.t}</p>
+    <div class="row-btns">${x.btns || (x.act ? `<button class="ghost sm" data-act="${x.act}" data-v="${x.v ?? ''}">${x.b}</button>` : '')}</div></div>`).join('')}</div>`;
+}
+function buyerFeed(bid){
+  const f = [], b = BY[bid], cd = checkinDay(bid);
+  if (cd != null) f.push({k:'Cierre del servicio', cls:'info', t:`¿Cómo estuvo el movimiento ${whenTxt(cd)}?`, btns: ['suave','normal','alto'].map(l => `<button class="ghost sm" data-act="lvl" data-v="${l}" data-d="${cd}">${LEVELS[l].l}</button>`).join('')});
+  const inv = inventory(bid);
+  for (const sid of b.sups) { const bad = inv.filter(m => m.p.s === sid && m.cls === 'bad');
+    if (bad.length) f.push({k:'Inventario', cls:'bad', t:`${esc(bad.slice(0,2).map(m => m.p.n).join(' y '))}${bad.length > 2 ? ` y ${bad.length - 2} más` : ''} no ${bad.length === 1 ? 'alcanza' : 'alcanzan'} a la entrega del ${fDate(nextDelivery(sid))} de ${esc(sup(sid).name)}.`, act:'go-sup', v:sid, b:'Pedir'}); }
+  for (const sid of b.sups) { const mine = boughtSet(bid, sid);
+    activeDeals(sid).sort((x,y) => mine.has(y.p) - mine.has(x.p)).slice(0,2).forEach(d => f.push({k:'Oferta', cls:'ok', t:`${esc(PR[d.p].n)} −${d.pct}% en ${esc(sup(sid).name)}: ${REASONS[d.r].l.toLowerCase()}. Quedan ${fQty(dealLeft(d), PR[d.p].u)}.`, act:'go-sup', v:sid, b:'Ver oferta'})); }
+  for (const sid of b.sups) { const sp = sup(sid); if (!sp.inApp || cutoffPassed(sid) || ORDERS.some(o => o.b === bid && o.s === sid && o.status !== 'Entregado')) continue;
+    const n = suggestions(bid, sid).due.length; if (n) f.push({k:'Cierre de pedidos', cls:'warn', t:`${esc(sp.name)} recibe pedidos hasta las ${fCut(sid)}. Tienes ${n} productos por pedir.`, act:'go-sup', v:sid, b:'Hacer pedido'}); }
+  const seen = new Set();
+  for (const o of delivered(bid).filter(o => o.day >= -30).reverse()) for (const it of o.items) { if (seen.has(it.p) || it.deal) continue; seen.add(it.p);
+    const p = PR[it.p], ch = p.pr / it.price - 1; if (Math.abs(ch) >= 0.05) f.push({k:'Precio', cls: ch > 0 ? 'warn' : 'ok', t:`${esc(p.n)} ${ch > 0 ? 'subió' : 'bajó'} ${Math.round(Math.abs(ch) * 100)}% en ${esc(sup(p.s).name)}: ahora ${money(p.pr)}/${p.u}.`, act:'go-sup', v:p.s, b:'Ver proveedor'}); }
+  for (const sid of b.sups) { const sp = sup(sid); if (!sp.inApp) f.push({k:'Invita y gana', cls:'info', t:`${esc(sp.name)} todavía recibe tus pedidos por WhatsApp. Invítalo a la app y cada uno gana ${REF_PCT}% en la mensualidad.`, act:'ref-sup', v:sid, b:'Invitar'}); }
+  return f;
+}
+function supFeed(sid){
+  const f = [], pend = pendingOrders(sid).filter(o => o.status === 'Recibido');
+  if (pend.length) f.push({k:'Pedidos', cls:'warn', t:`Tienes ${pend.length} ${pend.length === 1 ? 'pedido' : 'pedidos'} por confirmar.`, act:'go-stab', v:'pedidos', b:'Ver pedidos'});
+  for (const b of clientsOf(sid)) { const st = clientToday(sid, b.id);
+    if (st.k === 'due') f.push({k:'Cliente', cls:'warn', t:`${esc(b.name)} suele pedir hoy y todavía no lo hace. Cierras a las ${fCut(sid)}.`, act:'remind', v:b.id, b:'Copiar recordatorio'});
+    if (st.k === 'risk') f.push({k:'En riesgo', cls:'bad', t:`${esc(b.name)} lleva ${st.label.split(' ')[0]} días sin pedir; normalmente pide cada ${cadence(b.id, sid)}.`, act:'call', v:b.id, b:'Ver teléfono'});
+    const g = growth(sid, b.id)[0]; if (g) f.push({k:'Crece', cls:'ok', t:`${esc(b.name)} pide ${Math.round(g.ch * 100)}% más ${esc(PR[g.pid].n.toLowerCase())} que el mes anterior.`}); }
+  const ds = activeDeals(sid);
+  ds.forEach(d => f.push({k:'Oferta activa', cls:'ok', t:`${esc(PR[d.p].n)}: vendiste ${fQty(d.sold, PR[d.p].u)} de ${fQty(d.qty, PR[d.p].u)}. ${untilTxt(d.until)}.`, act:'go-stab', v:'ofertas', b:'Ver ofertas'}));
+  if (!ds.length) f.push({k:'Ofertas', cls:'info', t:'¿Tienes producto por vencer o con detalle visual? Publícalo como oferta para tus clientes.', act:'go-stab', v:'ofertas', b:'Crear oferta'});
+  const r = refCalc(ref('s:' + sid)); f.push({k:'Invita y gana', cls:'info', t: r.now ? `Este mes tienes ${r.now}% de descuento en tu mensualidad. Cada negocio que invites suma ${REF_PCT}%.` : `Invita a otro negocio y gana ${REF_PCT}% en tu mensualidad por cada uno que se una.`, act:'go-stab', v:'ref', b:'Invitar'});
+  return f;
+}
 
 /* ---------- entrada ---------- */
 function viewLogin(){
@@ -434,7 +574,7 @@ function viewLogin(){
   if (L.step === 'code') return `<div class="login">
     <h1>Escribe el código</h1><p class="sub">Te lo enviamos por WhatsApp al ${fPhone(L.phone)}.</p>
     <form class="form" id="f-code" novalidate>
-      <div class="field"><label for="code">Código de 6 dígitos</label><input class="code-in" id="code" inputmode="numeric" maxlength="6" autocomplete="one-time-code" autofocus>
+      <div class="field"><label for="code">Código de 6 dígitos</label><input class="code-in" id="code" inputmode="numeric" maxlength="6" autocomplete="one-time-code">
       <span class="hint">En el prototipo el código es 123456.</span></div>
       ${L.err ? `<div class="err">${L.err}</div>` : ''}
       <button class="primary full" type="submit">Entrar</button>
@@ -448,7 +588,7 @@ function viewLogin(){
       <button class="primary full" type="submit">Enviarme el código</button>
     </form>
     <div class="demo"><h3>Cuentas de prueba</h3>
-      <button data-act="demo" data-v="${SUPPLIER_PHONE}"><b>${esc(SUPPLIER.name)}</b><span>Proveedor · ${fPhone(SUPPLIER_PHONE)}</span></button>
+      ${SUPPLIERS.filter(s => s.inApp).map(s => `<button data-act="demo" data-v="${s.phone}"><b>${esc(s.name)}</b><span>Proveedor · ${fPhone(s.phone)}</span></button>`).join('')}
       ${BUYERS.map(b => `<button data-act="demo" data-v="${b.phone}"><b>${esc(b.name)}</b><span>${esc(b.kind)} · ${fPhone(b.phone)}</span></button>`).join('')}
     </div></div>`;
 }
@@ -456,7 +596,7 @@ function viewOnboard(){
   const inv = INVITES.find(i => i.code === S.inviteCode);
   if (!inv) return `<div class="login"><h1>Este link ya no es válido</h1><p class="sub">Pídele a tu proveedor una invitación nueva.</p><button class="ghost" data-act="ob-cancel">Ir a la entrada</button></div>`;
   return `<div class="wrap">
-    <div class="invite-hero"><h1>${esc(SUPPLIER.name)} te invitó a hacer tus pedidos aquí</h1><p class="sub" style="margin:0">Tarda un minuto. Después entras con tu celular, sin contraseña.</p></div>
+    <div class="invite-hero"><h1>${esc(sup(inv.sid).name)} te invitó a hacer tus pedidos aquí</h1><p class="sub" style="margin:0">Tarda un minuto. Con esta invitación tienes ${REF_PCT}% de descuento en tu primera mensualidad.</p></div>
     <form class="form card" id="f-ob" novalidate>
       <div class="field"><label for="ob-name">Nombre del negocio</label><input id="ob-name" value="${esc(inv.name)}"></div>
       <div class="field"><label for="ob-addr">Dirección de entrega</label><input id="ob-addr" placeholder="Cra 33 # 45-12, Cabecera" autocomplete="street-address"><span class="hint">Así sabe el proveedor a dónde llevar el pedido.</span></div>
@@ -470,63 +610,134 @@ function viewOnboard(){
     <p class="sub" style="margin-top:10px">Prototipo: este es el link que abriría el restaurante desde WhatsApp.</p></div>`;
 }
 
-/* ---------- vista restaurante ---------- */
+/* ---------- restaurante: proveedores ---------- */
+function supCard(bid, sid){
+  const sp = sup(sid), D = nextDelivery(sid), pend = ORDERS.find(o => o.b === bid && o.s === sid && o.status !== 'Entregado');
+  const n = pend ? 0 : suggestions(bid, sid).due.length, nd = activeDeals(sid).length;
+  const st = pend ? `<span class="tag ok">${pend.status === 'Enviado' ? 'Enviado' : pend.status} · entrega ${fDate(pend.deliver)}</span>` : n ? `<span class="tag warn">${n} ${n === 1 ? 'producto' : 'productos'} por pedir</span>` : '<span class="tag mute">Todo al día</span>';
+  return `<button class="supc" data-act="go-sup" data-v="${sid}"><div class="supc-h"><b>${esc(sp.name)}</b><span class="tag ${sp.inApp ? 'ok' : 'mute'}">${sp.inApp ? 'En la app' : 'Por WhatsApp'}</span></div>
+    <span class="meta">${esc(sp.kind)} · próxima entrega ${fDate(D)} · pide antes de las ${fCut(sid)}</span>
+    <div class="tags">${st}${nd ? `<span class="tag ok">${nd} ${nd === 1 ? 'oferta' : 'ofertas'}</span>` : ''}</div></button>`;
+}
+function buyerProv(){
+  if (S.sid) return S.placed ? buyerPlaced() : buyerSup();
+  const bid = S.session.bid, b = BY[bid], order = [1,2,3,4,5,6,0];
+  return feedHtml(buyerFeed(bid)) + `<div class="sec-h"><h2>Mis proveedores</h2><button class="act" data-act="sup-new">Agregar proveedor</button></div>
+  ${S.supForm ? `<form class="form card" id="f-sup" novalidate style="margin-bottom:10px"><b>Proveedor que no usa la app</b>
+    <p class="sub" style="margin:0">Le haces el pedido aquí y la app te arma el mensaje de WhatsApp. Su consumo también entra en tu inventario.</p>
+    <div class="cols"><div class="field"><label for="ns-name">Nombre</label><input id="ns-name" placeholder="Distribuidora El Trigal"></div>
+    <div class="field"><label for="ns-kind">Qué te vende</label><input id="ns-kind" placeholder="Abarrotes"></div>
+    <div class="field"><label for="ns-phone">WhatsApp</label><input id="ns-phone" type="tel" inputmode="tel" placeholder="300 123 4567"></div>
+    <div class="field"><label for="ns-cut">Hasta qué hora recibe pedidos</label><input id="ns-cut" type="time" value="18:00"></div></div>
+    <div class="field"><label>Días en que entrega</label><div class="daychips">${order.map(w => `<button type="button" data-act="nsday" data-v="${w}" aria-pressed="${S.nsDays.includes(w)}">${DOW[w]}</button>`).join('')}</div></div>
+    ${S.supErr ? `<div class="err">${S.supErr}</div>` : ''}
+    <div class="row-btns"><button class="primary" type="submit">Agregar</button><button class="ghost" type="button" data-act="sup-close">Cancelar</button></div></form>` : ''}
+  <div class="sups">${b.sups.map(sid => supCard(bid, sid)).join('')}</div>`;
+}
 function itemRow(pid, why){
-  const p = PR[pid], q = S.cart[pid] || 0;
+  const p = PR[pid], q = cart().items[pid] || 0;
   const ctl = q > 0
     ? `<div class="stepper"><button data-act="dec" data-p="${pid}" aria-label="Menos ${esc(p.n)}">−</button><output>${fQty(q,p.u)}</output><button data-act="inc" data-p="${pid}" aria-label="Más ${esc(p.n)}">+</button></div>`
     : `<button class="add" data-act="inc" data-p="${pid}">Agregar</button>`;
   return `<div class="item ${q ? '' : 'off'}"><div class="name">${esc(p.n)}</div>${ctl}<div class="why">${why}</div><div class="price">${q ? money(q * p.pr) : money(p.pr) + '/' + p.u}</div></div>`;
 }
-function catalogBlock(open){
-  return `<input class="search" id="search" type="search" placeholder="Buscar: tomate, fresa…" value="${esc(S.q)}" autocomplete="off">
-    <div class="chips">${['Todos', ...categories()].map(c => `<button data-act="cat" data-v="${esc(c)}" aria-pressed="${S.cat === c}">${esc(c)}</button>`).join('')}</div>
+function dealCard(d, mine){
+  const p = PR[d.p], q = cart().items['deal:' + d.id] || 0, R = REASONS[d.r];
+  return `<div class="deal"><div class="deal-top"><span class="pct">−${d.pct}%</span><span class="tag ${R.c}">${R.l}</span></div>
+    <b>${esc(p.n)}</b><p class="sub">${esc(d.note || R.d)}</p>
+    <div class="dprice"><b>${money(dealPrice(d))}/${p.u}</b><s>${money(p.pr)}</s></div>
+    <p class="sub">Quedan ${fQty(dealLeft(d), p.u)} · ${untilTxt(d.until)}</p>
+    ${mine ? '<span class="tag info">Lo compras seguido</span>' : ''}
+    ${q ? `<div class="stepper"><button data-act="ddec" data-v="${d.id}" aria-label="Menos">−</button><output>${fQty(q,p.u)}</output><button data-act="dinc" data-v="${d.id}" aria-label="Más">+</button></div>` : `<button class="add" data-act="dinc" data-v="${d.id}">Agregar</button>`}</div>`;
+}
+function catalogBlock(){
+  return `<input class="search" id="search" type="search" placeholder="Buscar producto" value="${esc(S.q)}" autocomplete="off">
+    <div class="chips">${['Todos', ...categories(S.sid)].map(c => `<button data-act="cat" data-v="${esc(c)}" aria-pressed="${S.cat === c}">${esc(c)}</button>`).join('')}</div>
     <div class="list" id="catalog">${catalogHtml()}</div>`;
 }
 function catalogHtml(){
   const q = norm(S.q);
-  const rows = PRODUCTS.filter(p => p.active && (S.cat === 'Todos' || p.c === S.cat) && (!q || norm(p.n).includes(q)));
-  return rows.length ? rows.map(p => itemRow(p.id, esc(p.c))).join('') : `<div class="empty">No hay productos con “${esc(S.q)}”.</div>`;
+  const rows = productsOf(S.sid).filter(p => p.active && (S.cat === 'Todos' || p.c === S.cat) && (!q || norm(p.n).includes(q)));
+  return rows.length ? rows.map(p => itemRow(p.id, esc(p.c))).join('') : `<div class="empty">${productsOf(S.sid).length ? `No hay productos con “${esc(S.q)}”.` : 'Todavía no hay productos.'}</div>`;
 }
-function buyerPedir(){
-  if (S.placed) return buyerPlaced();
-  const bid = S.session.bid, D = nextDelivery(), b = BY[bid];
-  const {due, later} = suggestions(bid), hasHistory = delivered(bid).length > 0;
-  const head = `<div class="delivery"><div class="day">${dateOf(D).getDate()}<small>${fDow(D)}</small></div>
-    <div><b>Entrega ${relDay(D)} · ${fDate(D)}</b><span>${esc(SUPPLIER.name)} · pide antes de las ${fCut()}${cutoffPassed() ? ' (ya pasó el cierre de hoy)' : ''}</span></div></div>`;
-  if (!hasHistory) return head + (due.length ? `
+function buyerSup(){
+  const bid = S.session.bid, sid = S.sid, sp = sup(sid), D = nextDelivery(sid), b = BY[bid];
+  const {due, later} = suggestions(bid, sid), hasHistory = delivered(bid, sid).length > 0, c = cart();
+  const mine = boughtSet(bid, sid), deals = activeDeals(sid).sort((x,y) => mine.has(y.p) - mine.has(x.p));
+  const head = `<button class="back" data-act="sup-back">← Proveedores</button>
+    <div class="sup-title"><h2>${esc(sp.name)}</h2><span class="tag ${sp.inApp ? 'ok' : 'mute'}">${sp.inApp ? 'En la app' : 'Por WhatsApp'}</span></div>
+    <div class="delivery"><div class="day">${dateOf(D).getDate()}<small>${fDow(D)}</small></div>
+    <div><b>Entrega ${relDay(D)} · ${fDate(D)}</b><span>Pide antes de las ${fCut(sid)}${cutoffPassed(sid) ? ' (ya pasó el cierre de hoy)' : ''}${sp.inApp ? '' : ' · el pedido se envía por WhatsApp'}</span></div></div>`;
+  const dealsHtml = deals.length ? `<div class="sec-h"><h2>Ofertas</h2></div><div class="deals">${deals.map(d => dealCard(d, mine.has(d.p))).join('')}</div>` : '';
+  const dealLines = Object.entries(c.items).filter(([k,q]) => k.startsWith('deal:') && q > 0);
+  const extHtml = sp.inApp ? '' : `<details class="more" id="xp-d" ${S.det['xp-d'] || !productsOf(sid).length ? 'open' : ''}><summary>Productos que le compras (${productsOf(sid).length})</summary>
+    <form class="ing-add card" id="f-xprod" novalidate style="margin:6px 0"><input id="xp-name" placeholder="Producto" aria-label="Producto" style="flex:2 1 160px;width:auto"><select id="xp-unit" aria-label="Unidad"><option value="und">und</option><option value="kg">kg</option><option value="atado">atado</option></select><input id="xp-price" type="number" inputmode="numeric" placeholder="Precio" aria-label="Precio de referencia"><button class="ghost" type="submit">Agregar</button></form></details>
+    <div class="card" style="margin-top:12px"><b>Invita a ${esc(sp.name)} a la app</b><p class="sub" style="margin:4px 0 8px">Recibiría tus pedidos ordenados y vería sus estadísticas. Cuando se una, cada uno gana ${REF_PCT}% en la mensualidad.</p><button class="ghost" data-act="ref-sup" data-v="${sid}">Invitar</button></div>`;
+  if (!hasHistory) return head + dealsHtml + (due.length ? `
     <div class="sec-h"><h2>Sugerido con tus best sellers</h2><button class="act" data-act="reset">Repetir sugerido</button></div>
     <p class="sub">Para cubrir unos 3 días de servicio. Mientras más pidas, más se ajusta a tu consumo real.</p>
-    <div class="list">${due.map(x => itemRow(x.pid, `Tus platos usan ≈ ${fRate(theo(bid,x.pid), PR[x.pid].u)} en un día normal`)).join('')}${Object.keys(S.cart).filter(pid => S.cart[pid] > 0 && !due.some(x => x.pid === pid)).map(pid => itemRow(pid, 'Agregado por ti')).join('')}</div>
+    <div class="list">${due.map(x => itemRow(x.pid, `Tus platos usan ≈ ${fRate(theo(bid,x.pid), PR[x.pid].u)} en un día normal`)).join('')}${Object.keys(c.items).filter(k => !k.startsWith('deal:') && c.items[k] > 0 && !due.some(x => x.pid === k)).map(pid => itemRow(pid, 'Agregado por ti')).join('')}</div>
     <details class="more" id="cat-d" ${S.det['cat-d'] ? 'open' : ''}><summary>Agregar otro producto</summary>${catalogBlock()}</details>` : `
     <div class="card" style="margin-bottom:12px"><b>Tu primer pedido</b><p class="sub" style="margin:4px 0 0">Elige del catálogo. Si agregas tus best sellers en <button class="link" data-act="btab" data-v="negocio">Mi negocio</button>, te armamos un pedido sugerido desde hoy.</p></div>
-    ${catalogBlock()}`);
+    ${catalogBlock()}`) + extHtml;
   const whyDue = x => { const p = PR[x.pid];
     if (x.menuOnly) return `Tus best sellers usan ≈ ${fRate(theo(bid,x.pid), p.u)} en un día normal`;
     const ago = x.s ? `Último pedido hace ${x.s.daysSince} ${x.s.daysSince === 1 ? 'día' : 'días'}` : '';
-    return x.m ? `${ago ? ago + ' · ' : ''}te queda ≈ ${fApprox(x.m.current, p.u)} · ${x.m.until.toLowerCase()}` : ago; };
-  const dueHtml = due.length ? due.map(x => itemRow(x.pid, whyDue(x))).join('') : `<div class="empty">Nada por reponer para esta entrega.</div>`;
-  const short = inventory(bid).filter(x => x.cls === 'bad');
+    return x.m ? `${ago ? ago + ' · ' : ''}${x.m.current < STEP[p.u] / 2 ? 'ya no te queda' : `te queda ≈ ${fApprox(x.m.current, p.u)} · ${x.m.until.toLowerCase()}`}` : ago; };
+  const short = inventory(bid, sid).filter(x => x.cls === 'bad');
   const alertHtml = short.length ? `<div class="alert"><span><b>${short.length === 1 ? 'Un producto no alcanza' : `${short.length} productos no alcanzan`}</b> a esta entrega: ${esc(short.slice(0,3).map(x => x.p.n.toLowerCase()).join(', '))}${short.length > 3 ? ` y ${short.length - 3} más` : ''}.</span><button class="link" data-act="btab" data-v="inv">Ver inventario</button></div>` : '';
-  const laterHtml = later.map(x => itemRow(x.pid, x.m ? (x.m.cls === 'info' ? x.m.label : x.m.until) : `Último pedido hace ${x.s.daysSince} días`)).join('');
-  const extra = Object.keys(S.cart).filter(pid => S.cart[pid] > 0 && !due.some(x => x.pid === pid) && !later.some(x => x.pid === pid));
-  return head + checkinCard(bid) + alertHtml + `
+  const extra = Object.keys(c.items).filter(k => !k.startsWith('deal:') && c.items[k] > 0 && !due.some(x => x.pid === k) && !later.some(x => x.pid === k));
+  return head + alertHtml + dealsHtml + `
   <div class="sec-h"><h2>Tu pedido sugerido</h2><button class="act" data-act="reset">Repetir sugerido</button></div>
   <p class="sub">Calculado con tu inventario estimado, tu movimiento y tus best sellers. Ajusta con − y +.</p>
-  <div class="list">${dueHtml}${extra.map(pid => itemRow(pid, 'Agregado por ti')).join('')}</div>
-  ${later.length ? `<details class="more" id="later-d" ${S.det['later-d'] ? 'open' : ''}><summary>Aún no te toca (${later.length})</summary><div class="list">${laterHtml}</div></details>` : ''}
+  <div class="list">${due.length ? due.map(x => itemRow(x.pid, whyDue(x))).join('') : '<div class="empty">Nada por reponer para esta entrega.</div>'}${extra.map(pid => itemRow(pid, 'Agregado por ti')).join('')}${dealLines.map(([k,q]) => { const d = DEALS.find(x => 'deal:' + x.id === k), p = PR[d.p];
+    return `<div class="item"><div class="name">${esc(p.n)} <span class="tag bad">−${d.pct}%</span></div><div class="stepper"><button data-act="ddec" data-v="${d.id}" aria-label="Menos">−</button><output>${fQty(q,p.u)}</output><button data-act="dinc" data-v="${d.id}" aria-label="Más">+</button></div><div class="why">Oferta · ${REASONS[d.r].l.toLowerCase()}</div><div class="price">${money(q * dealPrice(d))}</div></div>`; }).join('')}</div>
+  ${later.length ? `<details class="more" id="later-d" ${S.det['later-d'] ? 'open' : ''}><summary>Aún no te toca (${later.length})</summary><div class="list">${later.map(x => itemRow(x.pid, x.m ? (x.m.cls === 'info' ? x.m.label : x.m.until) : `Último pedido hace ${x.s.daysSince} días`)).join('')}</div></details>` : ''}
   <details class="more" id="cat-d" ${S.det['cat-d'] ? 'open' : ''}><summary>Agregar otro producto</summary>${catalogBlock()}</details>
+  ${extHtml}
   <details class="how"><summary>Así se calcula la sugerencia</summary><ul>
-    <li>Se sugiere lo que, según tu inventario estimado, no alcanza hasta tu siguiente pedido después de esta entrega (${esc(b.name)} pide cada ${cadence(bid)} días).</li>
+    <li>Se sugiere lo que, según tu inventario estimado, no alcanza hasta tu siguiente pedido después de esta entrega (a ${esc(sp.name)} le pides cada ${cadence(bid, sid)} días).</li>
     <li>Cantidad sugerida = lo que vas a gastar entre esta entrega y la siguiente, según el movimiento esperado de cada día, menos lo que te quede al recibir.</li>
-    <li>El detalle del cálculo está en Inventario.</li>
   </ul></details>`;
 }
-/* ---------- vistas del inventario ---------- */
-function invRow(x, D){
-  const max = Math.max(8, D + 3), pct = Math.min(100, x.out / max * 100), dpct = D / max * 100, u = x.p.u;
+function buyerPlaced(){
+  const o = ORDERS.find(x => x.id === S.placed), sp = sup(o.s), ext = !sp.inApp;
+  return `<button class="back" data-act="sup-back">← Proveedores</button>
+  <div class="done-h"><div class="check" aria-hidden="true">✓</div><div><h2>${ext ? 'Pedido listo para WhatsApp' : 'Pedido enviado'}</h2><p class="sub" style="margin:2px 0 0">${esc(sp.name)} · #${o.id} · entrega ${fDate(o.deliver)}</p></div></div>
+  <div class="card">${stepsHtml(o.status, ext)}
+    <p class="sub" style="margin-top:10px">${ext ? `Copia el mensaje y mándalo al WhatsApp de ${esc(sp.name)}: ${fPhone(sp.phone)}. Cuando llegue, márcalo como recibido en Mis pedidos.` : o.status === 'Recibido' ? `${esc(sp.name)} lo verá en su panel. Para probarlo, sal y entra con la cuenta del proveedor.` : 'El proveedor ya lo está gestionando.'}</p>
+    <ul style="list-style:none;padding:0;margin:8px 0 0">${o.items.map(it => `<li style="display:flex;justify-content:space-between;padding:5px 0;border-top:1px solid var(--line)"><span>${esc(PR[it.p].n)}${it.deal ? ' <span class="tag bad">oferta</span>' : ''}</span><b>${fQty(it.qty, PR[it.p].u)}</b></li>`).join('')}</ul>
+  </div>
+  <h3 style="font-size:16px;margin:18px 0 0">${ext ? 'Mensaje para WhatsApp' : 'Resumen para WhatsApp'}</h3>
+  <div class="wa" id="wa-text">${esc(waText(o))}</div>
+  <div class="row-btns"><button class="${ext ? 'primary' : 'ghost'}" data-act="copy" data-v="wa-text">Copiar mensaje</button><button class="ghost" data-act="again">Hacer otro pedido</button></div>`;
+}
+function buyerHist(){
+  const os = ORDERS.filter(o => o.b === S.session.bid).sort((a,b) => b.deliver - a.deliver || b.id - a.id).slice(0, 15);
+  if (!os.length) return `<div class="sec-h"><h2>Mis pedidos</h2></div><div class="card empty">Todavía no has hecho pedidos.</div>`;
+  return `<div class="sec-h"><h2>Mis pedidos</h2></div>` + os.map(o => {
+    const open = S.open['h' + o.id], st = o.status === 'Entregado' ? 'mute' : o.status === 'En camino' || o.status === 'Enviado' ? 'warn' : 'ok';
+    return `<div class="card order">
+      <div class="order-h"><div><h3>${esc(sup(o.s).name)}</h3><div class="meta">${fDate(o.deliver)} · #${o.id} · ${o.items.length} productos · ${money(orderTotal(o))}</div></div><span class="tag ${st}">${o.status}</span></div>
+      ${open || o.status !== 'Entregado' ? `<ul>${o.items.map(it => `<li class="${it.del !== it.qty ? 'changed' : ''}"><span>${esc(PR[it.p].n)}${it.deal ? ' <span class="tag bad">oferta</span>' : ''}</span><span class="q">${it.del !== it.qty ? `<s style="color:var(--muted);font-weight:400">${fQty(it.qty, PR[it.p].u)}</s> ` : ''}${fQty(it.del, PR[it.p].u)}</span></li>`).join('')}</ul>` : ''}
+      <div class="row-btns">${o.status === 'En camino' || o.status === 'Enviado' ? `<button class="primary" data-act="receive" data-o="${o.id}">Recibí todo bien</button>` : ''}
+      ${o.status === 'Entregado' ? `<button class="ghost" data-act="toggle" data-k="h${o.id}">${open ? 'Ocultar' : 'Ver productos'}</button>` : ''}</div>
+    </div>`;
+  }).join('');
+}
+
+/* ---------- restaurante: inventario ---------- */
+function checkinCard(bid){
+  const d = checkinDay(bid); if (d == null) return '';
+  const b = biz(bid), late = d === 0 && minsNow() >= toMin(b.close) + NOTIF_REMIND;
+  return `<div class="card checkin"><div class="sub" style="margin:0 0 2px">${late ? 'Recordatorio' : 'Notificación'} · ${fDate(d)}${d === 0 ? ` · ${fHour(addMin(b.close, late ? NOTIF_REMIND : NOTIF_DELAY))}` : ''}</div><b>¿Cómo estuvo el movimiento ${whenTxt(d)}?</b>
+    <div class="row-btns" style="margin-top:10px">${['suave','normal','alto'].map(l => `<button class="ghost" data-act="lvl" data-v="${l}" data-d="${d}">${LEVELS[l].l}</button>`).join('')}</div>
+    <p class="sub" style="margin:8px 0 0">Con tu respuesta ajustamos lo que se gastó ${whenTxt(d)} y lo que esperamos para los próximos ${plural(DOWL[wd(d)])}.</p></div>`;
+}
+function invRow(x){
+  const D = x.D, max = Math.max(8, D + 3), pct = Math.min(100, x.out / max * 100), dpct = D / max * 100, u = x.p.u;
   return `<div class="inv"><div class="inv-h"><div><b>${esc(x.p.n)}</b> ${x.corrected ? '<span class="tag mute">Corregido por ti</span>' : ''}${x.onlyMenu ? ' <span class="tag info">Según tu menú</span>' : x.menuDelta > 0.001 ? ' <span class="tag info">Sube por tu menú</span>' : x.menuDelta < -0.001 ? ' <span class="tag info">Baja por tu menú</span>' : ''}
-      <div class="why">Un día normal usas ≈ ${fRate(x.rate,u)}${x.share && !x.onlyMenu ? ` · ${Math.round(x.share * 100)}% en tus best sellers` : ''} · confianza ${x.conf}</div></div>
+      <div class="why">${esc(sup(x.p.s).name)} · un día normal usas ≈ ${fRate(x.rate,u)}${x.share && !x.onlyMenu ? ` · ${Math.round(x.share * 100)}% en tus best sellers` : ''} · confianza ${x.conf}</div></div>
     <div class="inv-q"><b>≈ ${fApprox(x.current,u)}</b><span class="tag ${x.cls}">${x.label}</span></div></div>
     <div class="cov" role="img" aria-label="${esc(x.until)}"><i class="${x.cls}" style="width:${pct}%"></i><s style="left:${dpct}%"></s></div>
     <div class="inv-f"><span>${x.until}</span><button class="link" data-act="fix" data-p="${x.pid}">Corregir</button></div>
@@ -536,24 +747,24 @@ function invRow(x, D){
   </div>`;
 }
 function buyerInv(){
-  const bid = S.session.bid, D = nextDelivery(), inv = inventory(bid);
+  const bid = S.session.bid, inv = inventory(bid);
   if (!inv.length) return checkinCard(bid) + `<div class="sec-h"><h2>Inventario</h2></div><div class="card empty">Tu inventario aparece cuando pides un producto al menos 2 veces, o desde el primer pedido si agregas tus best sellers en Mi negocio. No tienes que contar nada.</div>`;
   const bad = inv.filter(x => x.cls === 'bad'), warn = inv.filter(x => x.cls === 'warn'), val = inv.reduce((t,x) => t + x.current * x.p.pr, 0);
-  return checkinCard(bid) + `<div class="sec-h"><h2>Inventario</h2>${bad.length + warn.length ? `<button class="act" data-act="inv-add">Agregar lo que falta al pedido</button>` : ''}</div>
-  <p class="sub">Estimado con tus pedidos, tu movimiento diario y tus best sellers, sin contar nada. Si algo no cuadra, corrígelo y la app ajusta tu consumo.</p>
+  return checkinCard(bid) + `<div class="sec-h"><h2>Inventario</h2>${bad.length + warn.length ? `<button class="act" data-act="inv-add">Agregar lo que falta a los pedidos</button>` : ''}</div>
+  <p class="sub">De todos tus proveedores, estimado con tus pedidos, tu movimiento diario y tus best sellers, sin contar nada. Si algo no cuadra, corrígelo y la app ajusta tu consumo.</p>
   <div class="grid2">
-    <div class="stat"><b>${bad.length}</b><span>No alcanzan a la entrega del ${fDate(D)}</span></div>
-    <div class="stat"><b>${warn.length}</b><span>Conviene pedirlos en este pedido</span></div>
+    <div class="stat"><b>${bad.length}</b><span>No alcanzan a la próxima entrega</span></div>
+    <div class="stat"><b>${warn.length}</b><span>Conviene pedirlos en el próximo pedido</span></div>
     <div class="stat"><b>${money(val)}</b><span>Valor aproximado de lo que tienes</span></div>
   </div>
-  <div class="list">${inv.map(x => invRow(x, D)).join('')}</div>
-  <p class="sub" style="margin-top:8px">La barra muestra cuántos días te alcanza cada producto. La raya negra marca tu próxima entrega.</p>
+  <div class="list">${inv.map(invRow).join('')}</div>
+  <p class="sub" style="margin-top:8px">La barra muestra cuántos días te alcanza cada producto. La raya negra marca la próxima entrega de su proveedor.</p>
   <details class="how"><summary>Así se calcula</summary><ul>
     <li>Consumo de un día normal = lo que te entregaron en tus últimos pedidos ÷ los días de servicio entre el primero y el último. Cada día pesa según su movimiento: suave 0,7, normal 1, alto 1,4 y cerrado 0.</li>
     <li>Los días que no reportas toman el promedio de ese día de la semana. Los días que marcas en Próximos días cambian lo que esperamos que gastes.</li>
     <li>Best sellers: con pocos pedidos, el consumo se mezcla con lo que usan tus platos. Si cambias los platos por día, el consumo sube o baja en esa diferencia.</li>
     <li>Existencia hoy = lo que tenías + lo que llegó en cada entrega − lo consumido cada día según su movimiento.</li>
-    <li>Cuando corriges una cantidad, la app compara lo que estimó con lo que tienes y ajusta tu consumo diario a la mitad del camino. Con cada corrección se acerca más a tu consumo real.</li>
+    <li>Cuando corriges una cantidad, la app compara lo que estimó con lo que tienes y ajusta tu consumo diario a la mitad del camino.</li>
     <li>La confianza baja cuando pides en fechas o cantidades muy irregulares, o cuando hay pocos pedidos.</li>
   </ul></details>`;
 }
@@ -564,24 +775,15 @@ function applyFix(pid, q){
   const n = invModel(bid, pid); toast(`Listo. Ahora calculamos que usas ≈ ${fRate(n.rate, n.p.u)} de ${n.p.n.toLowerCase()}.`);
 }
 
-const plural = w => w.endsWith('s') ? w : w + 's';
-const whenTxt = d => d === 0 ? 'hoy' : d === -1 ? 'ayer' : `el ${DOWL[wd(d)]}`;
-function checkinCard(bid){
-  const d = checkinDay(bid); if (d == null) return '';
-  const b = biz(bid), late = d === 0 && minsNow() >= (([h,m]) => h * 60 + m)(b.close.split(':').map(Number)) + NOTIF_REMIND;
-  return `<div class="card checkin"><div class="sub" style="margin:0 0 2px">${late ? 'Recordatorio' : 'Notificación'} · ${fDate(d)} · ${fHour(addMin(b.close, late ? NOTIF_REMIND : NOTIF_DELAY))}</div><b>¿Cómo estuvo el movimiento ${whenTxt(d)}?</b>
-    <div class="row-btns" style="margin-top:10px">${['suave','normal','alto'].map(l => `<button class="ghost" data-act="lvl" data-v="${l}" data-d="${d}">${LEVELS[l].l}</button>`).join('')}</div>
-    <p class="sub" style="margin:8px 0 0">Con tu respuesta ajustamos lo que se gastó ${whenTxt(d)} y lo que esperamos para los próximos ${plural(DOWL[wd(d)])}.</p></div>`;
-}
-const fHour = t => { const [h,m] = t.split(':').map(Number); return `${h % 12 || 12}:${String(m).padStart(2,'0')} ${h < 12 ? 'a. m.' : 'p. m.'}`; };
+/* ---------- restaurante: mi negocio ---------- */
 function buyerBiz(){
   const bid = S.session.bid, b = biz(bid), order = [1,2,3,4,5,6,0];
   const reps = w => Object.entries(b.log).filter(([d,l]) => +d <= 0 && l !== 'cerrado' && wd(+d) === w).length;
   const levelOf = f => f === 0 ? 'cerrado' : f < 0.85 ? 'suave' : f > 1.15 ? 'alto' : 'normal';
   const strip = []; for (let d = -13; d <= 0; d++) { const l = b.log[d] || (b.open.includes(wd(d)) ? '' : 'cerrado');
     strip.push(`<div class="${l}"><span>${DOW[wd(d)]} ${dateOf(d).getDate()}</span><b>${l ? LEVELS[l].l : '—'}</b></div>`); }
-  const menuRows = [...menuProducts(bid)].map(pid => { const m = invModel(bid,pid), th = theo(bid,pid); return {pid, th, m}; }).sort((a,b) => b.th * PR[b.pid].pr - a.th * PR[a.pid].pr);
-  const opts = PRODUCTS.filter(p => p.active).map(p => `<option value="${p.id}">${esc(p.n)} (${p.u})</option>`).join('');
+  const menuRows = [...menuProducts(bid)].map(pid => ({pid, th: theo(bid,pid), m: invModel(bid,pid)})).sort((x,y) => y.th * PR[y.pid].pr - x.th * PR[x.pid].pr);
+  const opts = BY[bid].sups.map(sid => `<optgroup label="${esc(sup(sid).name)}">${productsOf(sid).filter(p => p.active).map(p => `<option value="${p.id}">${esc(p.n)} (${p.u})</option>`).join('')}</optgroup>`).join('');
   return `${checkinCard(bid)}
   <div class="sec-h"><h2>Servicio</h2></div>
   <div class="card form">
@@ -602,14 +804,14 @@ function buyerBiz(){
       return `<tr><td>${DOWL[w][0].toUpperCase() + DOWL[w].slice(1)}</td><td class="l">${l ? `<span class="tag ${LEVELS[l].c}">${LEVELS[l].l}</span>` : '<span style="color:var(--muted)">Sin datos, se toma como normal</span>'}</td><td>${b.open.includes(w) ? n : '—'}</td></tr>`; }).join('')}
   </tbody></table></div>
   <div class="sec-h"><h2>Próximos días</h2></div>
-  <p class="sub">Si esperas un festivo, un evento o un día cerrado, márcalo. Cambia tu inventario y tu pedido sugerido.</p>
+  <p class="sub">Si esperas un festivo, un evento o un día cerrado, márcalo. Cambia tu inventario y tus pedidos sugeridos.</p>
   <div class="tbl-wrap"><table><thead><tr><th>Día</th><th class="l">Esperamos</th><th class="l">Tú dices</th></tr></thead><tbody>
     ${[1,2,3,4,5,6,7].map(d => { const auto = levelOf(b.open.includes(wd(d)) ? wdFactor(bid, wd(d)) : 0), set = b.log[d] || '';
       return `<tr><td>${fDate(d)}</td><td class="l"><span class="tag ${LEVELS[auto].c}">${LEVELS[auto].l}</span></td><td class="l"><select id="plan-${d}" data-act="plan" data-d="${d}" aria-label="Movimiento esperado ${fDate(d)}">
         <option value="" ${set ? '' : 'selected'}>Automático</option>${['suave','normal','alto','cerrado'].map(l => `<option value="${l}" ${set === l ? 'selected' : ''}>${LEVELS[l].l}</option>`).join('')}</select></td></tr>`; }).join('')}
   </tbody></table></div>
   <div class="sec-h"><h2>Best sellers</h2><button class="act" data-act="dish-open">Agregar plato</button></div>
-  <p class="sub">Tus platos más vendidos y lo que lleva cada uno. Sirven para predecir desde el primer pedido y para anticipar cambios: si esperas vender más de un plato, súbele los platos por día.</p>
+  <p class="sub">Tus platos más vendidos y lo que lleva cada uno, de cualquier proveedor. Sirven para predecir desde el primer pedido y para anticipar cambios: si esperas vender más de un plato, súbele los platos por día.</p>
   ${S.dishForm ? `<form class="form card" id="f-dish" novalidate style="margin-bottom:10px"><b>Nuevo plato</b>
     <div class="cols"><div class="field"><label for="dish-name">Nombre del plato</label><input id="dish-name" placeholder="Arepa de pollo"></div>
     <div class="field"><label for="dish-per">Platos en un día normal</label><input id="dish-per" type="number" inputmode="numeric" min="1" step="1" placeholder="20"></div></div>
@@ -628,94 +830,69 @@ function buyerBiz(){
   </tbody></table></div>
   <p class="sub" style="margin-top:8px">La diferencia entre lo que usan tus best sellers y tu consumo total es lo que se va en otros platos, pruebas y merma.</p>` : ''}`;
 }
-function cartUntouched(){ const a = Object.entries(S.cart).filter(([,q]) => q > 0), k = Object.keys(S.sugQ); return a.length === k.length && a.every(([p,q]) => S.sugQ[p] === q); }
-function bizChanged(){ if (!S.placed && cartUntouched()) resetCart(); }
 
-function buyerPlaced(){
-  const o = ORDERS.find(x => x.id === S.placed); const b = BY[o.b];
-  const txt = `Hola, pedido de ${b.name} para ${fDate(o.deliver)}:\n` + o.items.map(it => `• ${PR[it.p].n}: ${fQty(it.qty, PR[it.p].u)}`).join('\n') + `\nTotal aprox: ${money(orderTotal(o,'qty'))}`;
-  return `
-  <div class="done-h"><div class="check" aria-hidden="true">✓</div><div><h2>Pedido enviado</h2><p class="sub" style="margin:2px 0 0">#${o.id} · entrega ${fDate(o.deliver)}</p></div></div>
-  <div class="card">${stepsHtml(o.status)}
-    <p class="sub" style="margin-top:10px">${o.status === 'Recibido' ? `${esc(SUPPLIER.name)} lo verá en su panel. Para probarlo, sal y entra con la cuenta del proveedor.` : o.status === 'Confirmado' ? 'El proveedor confirmó tu pedido.' : o.status === 'En camino' ? 'Tu pedido va en camino. Revísalo al recibirlo.' : 'Recibido. Gracias.'}</p>
-    <ul style="list-style:none;padding:0;margin:8px 0 0">${o.items.map(it => `<li style="display:flex;justify-content:space-between;padding:5px 0;border-top:1px solid var(--line)"><span>${esc(PR[it.p].n)}</span><b>${fQty(it.qty, PR[it.p].u)}</b></li>`).join('')}</ul>
+/* ---------- invita y gana (ambos) ---------- */
+function refView(){
+  const key = refKey(), R = ref(key), c = refCalc(R), last = S.refLast;
+  return `<div class="sec-h"><h2>Invita y gana</h2></div>
+  <div class="card">
+    <div class="sub" style="margin:0">Tu código</div><div class="code">${R.code}</div>
+    <p class="sub" style="margin:4px 0 10px">Cada negocio que se una con tu link te da ${REF_PCT}% de descuento en la mensualidad, y a él ${REF_PCT}% en su primer mes. Se suman hasta ${REF_CAP}% por mes; lo que pase del tope se guarda para el mes siguiente.</p>
+    <div class="wa" id="ref-text">${esc(refMsg(key))}</div>
+    <button class="ghost" data-act="copy" data-v="ref-text">Copiar invitación</button>
   </div>
-  <h3 style="font-size:16px;margin:18px 0 0">Resumen para WhatsApp</h3>
-  <p class="sub">Mientras el proveedor se acostumbra al panel, puedes mandarle esto.</p>
-  <div class="wa" id="wa-text">${esc(txt)}</div>
-  <div class="row-btns"><button class="ghost" data-act="copy" data-v="wa-text">Copiar resumen</button><button class="ghost" data-act="again">Hacer otro pedido</button></div>`;
-}
-function buyerHist(){
-  const os = ORDERS.filter(o => o.b === S.session.bid).sort((a,b) => b.deliver - a.deliver).slice(0, 12);
-  if (!os.length) return `<div class="sec-h"><h2>Mis pedidos</h2></div><div class="card empty">Todavía no has hecho pedidos.</div>`;
-  return `<div class="sec-h"><h2>Mis pedidos</h2></div>` + os.map(o => {
-    const open = S.open['h' + o.id];
-    const st = o.status === 'Entregado' ? 'mute' : o.status === 'En camino' ? 'warn' : 'ok';
-    return `<div class="card order">
-      <div class="order-h"><div><h3>${fDate(o.deliver)}</h3><div class="meta">#${o.id} · ${o.items.length} productos · ${money(orderTotal(o))}</div></div><span class="tag ${st}">${o.status}</span></div>
-      ${open || o.status !== 'Entregado' ? `<ul>${o.items.map(it => `<li class="${it.del !== it.qty ? 'changed' : ''}"><span>${esc(PR[it.p].n)}</span><span class="q">${it.del !== it.qty ? `<s style="color:var(--muted);font-weight:400">${fQty(it.qty, PR[it.p].u)}</s> ` : ''}${fQty(it.del, PR[it.p].u)}</span></li>`).join('')}</ul>` : ''}
-      <div class="row-btns">${o.status === 'En camino' ? `<button class="primary" data-act="receive" data-o="${o.id}">Recibí todo bien</button>` : ''}
-      ${o.status === 'Entregado' ? `<button class="ghost" data-act="toggle" data-k="h${o.id}">${open ? 'Ocultar' : 'Ver productos'}</button>` : ''}</div>
-    </div>`;
-  }).join('');
+  ${last ? `<div class="card" style="margin-top:10px;border-color:var(--accent)"><b>Invitación para ${esc(last.name)}</b><p class="sub" style="margin:4px 0 0">Mándala por WhatsApp al ${fPhone(last.phone)}.</p><div class="wa" id="ref-last">${esc(refMsg(key, last.name))}</div><div class="row-btns"><button class="ghost" data-act="copy" data-v="ref-last">Copiar mensaje</button><button class="link" data-act="ref-done">Listo</button></div></div>` : ''}
+  <div class="grid2">
+    <div class="stat"><b>${c.now}%</b><span>Descuento este mes</span><div class="meter"><i style="width:${c.now / REF_CAP * 100}%"></i></div><span>Tope ${REF_CAP}%</span></div>
+    <div class="stat"><b>${c.next}%</b><span>Ya ganado para el próximo mes</span></div>
+    <div class="stat"><b>${R.list.filter(x => x.status === 'Activo').length} de ${R.list.length}</b><span>Invitados que ya se unieron</span></div>
+  </div>
+  ${R.welcome ? `<p class="sub">Te invitó ${esc(R.welcome.from)}: tu bono de bienvenida de ${REF_PCT}% ya está incluido.</p>` : ''}
+  <div class="sec-h"><h2 style="font-size:17px">Invitar a alguien</h2></div>
+  <form class="form card" id="f-ref" novalidate>
+    <div class="cols"><div class="field"><label for="rf-name">Nombre del negocio</label><input id="rf-name" placeholder="Restaurante La Esquina"></div>
+    <div class="field"><label for="rf-kind">Es un</label><select id="rf-kind"><option>Restaurante</option><option>Proveedor</option></select></div>
+    <div class="field"><label for="rf-phone">Celular</label><input id="rf-phone" type="tel" inputmode="tel" placeholder="300 123 4567"></div></div>
+    ${S.refErr ? `<div class="err">${S.refErr}</div>` : ''}
+    <div class="row-btns"><button class="primary" type="submit">Crear invitación</button></div></form>
+  ${R.list.length ? `<div class="sec-h"><h2 style="font-size:17px">Tus invitados</h2></div><div class="tbl-wrap"><table><thead><tr><th>Negocio</th><th class="l">Tipo</th><th class="l">Estado</th><th>Te dio</th><th></th></tr></thead><tbody>
+    ${R.list.map((x,i) => `<tr><td>${esc(x.name)}</td><td class="l">${x.kind}</td><td class="l"><span class="tag ${x.status === 'Activo' ? 'ok' : 'warn'}">${x.status === 'Activo' ? `Activo desde ${x.month === 0 ? 'este mes' : 'el mes pasado'}` : 'Pendiente'}</span></td><td>${x.status === 'Activo' ? REF_PCT + '%' : '—'}</td><td>${x.status === 'Pendiente' ? `<button class="link" data-act="ref-sim" data-v="${i}">Simular que se unió</button>` : ''}</td></tr>`).join('')}
+  </tbody></table></div>` : ''}
+  <details class="how"><summary>Reglas</summary><ul>
+    <li>Cuenta cuando el invitado se activa: un restaurante al hacer su primer pedido; un proveedor al recibir su primer pedido en la app.</li>
+    <li>Cada activación da ${REF_PCT}% a quien invita y ${REF_PCT}% al invitado en su primer mes.</li>
+    <li>En un mismo mes se suman hasta ${REF_CAP}%. Lo que pase del tope se guarda y se usa en los meses siguientes.</li>
+    <li>Se descuenta de la mensualidad de la app, no de los productos. Porcentajes de prueba.</li>
+  </ul></details>`;
 }
 
-/* ---------- vista proveedor ---------- */
-function supPedidos(){
-  const os = pendingOrders().sort((a,b) => a.deliver - b.deliver || STATUS.indexOf(a.status) - STATUS.indexOf(b.status));
-  const segs = Object.fromEntries(buyerStats().map(r => [r.b.id, r]));
-  const groups = [...new Set(os.map(o => o.deliver))];
-  if (!os.length) return `<div class="sec-h"><h2>Pedidos</h2></div><div class="card empty">No hay pedidos pendientes. Cierre de hoy: ${fCut()}.</div>`;
-  return groups.map(D => { const g = os.filter(o => o.deliver === D), tot = g.reduce((t,o) => t + orderTotal(o,'qty'), 0);
-    return `<div class="sec-h"><h2>Entrega ${relDay(D)} · ${fDate(D)}</h2></div>
-    <p class="sub">${g.length} ${g.length === 1 ? 'pedido' : 'pedidos'} · ${money(tot)} · cierre a las ${fCut()}</p>
-    ${g.map(o => { const r = segs[o.b]; const isNew = o.id === S.lastPlaced;
-      return `<div class="card order ${isNew ? 'new' : ''}">
-      <div class="order-h"><div><h3>${esc(BY[o.b].name)} ${isNew ? '<span class="tag ok">Nuevo</span>' : ''}</h3>
-        <div class="meta">#${o.id} · ${o.created || 'hace un momento'} · <span class="tag ${SEGCLS[r.seg]}">${r.seg}</span></div></div>
-        <span class="tag ${o.status === 'Recibido' ? 'warn' : 'ok'}">${o.status}</span></div>
-      <ul>${o.items.map((it,i) => { const p = PR[it.p];
-        return `<li class="${it.del !== it.qty ? 'changed' : ''}"><span>${esc(p.n)}<br><small style="color:var(--muted)">Pidió ${fQty(it.qty,p.u)}</small></span>
-          ${o.status === 'Recibido' ? `<span><input id="d-${o.id}-${i}" type="number" inputmode="decimal" step="${STEP[p.u]}" min="0" value="${it.del}" data-act="del" data-o="${o.id}" data-i="${i}" aria-label="Cantidad entregada de ${esc(p.n)}"><span class="unit">${p.u}</span></span>` : `<span class="q">${fQty(it.del,p.u)}</span>`}</li>`; }).join('')}</ul>
-      <div class="row-btns">${o.status === 'Recibido' ? `<button class="primary" data-act="confirm" data-o="${o.id}">Confirmar pedido</button>` : o.status === 'Confirmado' ? `<button class="primary" data-act="ship" data-o="${o.id}">Marcar en camino</button>` : `<span class="sub">Esperando que el cliente confirme la recepción.</span>`}</div>
-    </div>`; }).join('')}`; }).join('') +
-  `<p class="sub">En productos por kilo puedes ajustar el peso real antes de confirmar; el cliente ve el cambio y las estadísticas usan lo entregado.</p>`;
-}
-function supAlist(){
-  const D = nextDelivery(), os = pendingOrders().filter(o => o.deliver === D), agg = {};
-  os.forEach(o => o.items.forEach(it => { const a = agg[it.p] ||= {q:0, n:0, who:[]}; a.q += it.del; a.n++; a.who.push(BY[o.b].name); }));
-  const rows = Object.entries(agg).sort((a,b) => b[1].q * PR[b[0]].pr - a[1].q * PR[a[0]].pr);
-  const max = Math.max(1, ...rows.map(([,a]) => a.q));
-  return `<div class="sec-h"><h2>Alistamiento · ${fDate(D)}</h2></div><p class="sub">Todo lo que sale en la próxima entrega, sumado por producto.</p>
-  ${rows.length ? `<div class="tbl-wrap"><table><thead><tr><th>Producto</th><th>Total</th><th>Pedidos</th><th class="l">Clientes</th></tr></thead><tbody>
-  ${rows.map(([pid,a]) => `<tr><td>${esc(PR[pid].n)}</td><td><div class="barcell"><i style="width:${Math.round(a.q / max * 60)}px"></i><b>${fQty(a.q, PR[pid].u)}</b></div></td><td>${a.n}</td><td class="l" style="color:var(--muted)">${esc(a.who.join(', '))}</td></tr>`).join('')}
-  </tbody></table></div>` : `<div class="card empty">Sin pedidos para esa entrega.</div>`}`;
-}
+/* ---------- proveedor ---------- */
+const SID = () => S.session.sid;
 function supClientes(){
-  const rows = buyerStats(), by = s => rows.filter(r => r.seg === s);
+  const sid = SID(), rows = buyerStats(sid), by = s => rows.filter(r => r.seg === s);
   const cell = (s, d, key) => `<div class="cell ${key ? 'key' : ''}"><b>${s}</b><small>${d}</small>${by(s).map(r => `<div>${esc(r.b.name)} ${r.risk ? '<span class="tag bad">En riesgo</span>' : ''}</div>`).join('') || '<div style="color:var(--muted)">—</div>'}</div>`;
-  const risk = rows.filter(r => r.risk), nuevos = by('Nuevo');
-  return `<div class="sec-h"><h2>Clientes</h2><button class="act" data-act="invite-open">Invitar cliente</button></div>
+  const nuevos = by('Nuevo');
+  return feedHtml(supFeed(sid)) + `<div class="sec-h"><h2>Clientes</h2><button class="act" data-act="invite-open">Invitar cliente</button></div>
   ${S.inviteForm ? inviteFormHtml() : ''}
   ${S.lastInvite ? inviteSentHtml() : ''}
+  <div class="tbl-wrap"><table><thead><tr><th>Cliente</th><th class="l">Hoy</th><th>Ventas 30 d</th><th>Pedidos/sem</th><th>Ticket</th><th class="l">Segmento</th><th class="l">Celular</th></tr></thead><tbody>
+  ${rows.map(r => { const t = clientToday(sid, r.b.id); return `<tr><td>${esc(r.b.name)}</td><td class="l"><span class="tag ${t.cls}">${t.label}</span></td><td>${money(r.sales)}</td><td>${r.perWeek.toLocaleString('es-CO',{maximumFractionDigits:1})}</td><td>${money(r.ticket)}</td><td class="l"><span class="tag ${SEGCLS[r.seg]}">${r.seg}</span></td><td class="l">${fPhone(r.b.phone)}</td></tr>`; }).join('')}
+  </tbody></table></div>
+  <div class="sec-h"><h2 style="font-size:17px">Segmentos</h2></div>
   <p class="sub">Últimos 30 días. Grande = clientes que suman el 80% de las ventas. Frecuente = 2 o más pedidos por semana.</p>
-  ${risk.map(r => `<div class="card" style="border-color:var(--bad);margin-bottom:10px"><b>${esc(r.b.name)} lleva ${r.daysSince} días sin pedir.</b><div class="sub" style="margin:2px 0 0">Normalmente pide cada ${r.cad} días. Vale la pena llamarlo: ${fPhone(r.b.phone)}.</div></div>`).join('')}
   <div class="quad">
     <div></div><div class="ax">Frecuente</div><div class="ax">Esporádico</div>
     <div class="ax v">Grande</div>${cell('Clave','Prioridad en despacho y stock', true)}${cell('Por desarrollar','Ofrecer más días de entrega')}
     <div class="ax v">Pequeño</div>${cell('Fiel','Mantener servicio')}${cell('Ocasional','Atención estándar')}
   </div>
   ${nuevos.length ? `<p class="sub">Nuevos, todavía sin datos para clasificar: ${nuevos.map(r => esc(r.b.name)).join(', ')}.</p>` : ''}
-  <div class="tbl-wrap"><table><thead><tr><th>Cliente</th><th>Ventas 30 d</th><th>% ventas</th><th>Pedidos/sem</th><th>Ticket</th><th>Último pedido</th><th class="l">Segmento</th></tr></thead><tbody>
-  ${rows.map(r => `<tr><td>${esc(r.b.name)}</td><td>${money(r.sales)}</td><td>${Math.round(r.share * 100)}%</td><td>${r.perWeek.toLocaleString('es-CO',{maximumFractionDigits:1})}</td><td>${money(r.ticket)}</td><td>${r.daysSince == null ? '—' : r.risk ? `<span class="tag bad">hace ${r.daysSince} d</span>` : `hace ${r.daysSince} d`}</td><td class="l"><span class="tag ${SEGCLS[r.seg]}">${r.seg}</span></td></tr>`).join('')}
-  </tbody></table></div>
-  ${INVITES.length ? `<div class="sec-h"><h2 style="font-size:17px">Invitaciones</h2></div><div class="tbl-wrap"><table><thead><tr><th>Negocio</th><th>Celular</th><th class="l">Estado</th><th></th></tr></thead><tbody>
-    ${INVITES.map(i => `<tr><td>${esc(i.name)}</td><td>${fPhone(i.phone)}</td><td class="l"><span class="tag ${i.status === 'Aceptada' ? 'ok' : 'warn'}">${i.status}</span></td><td>${i.status === 'Pendiente' ? `<button class="link" data-act="invite-try" data-v="${i.code}">Abrir como cliente</button>` : ''}</td></tr>`).join('')}
+  ${INVITES.filter(i => i.sid === sid).length ? `<div class="sec-h"><h2 style="font-size:17px">Invitaciones</h2></div><div class="tbl-wrap"><table><thead><tr><th>Negocio</th><th>Celular</th><th class="l">Estado</th><th></th></tr></thead><tbody>
+    ${INVITES.filter(i => i.sid === sid).map(i => `<tr><td>${esc(i.name)}</td><td>${fPhone(i.phone)}</td><td class="l"><span class="tag ${i.status === 'Aceptada' ? 'ok' : 'warn'}">${i.status}</span></td><td>${i.status === 'Pendiente' ? `<button class="link" data-act="invite-try" data-v="${i.code}">Abrir como cliente</button>` : ''}</td></tr>`).join('')}
   </tbody></table></div>` : ''}`;
 }
 function inviteFormHtml(){
   return `<form class="form card" id="f-inv" novalidate style="margin-bottom:12px">
-    <b>Invitar un cliente</b>
+    <b>Invitar un cliente</b><p class="sub" style="margin:0">Cuando haga su primer pedido, tú ganas ${REF_PCT}% en tu mensualidad y él ${REF_PCT}% en su primer mes.</p>
     <div class="cols">
       <div class="field"><label for="inv-name">Nombre del negocio</label><input id="inv-name" placeholder="Panadería San Pío"></div>
       <div class="field"><label for="inv-kind">Tipo</label><select id="inv-kind">${['Restaurante','Cafetería','Panadería','Hotel','Heladería','Otro'].map(k => `<option>${k}</option>`).join('')}</select></div>
@@ -726,28 +903,84 @@ function inviteFormHtml(){
   </form>`;
 }
 function inviteSentHtml(){
-  const i = S.lastInvite;
-  const txt = `Hola, ${i.name}. Desde ahora puedes hacer tus pedidos a ${SUPPLIER.name} desde aquí, en menos de un minuto: surtido.app/i/${i.code}`;
+  const i = S.lastInvite, sp = sup(i.sid);
+  const txt = `Hola, ${i.name}. Desde ahora puedes hacer tus pedidos a ${sp.name} desde aquí, en menos de un minuto, y con ${REF_PCT}% de descuento en tu primer mes: surtido.app/i/${i.code}`;
   return `<div class="card" style="margin-bottom:12px;border-color:var(--accent)"><b>Invitación lista para ${esc(i.name)}</b>
     <p class="sub" style="margin:4px 0 0">Mándale este mensaje por WhatsApp al ${fPhone(i.phone)}.</p>
     <div class="wa" id="inv-text">${esc(txt)}</div>
     <div class="row-btns"><button class="ghost" data-act="copy" data-v="inv-text">Copiar mensaje</button><button class="ghost" data-act="invite-try" data-v="${i.code}">Abrir como cliente</button><button class="link" data-act="invite-done">Listo</button></div></div>`;
 }
+function supPedidos(){
+  const sid = SID(), os = pendingOrders(sid).sort((a,b) => a.deliver - b.deliver || STATUS.indexOf(a.status) - STATUS.indexOf(b.status));
+  const segs = Object.fromEntries(buyerStats(sid).map(r => [r.b.id, r]));
+  const groups = [...new Set(os.map(o => o.deliver))];
+  if (!os.length) return `<div class="sec-h"><h2>Pedidos</h2></div><div class="card empty">No hay pedidos pendientes. Cierre de hoy: ${fCut(sid)}.</div>`;
+  return groups.map(D => { const g = os.filter(o => o.deliver === D), tot = g.reduce((t,o) => t + orderTotal(o,'qty'), 0);
+    return `<div class="sec-h"><h2>Entrega ${relDay(D)} · ${fDate(D)}</h2></div>
+    <p class="sub">${g.length} ${g.length === 1 ? 'pedido' : 'pedidos'} · ${money(tot)} · cierre a las ${fCut(sid)}</p>
+    ${g.map(o => { const r = segs[o.b]; const isNew = o.id === S.lastPlaced;
+      return `<div class="card order ${isNew ? 'new' : ''}">
+      <div class="order-h"><div><h3>${esc(BY[o.b].name)} ${isNew ? '<span class="tag ok">Nuevo</span>' : ''}</h3>
+        <div class="meta">#${o.id} · ${o.created || 'hace un momento'}${r ? ` · <span class="tag ${SEGCLS[r.seg]}">${r.seg}</span>` : ''}</div></div>
+        <span class="tag ${o.status === 'Recibido' ? 'warn' : 'ok'}">${o.status}</span></div>
+      <ul>${o.items.map((it,i) => { const p = PR[it.p];
+        return `<li class="${it.del !== it.qty ? 'changed' : ''}"><span>${esc(p.n)}${it.deal ? ' <span class="tag bad">oferta</span>' : ''}<br><small style="color:var(--muted)">Pidió ${fQty(it.qty,p.u)}</small></span>
+          ${o.status === 'Recibido' ? `<span><input id="d-${o.id}-${i}" type="number" inputmode="decimal" step="${STEP[p.u]}" min="0" value="${it.del}" data-act="del" data-o="${o.id}" data-i="${i}" aria-label="Cantidad entregada de ${esc(p.n)}"><span class="unit">${p.u}</span></span>` : `<span class="q">${fQty(it.del,p.u)}</span>`}</li>`; }).join('')}</ul>
+      <div class="row-btns">${o.status === 'Recibido' ? `<button class="primary" data-act="confirm" data-o="${o.id}">Confirmar pedido</button>` : o.status === 'Confirmado' ? `<button class="primary" data-act="ship" data-o="${o.id}">Marcar en camino</button>` : `<span class="sub">Esperando que el cliente confirme la recepción.</span>`}</div>
+    </div>`; }).join('')}`; }).join('') +
+  `<p class="sub">En productos por kilo puedes ajustar el peso real antes de confirmar; el cliente ve el cambio y las estadísticas usan lo entregado.</p>`;
+}
+function supAlist(){
+  const sid = SID(), D = nextDelivery(sid), os = pendingOrders(sid).filter(o => o.deliver === D), agg = {};
+  os.forEach(o => o.items.forEach(it => { const a = agg[it.p] ||= {q:0, n:0, who:[]}; a.q += it.del; a.n++; a.who.push(BY[o.b].name); }));
+  const rows = Object.entries(agg).sort((a,b) => b[1].q * PR[b[0]].pr - a[1].q * PR[a[0]].pr);
+  const max = Math.max(1, ...rows.map(([,a]) => a.q));
+  return `<div class="sec-h"><h2>Alistamiento · ${fDate(D)}</h2></div><p class="sub">Todo lo que sale en la próxima entrega, sumado por producto.</p>
+  ${rows.length ? `<div class="tbl-wrap"><table><thead><tr><th>Producto</th><th>Total</th><th>Pedidos</th><th class="l">Clientes</th></tr></thead><tbody>
+  ${rows.map(([pid,a]) => `<tr><td>${esc(PR[pid].n)}</td><td><div class="barcell"><i style="width:${Math.round(a.q / max * 60)}px"></i><b>${fQty(a.q, PR[pid].u)}</b></div></td><td>${a.n}</td><td class="l" style="color:var(--muted)">${esc(a.who.join(', '))}</td></tr>`).join('')}
+  </tbody></table></div>` : `<div class="card empty">Sin pedidos para esa entrega.</div>`}`;
+}
+function supOfertas(){
+  const sid = SID(), ds = DEALS.filter(d => d.s === sid && d.until >= 0), cl = clientsOf(sid);
+  const opts = productsOf(sid).filter(p => p.active).map(p => `<option value="${p.id}">${esc(p.n)} (${money(p.pr)}/${p.u})</option>`).join('');
+  return `<div class="sec-h"><h2>Ofertas</h2><button class="act" data-act="deal-open">Crear oferta</button></div>
+  <p class="sub">Para producto por vencer, con detalle visual o que te sobró. Tus clientes las ven arriba de su pedido, primero quienes ya compran ese producto.</p>
+  ${S.dealForm ? `<form class="form card" id="f-deal" novalidate style="margin-bottom:12px"><b>Nueva oferta</b>
+    <div class="cols">
+      <div class="field"><label for="dl-p">Producto</label><select id="dl-p">${opts}</select></div>
+      <div class="field"><label for="dl-r">Motivo</label><select id="dl-r">${Object.entries(REASONS).map(([k,r]) => `<option value="${k}">${r.l}</option>`).join('')}</select></div>
+      <div class="field"><label for="dl-pct">Descuento (%)</label><input id="dl-pct" type="number" inputmode="numeric" min="5" max="70" step="5" value="30"></div>
+      <div class="field"><label for="dl-q">Cantidad disponible</label><input id="dl-q" type="number" inputmode="decimal" min="0" step="0.5" placeholder="8"><span class="hint">En la unidad del producto.</span></div>
+      <div class="field"><label for="dl-u">Válida hasta</label><select id="dl-u"><option value="0">Hoy</option><option value="1" selected>Mañana</option><option value="3">3 días</option><option value="7">7 días</option></select></div>
+      <div class="field"><label for="dl-note">Nota para el cliente</label><input id="dl-note" placeholder="Bien maduro, ideal para jugos"></div>
+    </div>
+    ${S.dealErr ? `<div class="err">${S.dealErr}</div>` : ''}
+    <div class="row-btns"><button class="primary" type="submit">Publicar oferta</button><button class="ghost" type="button" data-act="deal-close">Cancelar</button></div></form>` : ''}
+  ${ds.length ? ds.map(d => { const p = PR[d.p], R = REASONS[d.r], buyers = cl.filter(b => boughtSet(b.id, sid).has(d.p)).length, left = dealLeft(d);
+    return `<div class="card order"><div class="order-h"><div><h3>${esc(p.n)} <span class="pct">−${d.pct}%</span></h3>
+      <div class="meta"><span class="tag ${R.c}">${R.l}</span> · ${money(dealPrice(d))}/${p.u} (antes ${money(p.pr)}) · ${untilTxt(d.until)}</div></div>
+      <span class="tag ${!d.on ? 'mute' : left ? 'ok' : 'mute'}">${!d.on ? 'Pausada' : left ? 'Activa' : 'Agotada'}</span></div>
+      ${d.note ? `<p class="sub" style="margin:8px 0 0">“${esc(d.note)}”</p>` : ''}
+      <div class="meter"><i style="width:${Math.min(100, d.sold / d.qty * 100)}%"></i></div>
+      <p class="sub" style="margin:0 0 8px">Vendiste ${fQty(d.sold, p.u)} de ${fQty(d.qty, p.u)} · ${money(d.sold * dealPrice(d))} · la ven ${cl.length} clientes, ${buyers} ya compran ${esc(p.n.toLowerCase())}</p>
+      <div class="row-btns"><button class="ghost" data-act="deal-toggle" data-v="${d.id}">${d.on ? 'Pausar' : 'Reanudar'}</button><button class="link" data-act="deal-end" data-v="${d.id}">Terminar</button></div></div>`; }).join('')
+    : '<div class="card empty">No tienes ofertas activas.</div>'}`;
+}
 function supPrev(){
-  const days = [1,2,3,4,5,6,7], f = {}, risky = new Set(buyerStats().filter(r => r.risk).map(r => r.b.id));
-  for (const b of BUYERS) {
+  const sid = SID(), days = [1,2,3,4,5,6,7], f = {}, sp = sup(sid), risky = new Set(buyerStats(sid).filter(r => r.risk).map(r => r.b.id));
+  for (const b of clientsOf(sid)) {
     if (risky.has(b.id)) continue;
-    const pend = pendingOrders().filter(o => o.b === b.id && o.deliver >= 1 && o.deliver <= 7);
+    const pend = pendingOrders(sid).filter(o => o.b === b.id && o.deliver >= 1 && o.deliver <= 7);
     for (const o of pend) for (const it of o.items) { const row = f[it.p] ||= Object.fromEntries(days.map(d => [d,0])); row[o.deliver] += it.del; }
-    for (const pid of boughtSet(b.id)) {
+    for (const pid of boughtSet(b.id, sid)) {
       const s = pstats(b.id, pid); if (s.n < 2) continue;
       const row = f[pid] ||= Object.fromEntries(days.map(d => [d,0]));
       const real = pend.find(o => o.items.some(x => x.p === pid));
       let t = real ? real.deliver + s.intTyp : Math.max(1, s.last + s.intTyp);
-      while (t <= 7.5) { const d = Math.min(7, Math.max(1, Math.round(t))); if (SUPPLIER.days.includes(dateOf(d).getDay())) row[d] += s.qtyTyp; else { const n = days.find(x => x > d && SUPPLIER.days.includes(dateOf(x).getDay())); if (n) row[n] += s.qtyTyp; } t += s.intTyp; }
+      while (t <= 7.5) { const d = Math.min(7, Math.max(1, Math.round(t))); if (sp.days.includes(wd(d))) row[d] += s.qtyTyp; else { const n = days.find(x => x > d && sp.days.includes(wd(x))); if (n) row[n] += s.qtyTyp; } t += s.intTyp; }
     }
   }
-  const D = nextDelivery();
+  const D = nextDelivery(sid);
   const rows = Object.entries(f).filter(([pid,r]) => PR[pid].active && days.some(d => r[d] > 0)).sort((a,b) => ((b[1][D] || 0) + (b[1][D+1] || 0)) * PR[b[0]].pr - ((a[1][D] || 0) + (a[1][D+1] || 0)) * PR[a[0]].pr);
   const max = Math.max(1, ...rows.flatMap(([pid,r]) => days.map(d => r[d] * PR[pid].pr)));
   const cellBg = v => v ? `background:color-mix(in srgb, var(--accent) ${Math.round(8 + 32 * v / max)}%, transparent)` : '';
@@ -756,30 +989,25 @@ function supPrev(){
   <p class="sub">Lo que esperas vender cada día de entrega según el ritmo de cada cliente. Combina pedidos ya recibidos y pedidos esperados. No incluye clientes en riesgo.</p>
   <div class="grid2"><div class="stat"><b>${money(buyTotal)}</b><span>Compra sugerida para la entrega del ${fDate(D)} (con 10% de colchón)</span></div>
     <div class="stat"><b>${rows.length}</b><span>Productos con demanda esta semana</span></div></div>
-  <div class="tbl-wrap"><table><thead><tr><th>Producto</th><th>Comprar para ${fDow(D)}</th>${days.map(d => `<th>${fDow(d)} ${dateOf(d).getDate()}</th>`).join('')}<th>Semana</th></tr></thead><tbody>
+  ${rows.length ? `<div class="tbl-wrap"><table><thead><tr><th>Producto</th><th>Comprar para ${fDow(D)}</th>${days.map(d => `<th>${fDow(d)} ${dateOf(d).getDate()}</th>`).join('')}<th>Semana</th></tr></thead><tbody>
   ${rows.map(([pid,r]) => { const p = PR[pid], wk = days.reduce((t,d) => t + r[d], 0);
-    return `<tr><td>${esc(p.n)}</td><td class="buy">${r[D] ? fQty(roundStep(r[D] * 1.1, p.u), p.u) : '—'}</td>${days.map(d => `<td style="${SUPPLIER.days.includes(dateOf(d).getDay()) ? cellBg(r[d] * p.pr) : 'color:var(--muted)'}">${SUPPLIER.days.includes(dateOf(d).getDay()) ? (r[d] ? fQty(roundStep(r[d], p.u), p.u) : '') : 'sin entrega'}</td>`).join('')}<td><b>${fQty(roundStep(wk, p.u), p.u)}</b></td></tr>`; }).join('')}
-  </tbody></table></div>
-  <details class="how"><summary>Así se calcula</summary><ul>
-    <li>Por cada cliente y producto: próximo pedido esperado = último pedido + intervalo típico, y así sucesivamente durante 7 días.</li>
-    <li>Cada pedido esperado suma la cantidad típica de ese cliente. Si cae en un día sin entrega, pasa al siguiente día de entrega.</li>
-    <li>“Comprar para” = lo de la próxima entrega + 10%. Ese colchón se ajusta comparando previsión contra lo vendido.</li>
-  </ul></details>`;
+    return `<tr><td>${esc(p.n)}</td><td class="buy">${r[D] ? fQty(roundStep(r[D] * 1.1, p.u), p.u) : '—'}</td>${days.map(d => `<td style="${sp.days.includes(wd(d)) ? cellBg(r[d] * p.pr) : 'color:var(--muted)'}">${sp.days.includes(wd(d)) ? (r[d] ? fQty(roundStep(r[d], p.u), p.u) : '') : 'sin entrega'}</td>`).join('')}<td><b>${fQty(roundStep(wk, p.u), p.u)}</b></td></tr>`; }).join('')}
+  </tbody></table></div>` : '<div class="card empty">Todavía no hay datos suficientes para prever.</div>'}`;
 }
 function supAjustes(){
-  const order = [1,2,3,4,5,6,0], D = nextDelivery();
+  const sid = SID(), sp = sup(sid), order = [1,2,3,4,5,6,0], D = nextDelivery(sid), mine = productsOf(sid);
   return `<div class="sec-h"><h2>Entregas</h2></div>
   <div class="card form">
-    <div class="field"><label>Días en que entregas</label><div class="daychips">${order.map(d => `<button data-act="day" data-v="${d}" aria-pressed="${SUPPLIER.days.includes(d)}">${DOW[d]}</button>`).join('')}</div></div>
-    <div class="field" style="max-width:220px"><label for="cutoff">Hora de cierre de pedidos</label><input id="cutoff" type="time" value="${SUPPLIER.cutoff}"><span class="hint">Lo que llegue después pasa a la siguiente entrega.</span></div>
+    <div class="field"><label>Días en que entregas</label><div class="daychips">${order.map(d => `<button data-act="day" data-v="${d}" aria-pressed="${sp.days.includes(d)}">${DOW[d]}</button>`).join('')}</div></div>
+    <div class="field" style="max-width:220px"><label for="cutoff">Hora de cierre de pedidos</label><input id="cutoff" type="time" value="${sp.cutoff}"><span class="hint">Lo que llegue después pasa a la siguiente entrega.</span></div>
     <p class="sub" style="margin:0">Próxima entrega disponible para tus clientes: <b style="color:var(--ink)">${fDate(D)}</b>.</p>
   </div>
   <div class="sec-h"><h2>Catálogo</h2><div class="row-btns"><button class="act" data-act="imp-open">Importar de Excel</button><button class="act" data-act="prod-open">Agregar producto</button></div></div>
   ${S.imp ? importHtml() : ''}
   ${S.newProd ? newProdHtml() : ''}
-  <p class="sub">${PRODUCTS.filter(p => p.active).length} productos activos de ${PRODUCTS.length}. Los cambios de precio aplican a los pedidos nuevos; los pedidos ya hechos guardan su precio.</p>
+  <p class="sub">${mine.filter(p => p.active).length} productos activos de ${mine.length}. Los cambios de precio aplican a los pedidos nuevos; los pedidos ya hechos guardan su precio.</p>
   <div class="tbl-wrap"><table><thead><tr><th>Producto</th><th class="l">Categoría</th><th class="l">Unidad</th><th>Precio</th><th>Activo</th></tr></thead><tbody>
-  ${PRODUCTS.map(p => `<tr class="${p.active ? '' : 'inactive'}"><td>${esc(p.n)}</td><td class="l">${esc(p.c)}</td><td class="l">${p.u}</td>
+  ${mine.map(p => `<tr class="${p.active ? '' : 'inactive'}"><td>${esc(p.n)}</td><td class="l">${esc(p.c)}</td><td class="l">${p.u}</td>
     <td><input type="number" id="pr-${p.id}" min="0" step="100" value="${p.pr}" data-act="price" data-p="${p.id}" aria-label="Precio de ${esc(p.n)}"></td>
     <td><input type="checkbox" id="ac-${p.id}" ${p.active ? 'checked' : ''} data-act="active" data-p="${p.id}" aria-label="${esc(p.n)} activo"></td></tr>`).join('')}
   </tbody></table></div>`;
@@ -788,7 +1016,7 @@ function newProdHtml(){
   return `<form class="form card" id="f-prod" novalidate style="margin-bottom:12px"><b>Nuevo producto</b>
     <div class="cols">
       <div class="field"><label for="np-name">Nombre</label><input id="np-name" placeholder="Uchuva"></div>
-      <div class="field"><label for="np-cat">Categoría</label><input id="np-cat" list="cats" placeholder="Frutas"><datalist id="cats">${categories().map(c => `<option value="${esc(c)}">`).join('')}</datalist></div>
+      <div class="field"><label for="np-cat">Categoría</label><input id="np-cat" list="cats" placeholder="Frutas"><datalist id="cats">${categories(SID()).map(c => `<option value="${esc(c)}">`).join('')}</datalist></div>
       <div class="field"><label for="np-unit">Unidad</label><select id="np-unit"><option value="kg">kg</option><option value="und">und</option><option value="atado">atado</option></select></div>
       <div class="field"><label for="np-price">Precio</label><input id="np-price" type="number" inputmode="numeric" min="0" step="100" placeholder="8000"></div>
     </div>
@@ -806,14 +1034,14 @@ function analyze(rows){
   let ci = {n: find(['producto','nombre','item','articulo']), c: find(['categoria','grupo','linea']), u: find(['unidad','medida','und']), p: find(['precio','valor','costo'])};
   let body = rows.slice(1);
   if (ci.n < 0 || ci.p < 0) { ci = {n:0, c:1, u:2, p:3}; body = rows; }
-  const ok = [], bad = [];
+  const ok = [], bad = [], mine = productsOf(SID());
   body.forEach((r, i) => {
     const n = String(r[ci.n] ?? '').trim(), u0 = norm(r[ci.u] ?? ''), u = u0 ? UNITS[u0] : 'und', pr = parsePrice(r[ci.p]);
     const line = i + (body === rows ? 1 : 2);
     if (!n || norm(n).startsWith('ejemplo')) return; if (isNaN(pr) || pr <= 0) { bad.push({line, n, why:'precio vacío o inválido'}); return; }
     if (!u) { bad.push({line, n, why:`unidad “${r[ci.u]}” no reconocida (usa kg, und o atado)`}); return; }
     const c = String(ci.c >= 0 ? r[ci.c] ?? '' : '').trim() || 'Otros';
-    const ex = PRODUCTS.find(p => norm(p.n) === norm(n));
+    const ex = mine.find(p => norm(p.n) === norm(n));
     ok.push({n, c, u, pr, ex: ex ? ex.id : null, change: ex ? (ex.pr !== pr ? `${money(ex.pr)} → ${money(pr)}` : 'sin cambios') : 'nuevo'});
   });
   return {ok, bad};
@@ -831,7 +1059,7 @@ function importHtml(){
     </div>
     <span class="hint" style="font-size:12.5px;color:var(--muted)">Para cambiar precios, descarga tu catálogo actual, edita la columna de precio y vuelve a subirlo.</span>
     <div class="field"><label for="imp-file">Sube la plantilla llena</label><input id="imp-file" type="file" accept=".xlsx,.xls,.csv,.txt"></div>
-    <div class="field"><label for="imp-paste">O pega las filas copiadas de Excel</label><textarea id="imp-paste" placeholder="producto	categoría	unidad	precio&#10;Uchuva	Frutas	kg	8000&#10;Tomate chonto	Verduras	kg	3400"></textarea></div>
+    <div class="field"><label for="imp-paste">O pega las filas copiadas de Excel</label><textarea id="imp-paste" placeholder="producto	categoría	unidad	precio&#10;Uchuva	Frutas	kg	8000"></textarea></div>
     ${I.err ? `<div class="err">${I.err}</div>` : ''}
     <div class="row-btns"><button class="primary" data-act="imp-paste">Revisar filas pegadas</button><button class="ghost" data-act="imp-close">Cancelar</button></div></div>`;
   const {ok, bad} = I.res, nNew = ok.filter(r => !r.ex).length, nUpd = ok.filter(r => r.ex && r.change !== 'sin cambios').length;
@@ -845,7 +1073,7 @@ function importHtml(){
 }
 function readImportFile(file){
   const name = file.name.toLowerCase();
-  if (name.endsWith('.csv') || name.endsWith('.txt')) { file.text().then(t => { S.imp = {res: analyze(rowsFromText(t))}; if (S.imp.res.error) S.imp = {err:S.imp.res.error}; render(); }); return; }
+  if (name.endsWith('.csv') || name.endsWith('.txt')) { file.text().then(t => { const res = analyze(rowsFromText(t)); S.imp = res.error ? {err:res.error} : {res}; render(); }); return; }
   if (typeof XLSX === 'undefined') { S.imp = {err:'No se pudo cargar el lector de Excel. Guarda el archivo como CSV o pega las filas.'}; render(); return; }
   file.arrayBuffer().then(buf => { try { const wb = XLSX.read(buf, {type:'array'}); const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {header:1, raw:true, blankrows:false});
       const res = analyze(rows.map(r => r.map(c => c == null ? '' : c))); S.imp = res.error ? {err:res.error} : {res}; }
@@ -856,38 +1084,34 @@ function readImportFile(file){
 function render(){
   const app = $('app'), bar = $('bar'), who = $('who');
   bar.hidden = true;
-  if (!S.session) {
-    who.innerHTML = '';
-    app.className = 'wrap';
-    app.innerHTML = S.inviteCode ? viewOnboard() : viewLogin();
-    return;
-  }
+  if (!S.session) { who.innerHTML = ''; app.className = 'wrap'; app.innerHTML = S.inviteCode ? viewOnboard() : viewLogin(); return; }
   const isB = S.session.role === 'buyer';
-  who.innerHTML = `<b>${esc(isB ? BY[S.session.bid].name : SUPPLIER.name)}</b><button class="link" data-act="logout">Salir</button>`;
+  who.innerHTML = `<b>${esc(isB ? BY[S.session.bid].name : sup(S.session.sid).name)}</b><button class="link" data-act="logout">Salir</button>`;
   if (isB) {
     app.className = 'wrap';
-    app.innerHTML = `<nav class="tabs">${[['pedir','Pedir'],['inv','Inventario'],['hist','Mis pedidos'],['negocio','Mi negocio']].map(([k,l]) => `<button data-act="btab" data-v="${k}" aria-pressed="${S.btab === k}">${l}</button>`).join('')}</nav>` + ({pedir:buyerPedir, inv:buyerInv, hist:buyerHist, negocio:buyerBiz}[S.btab])();
-    const items = Object.entries(S.cart).filter(([,q]) => q > 0);
-    if (S.btab === 'pedir' && !S.placed) {
-      const tot = items.reduce((t,[pid,q]) => t + q * PR[pid].pr, 0);
+    app.innerHTML = `<nav class="tabs">${[['prov','Proveedores'],['inv','Inventario'],['hist','Mis pedidos'],['negocio','Mi negocio'],['ref','Invita y gana']].map(([k,l]) => `<button data-act="btab" data-v="${k}" aria-pressed="${S.btab === k}">${l}</button>`).join('')}</nav>` +
+      ({prov:buyerProv, inv:buyerInv, hist:buyerHist, negocio:buyerBiz, ref:refView}[S.btab])();
+    if (S.btab === 'prov' && S.sid && !S.placed) {
+      const c = cart(), lines = Object.entries(c.items).filter(([,q]) => q > 0);
+      const tot = lines.reduce((t,[k,q]) => { if (k.startsWith('deal:')) { const d = DEALS.find(x => 'deal:' + x.id === k); return t + q * dealPrice(d); } return t + q * PR[k].pr; }, 0);
       bar.hidden = false;
-      bar.innerHTML = `<div class="bar-in"><div class="sum"><b>${money(tot)}</b><span>${items.length} productos · precio de referencia</span></div><button class="primary" data-act="place" ${items.length ? '' : 'disabled'}>Confirmar pedido</button></div>`;
+      bar.innerHTML = `<div class="bar-in"><div class="sum"><b>${money(tot)}</b><span>${lines.length} productos · ${esc(sup(S.sid).name)}</span></div><button class="primary" data-act="place" ${lines.length ? '' : 'disabled'}>${sup(S.sid).inApp ? 'Confirmar pedido' : 'Armar WhatsApp'}</button></div>`;
     }
   } else {
     app.className = 'wrap wide';
-    const n = pendingOrders().filter(o => o.status === 'Recibido').length;
-    app.innerHTML = `<nav class="tabs">${[['pedidos',`Pedidos${n ? ` (${n})` : ''}`],['alist','Alistamiento'],['clientes','Clientes'],['prev','Previsión'],['ajustes','Ajustes']].map(([k,l]) => `<button data-act="stab" data-v="${k}" aria-pressed="${S.stab === k}">${l}</button>`).join('')}</nav>` +
-      ({pedidos:supPedidos, alist:supAlist, clientes:supClientes, prev:supPrev, ajustes:supAjustes}[S.stab])();
+    const n = pendingOrders(SID()).filter(o => o.status === 'Recibido').length;
+    app.innerHTML = `<nav class="tabs">${[['clientes','Clientes'],['pedidos',`Pedidos${n ? ` (${n})` : ''}`],['alist','Alistamiento'],['ofertas','Ofertas'],['prev','Previsión'],['ref','Invita y gana'],['ajustes','Ajustes']].map(([k,l]) => `<button data-act="stab" data-v="${k}" aria-pressed="${S.stab === k}">${l}</button>`).join('')}</nav>` +
+      ({clientes:supClientes, pedidos:supPedidos, alist:supAlist, ofertas:supOfertas, prev:supPrev, ref:refView, ajustes:supAjustes}[S.stab])();
   }
 }
-function signIn(acc){ S.session = acc; S.login = {step:'phone', phone:'', err:''}; S.inviteCode = null; S.btab = 'pedir'; S.stab = 'pedidos'; S.det = {}; saveSession(); resetCart(); window.scrollTo(0,0); }
+function signIn(acc){ S.session = acc; S.login = {step:'phone', phone:'', err:''}; S.inviteCode = null; S.btab = 'prov'; S.stab = 'clientes'; S.sid = null; S.placed = null; S.det = {}; S.refLast = null; saveSession(); window.scrollTo(0,0); }
 
 /* ---------- eventos ---------- */
 document.addEventListener('submit', e => {
   e.preventDefault(); const f = e.target.id;
   if (f === 'f-phone') { const ph = digits($('phone').value);
     if (ph.length !== 10) S.login.err = 'Escribe un celular de 10 dígitos.';
-    else if (!accountFor(ph)) S.login.err = 'Este número no está registrado. Pídele a tu proveedor el link de invitación.';
+    else if (!accountFor(ph)) S.login.err = 'Este número no está registrado. Pide el link de invitación a tu proveedor o a un restaurante que use la app.';
     else S.login = {step:'code', phone:ph, err:''};
   }
   else if (f === 'f-code') { if ($('code').value.trim() === '123456') signIn(accountFor(S.login.phone)); else S.login.err = 'Ese código no coincide. Revisa el mensaje de WhatsApp.'; }
@@ -895,13 +1119,27 @@ document.addEventListener('submit', e => {
     if (!name) S.inviteErr = 'Escribe el nombre del negocio.';
     else if (ph.length !== 10) S.inviteErr = 'Escribe un celular de 10 dígitos.';
     else if (accountFor(ph)) S.inviteErr = 'Ese celular ya tiene cuenta.';
-    else { const code = Math.random().toString(36).slice(2, 6).toUpperCase(); const inv = {code, name, kind:$('inv-kind').value, phone:ph, status:'Pendiente'}; INVITES.push(inv); S.lastInvite = inv; S.inviteForm = false; S.inviteErr = ''; }
+    else { const code = Math.random().toString(36).slice(2, 6).toUpperCase(), inv = {code, sid:SID(), name, kind:$('inv-kind').value, phone:ph, status:'Pendiente'};
+      INVITES.push(inv); ref('s:' + SID()).list.push({name, kind:'Restaurante', phone:ph, status:'Pendiente'}); S.lastInvite = inv; S.inviteForm = false; S.inviteErr = ''; }
   }
   else if (f === 'f-ob') { const inv = INVITES.find(i => i.code === S.inviteCode), name = $('ob-name').value.trim(), addr = $('ob-addr').value.trim(), ph = digits($('ob-phone').value);
     if (!name || !addr) S.obErr = 'Falta el nombre del negocio o la dirección de entrega.';
     else if (ph.length !== 10) S.obErr = 'Escribe un celular de 10 dígitos.';
-    else { const b = {id:'n' + inv.code, name, kind:inv.kind, phone:ph, addr, contact:$('ob-contact').value.trim(), prof:{}}; BUYERS.push(b); syncBY(); inv.status = 'Aceptada'; S.obErr = ''; S.lastInvite = null; signIn({role:'buyer', bid:b.id}); S.det['cat-d'] = true; toast(`Cuenta creada. Ya puedes pedirle a ${SUPPLIER.name}.`); }
+    else { const b = {id:'n' + inv.code, name, kind:inv.kind, phone:ph, addr, contact:$('ob-contact').value.trim(), sups:[inv.sid], invitedBy:inv.sid, invitePhone:inv.phone, prof:{}};
+      BUYERS.push(b); syncBY(); inv.status = 'Aceptada'; S.obErr = ''; S.lastInvite = null; signIn({role:'buyer', bid:b.id}); openSup(inv.sid); S.det['cat-d'] = true;
+      toast(`Cuenta creada. Tu ${REF_PCT}% de bienvenida se activa con tu primer pedido.`); }
   }
+  else if (f === 'f-sup') { const name = $('ns-name').value.trim(), ph = digits($('ns-phone').value), cut = $('ns-cut').value || '18:00';
+    if (!name) S.supErr = 'Escribe el nombre del proveedor.';
+    else if (ph.length !== 10) S.supErr = 'Escribe un WhatsApp de 10 dígitos.';
+    else if (!S.nsDays.length) S.supErr = 'Elige al menos un día de entrega.';
+    else { const id = 'x' + Date.now().toString(36); SUPPLIERS.push({id, name, kind: $('ns-kind').value.trim() || 'Proveedor', inApp:false, owner:S.session.bid, phone:ph, days:[...S.nsDays], cutoff:cut});
+      BY[S.session.bid].sups.push(id); S.supForm = false; S.supErr = ''; openSup(id); toast('Proveedor agregado. Ahora carga los productos que le compras.'); }
+  }
+  else if (f === 'f-xprod') { const n = $('xp-name').value.trim(), u = $('xp-unit').value, pr = parsePrice($('xp-price').value);
+    if (!n) { toast('Escribe el nombre del producto.'); return; }
+    if (productsOf(S.sid).some(p => norm(p.n) === norm(n))) { toast('Ya tienes ese producto.'); return; }
+    PRODUCTS.push({id:'p' + Date.now().toString(36), n, c: sup(S.sid).kind, u, pr: pr > 0 ? pr : 0, s:S.sid, active:true}); syncPR(); S.det['xp-d'] = true; toast(`${n} agregado`); }
   else if (f === 'f-fix') { const v = parseFloat(String($('fix-q').value).replace(',', '.')); if (isNaN(v) || v < 0) { toast('Escribe una cantidad de 0 o más.'); return; } applyFix(e.target.dataset.p, v); }
   else if (f === 'f-dish') { const name = $('dish-name').value.trim(), per = parseInt($('dish-per').value, 10), b = biz(S.session.bid);
     if (!name) S.dishErr = 'Escribe el nombre del plato.';
@@ -911,23 +1149,44 @@ document.addEventListener('submit', e => {
   else if (f.startsWith('f-ing-')) { const id = e.target.dataset.v, d = biz(S.session.bid).menu.find(x => x.id === id), pid = $('ing-p-' + id).value, q = parseFloat(String($('ing-q-' + id).value).replace(',', '.'));
     if (!(q > 0)) { toast('Escribe cuánto lleva cada plato, por ejemplo 0,05.'); return; }
     const ex = d.ing.find(i => i.p === pid); if (ex) ex.q = q; else d.ing.push({p:pid, q}); bizChanged(); toast(`${PR[pid].n} agregado a ${d.name}`); }
+  else if (f === 'f-ref') { const name = $('rf-name').value.trim(), ph = digits($('rf-phone').value), R = ref(refKey());
+    if (!name) S.refErr = 'Escribe el nombre del negocio.';
+    else if (ph.length !== 10) S.refErr = 'Escribe un celular de 10 dígitos.';
+    else if (accountFor(ph) || R.list.some(x => x.phone === ph)) S.refErr = 'Ese celular ya tiene cuenta o ya fue invitado.';
+    else { const x = {name, kind:$('rf-kind').value, phone:ph, status:'Pendiente'}; R.list.push(x); S.refLast = x; S.refErr = ''; }
+  }
+  else if (f === 'f-deal') { const pid = $('dl-p').value, pct = parseInt($('dl-pct').value, 10), q = parseFloat(String($('dl-q').value).replace(',', '.'));
+    if (!(pct >= 5 && pct <= 70)) S.dealErr = 'El descuento debe estar entre 5% y 70%.';
+    else if (!(q > 0)) S.dealErr = 'Escribe cuánto tienes disponible.';
+    else { DEALS.unshift({id:'k' + Date.now().toString(36), s:SID(), p:pid, r:$('dl-r').value, pct, qty:q, sold:0, until:+$('dl-u').value, note:$('dl-note').value.trim(), on:true});
+      S.dealForm = false; S.dealErr = ''; toast(`Oferta publicada. La ven tus ${clientsOf(SID()).length} clientes.`); }
+  }
   else if (f === 'f-prod') { const n = $('np-name').value.trim(), c = $('np-cat').value.trim() || 'Otros', u = $('np-unit').value, pr = parsePrice($('np-price').value);
     if (!n) S.prodErr = 'Escribe el nombre del producto.';
-    else if (PRODUCTS.some(p => norm(p.n) === norm(n))) S.prodErr = 'Ya tienes un producto con ese nombre.';
+    else if (productsOf(SID()).some(p => norm(p.n) === norm(n))) S.prodErr = 'Ya tienes un producto con ese nombre.';
     else if (isNaN(pr) || pr <= 0) S.prodErr = 'Escribe un precio mayor a cero.';
-    else { PRODUCTS.push({id:'p' + Date.now().toString(36), n, c, u, pr, active:true}); syncPR(); S.newProd = false; S.prodErr = ''; toast(`${n} agregado al catálogo`); }
+    else { PRODUCTS.push({id:'p' + Date.now().toString(36), n, c, u, pr, s:SID(), active:true}); syncPR(); S.newProd = false; S.prodErr = ''; toast(`${n} agregado al catálogo`); }
   }
   render();
 });
 document.addEventListener('click', e => {
-  const el = e.target.closest('[data-act]'); if (!el || el.tagName === 'INPUT') return;
+  const el = e.target.closest('[data-act]'); if (!el || el.tagName === 'INPUT' || el.tagName === 'SELECT') return;
   const a = el.dataset.act, v = el.dataset.v, pid = el.dataset.p;
   if (a === 'demo') S.login = {step:'code', phone:v, err:''};
   else if (a === 'login-back') S.login = {step:'phone', phone:S.login.phone, err:''};
-  else if (a === 'logout') { S.session = null; saveSession(); S.placed = null; window.scrollTo(0,0); }
+  else if (a === 'logout') { S.session = null; saveSession(); S.placed = null; S.sid = null; S.carts = {}; window.scrollTo(0,0); }
   else if (a === 'ob-cancel') S.inviteCode = null;
-  else if (a === 'btab') { S.btab = v; S.fix = null; window.scrollTo(0,0); }
+  else if (a === 'btab') { S.btab = v; S.fix = null; if (v !== 'prov') S.sid = null; S.placed = null; window.scrollTo(0,0); }
+  else if (a === 'stab') { S.stab = v; window.scrollTo(0,0); }
+  else if (a === 'go-sup') openSup(v);
+  else if (a === 'go-stab') { S.stab = v; window.scrollTo(0,0); }
+  else if (a === 'sup-back') { S.sid = null; S.placed = null; window.scrollTo(0,0); }
+  else if (a === 'sup-new') { S.supForm = true; S.supErr = ''; }
+  else if (a === 'sup-close') S.supForm = false;
+  else if (a === 'nsday') { const w = +v; S.nsDays = S.nsDays.includes(w) ? S.nsDays.filter(x => x !== w) : [...S.nsDays, w]; el.setAttribute('aria-pressed', S.nsDays.includes(w)); return; }
   else if (a === 'fix') S.fix = S.fix === pid ? null : pid;
+  else if (a === 'fix-close') S.fix = null;
+  else if (a === 'fix-zero') applyFix(pid, 0);
   else if (a === 'lvl') { const d = +el.dataset.d; biz(S.session.bid).log[d] = v; bizChanged();
     toast(`Anotado: ${whenTxt(d)} fue un día ${LEVELS[v].l.toLowerCase()}. ${v === 'alto' ? 'Descontamos más consumo' : v === 'suave' ? 'Descontamos menos consumo' : 'Tu consumo queda igual'} y ajustamos tus ${plural(DOWL[wd(d)])}.`); }
   else if (a === 'open') { const b = biz(S.session.bid), w = +v, has = b.open.includes(w);
@@ -937,52 +1196,61 @@ document.addEventListener('click', e => {
   else if (a === 'dish-close') S.dishForm = false;
   else if (a === 'dish-del') { const b = biz(S.session.bid); b.menu = b.menu.filter(x => x.id !== v); bizChanged(); toast('Plato quitado'); }
   else if (a === 'ing-del') { const d = biz(S.session.bid).menu.find(x => x.id === v); d.ing.splice(+el.dataset.i, 1); bizChanged(); }
-  else if (a === 'fix-close') S.fix = null;
-  else if (a === 'fix-zero') applyFix(pid, 0);
-  else if (a === 'inv-add') { const list = inventory(S.session.bid).filter(x => (x.cls === 'bad' || x.cls === 'warn') && !x.incoming.length);
-    if (S.placed) resetCart();
-    list.forEach(x => { S.cart[x.pid] = Math.max(S.cart[x.pid] || 0, x.need); });
-    S.btab = 'pedir'; window.scrollTo(0,0); toast(`${list.length} productos agregados a tu pedido`); }
-  else if (a === 'stab') S.stab = v;
-  else if (a === 'inc') { const u = PR[pid].u; S.cart[pid] = (S.cart[pid] || 0) + STEP[u]; }
-  else if (a === 'dec') { const u = PR[pid].u; S.cart[pid] = Math.max(0, (S.cart[pid] || 0) - STEP[u]); }
+  else if (a === 'inv-add') { const list = inventory(S.session.bid).filter(x => (x.cls === 'bad' || x.cls === 'warn') && !x.incoming.length), per = {};
+    list.forEach(x => { if (!S.carts[x.p.s]) resetCart(x.p.s); const c = cart(x.p.s); c.items[x.pid] = Math.max(c.items[x.pid] || 0, x.need); per[x.p.s] = (per[x.p.s] || 0) + 1; });
+    S.btab = 'prov'; S.sid = null; S.placed = null; window.scrollTo(0,0);
+    toast(`Agregado a ${Object.keys(per).length === 1 ? 'tu pedido de' : 'tus pedidos de'} ${Object.entries(per).map(([s,n]) => `${sup(s).name} (${n})`).join(' y ')}`); }
+  else if (a === 'inc') { const u = PR[pid].u, c = cart(); c.items[pid] = (c.items[pid] || 0) + STEP[u]; }
+  else if (a === 'dec') { const u = PR[pid].u, c = cart(); c.items[pid] = Math.max(0, (c.items[pid] || 0) - STEP[u]); }
+  else if (a === 'dinc' || a === 'ddec') { const d = DEALS.find(x => x.id === v), u = PR[d.p].u, c = cart(), k = 'deal:' + d.id, cur = c.items[k] || 0;
+    if (a === 'dinc') { if (cur + STEP[u] > dealLeft(d)) { toast(`Solo quedan ${fQty(dealLeft(d), u)}`); return; } c.items[k] = cur + STEP[u]; } else c.items[k] = Math.max(0, cur - STEP[u]); }
   else if (a === 'reset') { resetCart(); toast('Pedido sugerido restaurado'); }
   else if (a === 'cat') { S.cat = v; $('catalog').innerHTML = catalogHtml(); document.querySelectorAll('[data-act="cat"]').forEach(b => b.setAttribute('aria-pressed', b.dataset.v === v)); return; }
   else if (a === 'place') {
-    const items = Object.entries(S.cart).filter(([,q]) => q > 0).map(([p,q]) => ({p, qty:q, del:q, price:PR[p].pr, sug: S.sugQ[p] === q}));
+    const bid = S.session.bid, sid = S.sid, sp = sup(sid), c = cart(), first = !ORDERS.some(o => o.b === bid);
+    const items = Object.entries(c.items).filter(([,q]) => q > 0).map(([k,q]) => { if (k.startsWith('deal:')) { const d = DEALS.find(x => 'deal:' + x.id === k); d.sold += q; return {p:d.p, qty:q, del:q, price:dealPrice(d), deal:d.id}; } return {p:k, qty:q, del:q, price:PR[k].pr, sug: c.sugQ[k] === q}; });
     if (!items.length) return;
-    const o = {id:++oid, b:S.session.bid, day:0, deliver:nextDelivery(), status:'Recibido', created:'hace un momento', items};
-    ORDERS.push(o); S.placed = o.id; S.lastPlaced = o.id; window.scrollTo(0,0);
+    const o = {id:++oid, b:bid, s:sid, day:0, deliver:nextDelivery(sid), status: sp.inApp ? 'Recibido' : 'Enviado', created:'hace un momento', items};
+    ORDERS.push(o); S.placed = o.id; S.lastPlaced = o.id; c.items = {}; c.sugQ = {}; window.scrollTo(0,0);
+    const b = BY[bid]; if (first && b.invitedBy) { activateRef('s:' + b.invitedBy, b.invitePhone || b.phone); ref('b:' + bid).welcome = {from: sup(b.invitedBy).name, month:0}; setTimeout(() => toast(`Primer pedido hecho: tu ${REF_PCT}% de bienvenida quedó activo y ${sup(b.invitedBy).name} ganó ${REF_PCT}%.`), 50); }
   }
-  else if (a === 'again') { resetCart(); window.scrollTo(0,0); }
-  else if (a === 'copy') { const node = $(v), txt = node.textContent;
-    const ok = () => toast('Copiado'), fail = () => { const r = document.createRange(); r.selectNodeContents(node); const s = getSelection(); s.removeAllRanges(); s.addRange(r); toast('Texto seleccionado: cópialo'); };
-    try { navigator.clipboard.writeText(txt).then(ok, fail); } catch(err) { fail(); } return; }
+  else if (a === 'again') { S.placed = null; resetCart(); window.scrollTo(0,0); }
+  else if (a === 'copy') { copyText($(v).textContent); return; }
   else if (a === 'toggle') S.open[el.dataset.k] = !S.open[el.dataset.k];
   else if (a === 'confirm') { const o = ORDERS.find(x => x.id === +el.dataset.o); o.status = 'Confirmado'; toast(`Pedido de ${BY[o.b].name} confirmado`); }
   else if (a === 'ship') { const o = ORDERS.find(x => x.id === +el.dataset.o); o.status = 'En camino'; toast('Marcado en camino'); }
-  else if (a === 'receive') { const o = ORDERS.find(x => x.id === +el.dataset.o); o.status = 'Entregado'; o.day = 0; toast('Pedido recibido. Las sugerencias se actualizan.'); resetCart(); }
+  else if (a === 'receive') { const o = ORDERS.find(x => x.id === +el.dataset.o); o.status = 'Entregado'; o.day = 0; toast('Pedido recibido. Las sugerencias se actualizan.'); if (S.carts[o.s]) resetCart(o.s); }
   else if (a === 'invite-open') { S.inviteForm = true; S.lastInvite = null; S.inviteErr = ''; }
   else if (a === 'invite-close') { S.inviteForm = false; S.inviteErr = ''; }
   else if (a === 'invite-done') S.lastInvite = null;
   else if (a === 'invite-try') { S.session = null; saveSession(); S.inviteCode = v; S.obErr = ''; window.scrollTo(0,0); }
-  else if (a === 'day') { const d = +v, has = SUPPLIER.days.includes(d);
-    if (has && SUPPLIER.days.length === 1) { toast('Debes entregar al menos un día'); return; }
-    SUPPLIER.days = has ? SUPPLIER.days.filter(x => x !== d) : [...SUPPLIER.days, d]; }
+  else if (a === 'remind') { const b = BY[v]; copyText(`Hola, ${b.name}. ¿Te preparo el pedido de siempre para el ${fDate(nextDelivery(SID()))}? Recibimos pedidos hasta las ${fCut(SID())}. Lo haces aquí en un minuto: surtido.app`, `Recordatorio copiado. Mándalo al ${fPhone(b.phone)}`); return; }
+  else if (a === 'call') { toast(`${BY[v].name}: ${fPhone(BY[v].phone)}`); return; }
+  else if (a === 'ref-sup') { const sp = sup(v), R = ref(refKey()); let x = R.list.find(i => i.phone === sp.phone);
+    if (!x) { x = {name:sp.name, kind:'Proveedor', phone:sp.phone, status:'Pendiente'}; R.list.push(x); } S.refLast = x; S.btab = 'ref'; S.sid = null; window.scrollTo(0,0); }
+  else if (a === 'ref-done') S.refLast = null;
+  else if (a === 'ref-sim') { const x = ref(refKey()).list[+v]; x.status = 'Activo'; x.month = 0; toast(`${x.name} se unió: sumaste ${REF_PCT}%.`); }
+  else if (a === 'deal-open') { S.dealForm = true; S.dealErr = ''; }
+  else if (a === 'deal-close') S.dealForm = false;
+  else if (a === 'deal-toggle') { const d = DEALS.find(x => x.id === v); d.on = !d.on; toast(d.on ? 'Oferta reanudada' : 'Oferta pausada'); }
+  else if (a === 'deal-end') { const i = DEALS.findIndex(x => x.id === v); DEALS.splice(i, 1); toast('Oferta terminada'); }
+  else if (a === 'day') { const sp = sup(SID()), d = +v, has = sp.days.includes(d);
+    if (has && sp.days.length === 1) { toast('Debes entregar al menos un día'); return; }
+    sp.days = has ? sp.days.filter(x => x !== d) : [...sp.days, d]; }
   else if (a === 'prod-open') { S.newProd = true; S.imp = null; S.prodErr = ''; }
   else if (a === 'prod-close') S.newProd = false;
   else if (a === 'imp-open') { S.imp = {}; S.newProd = false; }
   else if (a === 'imp-close') S.imp = null;
   else if (a === 'export') {
     if (typeof XLSX === 'undefined') { toast('No se pudo generar el archivo. Usa la plantilla vacía.'); return; }
-    const aoa = [['Producto','Categoría','Unidad','Precio (COP)'], ['Ejemplo: Tomate chonto','Verduras','kg',3200], ...PRODUCTS.filter(p => p.active).map(p => [p.n, p.c, p.u, p.pr])];
+    const aoa = [['Producto','Categoría','Unidad','Precio (COP)'], ['Ejemplo: Tomate chonto','Verduras','kg',3200], ...productsOf(SID()).filter(p => p.active).map(p => [p.n, p.c, p.u, p.pr])];
     const ws = XLSX.utils.aoa_to_sheet(aoa); ws['!cols'] = [{wch:34},{wch:18},{wch:10},{wch:14}];
     const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Catálogo');
     try { XLSX.writeFile(wb, 'catalogo-actual.xlsx'); toast('Descargando tu catálogo'); } catch(err) { toast('Tu navegador bloqueó la descarga.'); }
     return; }
   else if (a === 'imp-paste') { const t = $('imp-paste').value; if (!t.trim()) { S.imp = {err:'Pega al menos una fila.'}; } else { const res = analyze(rowsFromText(t)); S.imp = res.error ? {err:res.error} : {res}; } }
   else if (a === 'imp-apply') { const {ok} = S.imp.res; let nNew = 0, nUpd = 0;
-    for (const r of ok) { if (r.ex) { const p = PR[r.ex]; if (p.pr !== r.pr) { p.pr = r.pr; nUpd++; } p.active = true; } else { PRODUCTS.push({id:'p' + Math.random().toString(36).slice(2,8), n:r.n, c:r.c, u:r.u, pr:r.pr, active:true}); nNew++; } }
+    for (const r of ok) { if (r.ex) { const p = PR[r.ex]; if (p.pr !== r.pr) { p.pr = r.pr; nUpd++; } p.active = true; } else { PRODUCTS.push({id:'p' + Math.random().toString(36).slice(2,8), n:r.n, c:r.c, u:r.u, pr:r.pr, s:SID(), active:true}); nNew++; } }
     syncPR(); S.imp = null; toast(`Catálogo actualizado: ${nNew} nuevos, ${nUpd} precios cambiados`); }
   else return;
   render();
@@ -993,9 +1261,9 @@ document.addEventListener('change', e => {
     const v = parseFloat(String(t.value).replace(',', '.')); it.del = isNaN(v) || v < 0 ? it.qty : v; render(); }
   else if (t.dataset.act === 'price') { const v = parsePrice(t.value); if (v > 0) { PR[t.dataset.p].pr = v; toast(`Precio de ${PR[t.dataset.p].n}: ${money(v)}`); } else t.value = PR[t.dataset.p].pr; }
   else if (t.dataset.act === 'active') { PR[t.dataset.p].active = t.checked; render(); }
-  else if (t.id === 'cutoff' && t.value) { SUPPLIER.cutoff = t.value; render(); }
+  else if (t.id === 'cutoff' && t.value) { sup(SID()).cutoff = t.value; render(); }
   else if (t.id === 'close-t' && t.value) { biz(S.session.bid).close = t.value; render(); }
-  else if (t.dataset.act === 'plan') { const b = biz(S.session.bid), d = +t.dataset.d; if (t.value) b.log[d] = t.value; else delete b.log[d]; bizChanged(); toast(`${fDate(d)}: ${t.value ? LEVELS[t.value].l.toLowerCase() : 'automático'}. Ajustamos tu inventario y tu pedido sugerido.`); render(); }
+  else if (t.dataset.act === 'plan') { const b = biz(S.session.bid), d = +t.dataset.d; if (t.value) b.log[d] = t.value; else delete b.log[d]; bizChanged(); toast(`${fDate(d)}: ${t.value ? LEVELS[t.value].l.toLowerCase() : 'automático'}. Ajustamos tu inventario y tus pedidos sugeridos.`); render(); }
   else if (t.dataset.act === 'perday') { const d = biz(S.session.bid).menu.find(x => x.id === t.dataset.v), v = parseInt(t.value, 10);
     if (!(v >= 0)) { t.value = d.perDay; return; } d.perDay = v; bizChanged();
     toast(v === d.base ? `${d.name}: vuelve a lo de siempre` : `${d.name}: ${v > d.base ? 'sube' : 'baja'} a ${v} al día. Ajustamos sus ingredientes.`); render(); }

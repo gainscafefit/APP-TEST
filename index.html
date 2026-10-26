@@ -169,6 +169,39 @@ tr.inactive td{color:var(--muted)}
 .invite-hero{background:var(--accent-soft);border-radius:14px;padding:16px;margin:24px 0 16px}
 .invite-hero h1{font-size:24px;margin-bottom:4px}
 
+.inv{padding:12px 14px;border-top:1px solid var(--line)}
+.inv:first-child{border-top:0}
+.inv-h{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.inv-h > div:first-child{min-width:0}
+.inv-h .why{font-size:12.5px;color:var(--muted)}
+.inv-q{display:grid;gap:3px;justify-items:end;text-align:right}
+.inv-q b{font-size:16px;white-space:nowrap}
+.cov{position:relative;height:8px;border-radius:4px;background:var(--bg);box-shadow:inset 0 0 0 1px var(--line);margin:10px 0 6px}
+.cov i{position:absolute;left:0;top:0;bottom:0;border-radius:4px;background:var(--accent)}
+.cov i.bad{background:var(--bad)} .cov i.warn{background:var(--warn)} .cov i.info{background:var(--info)}
+.cov s{position:absolute;top:-4px;bottom:-4px;width:2px;margin-left:-1px;background:var(--ink)}
+.inv-f{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12.5px;color:var(--muted)}
+.fix{margin-top:10px;display:grid;gap:6px;font-size:13px;font-weight:600}
+.fix input{width:96px;padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:var(--bg);text-align:right;font-size:16px}
+.alert{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;background:var(--bad-soft);border-radius:12px;padding:10px 14px;margin:-4px 0 12px;font-size:14px}
+.alert b{color:var(--bad)}
+.checkin{border-color:var(--accent);margin-bottom:12px}
+.strip{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.strip div{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:6px 2px;text-align:center;font-size:11px;min-width:0;color:var(--muted)}
+.strip div b{display:block;font-size:13px;color:var(--ink)}
+.strip .alto{background:var(--warn-soft);border-color:transparent;color:var(--warn)}
+.strip .normal{background:var(--accent-soft);border-color:transparent;color:var(--accent)}
+.strip .suave{background:var(--info-soft);border-color:transparent;color:var(--info)}
+.strip .cerrado{opacity:.45}
+.ing{list-style:none;margin:10px 0;padding:0;border-top:1px solid var(--line)}
+.ing li{display:flex;justify-content:space-between;gap:8px;padding:7px 0;border-bottom:1px solid var(--line);font-size:14px;align-items:center}
+.ing li span{min-width:0}
+.ing-add{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.ing-add select,.ing-add input{padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);font-size:16px;min-width:0}
+.ing-add select{flex:1 1 180px}
+.ing-add input{width:110px}
+.dish{margin-bottom:10px}
+td select{max-width:150px}
 .empty{padding:28px 16px;text-align:center;color:var(--muted)}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(92px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;font-weight:600;font-size:14px;z-index:20;max-width:calc(100% - 32px)}
 @media (prefers-reduced-motion: no-preference){.toast{animation:pop .18s ease-out}@keyframes pop{from{opacity:0;transform:translate(-50%,6px)}}}
@@ -227,7 +260,7 @@ const categories = () => [...new Set(PRODUCTS.map(p => p.c))];
 
 /* ---------- restaurantes, cuentas e historial (ejemplo) ---------- */
 const BUYERS = [
-  {id:'gd', name:'GAINS Diamante', kind:'Restaurante', every:2, off:0, phone:'3004445566',
+  {id:'gd', name:'GAINS Diamante', kind:'Restaurante', every:2, off:1, phone:'3004445566',
    prof:{tom:[8,4],ceb:[5,4],pim:[3,4],lec:[12,2],agu:[6,2],cil:[4,2],lim:[4,4],esp:[3,4],bro:[4,4],zan:[3,6],pep:[3,4]}},
   {id:'sg', name:'Sweet Gains', kind:'Heladería', every:3, off:1, phone:'3157778899',
    prof:{fre:[6,3],man:[5,6],ban:[8,3],mor:[4,6],mar:[3,6]}},
@@ -273,17 +306,82 @@ function pstats(bid, pid){
   return { n, last:last.day, lastQ:last.q, daysSince:-last.day, intTyp, qtyTyp, rate: qtyTyp / intTyp, next: last.day + intTyp };
 }
 function boughtSet(bid){ const s = new Set(); delivered(bid).forEach(o => o.items.forEach(it => { if (PR[it.p] && PR[it.p].active) s.add(it.p); })); return s; }
+/* ---------- memoria del negocio: movimiento diario y best sellers ---------- */
+const LEVELS = {suave:{f:0.7, l:'Suave', c:'mute'}, normal:{f:1, l:'Normal', c:'ok'}, alto:{f:1.4, l:'Alto', c:'warn'}, cerrado:{f:0, l:'Cerrado', c:'bad'}};
+const DOWL = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+const BIZ = {};
+const biz = bid => BIZ[bid] ||= {open:[0,1,2,3,4,5,6], close:'22:00', log:{}, menu:[]};
+const wd = d => dateOf(d).getDay();
+function wdFactor(bid, w){
+  const b = biz(bid); if (!b.open.includes(w)) return 0;
+  const v = Object.entries(b.log).filter(([d,l]) => +d <= 0 && l !== 'cerrado' && wd(+d) === w).map(([,l]) => LEVELS[l].f);
+  return v.length ? v.reduce((t,x) => t + x, 0) / v.length : 1;
+}
+function mult(bid, d){ const b = biz(bid), l = b.log[d]; if (l) return LEVELS[l].f; return b.open.includes(wd(d)) ? wdFactor(bid, wd(d)) : 0; }
+function consume(bid, rate, a, b){ let t = 0; for (let k = Math.floor(a); k < b; k++) { const lo = Math.max(a,k), hi = Math.min(b,k+1); if (hi > lo) t += (hi - lo) * mult(bid,k); } return rate * t; }
+function runout(bid, rate, stock, from){ let t = from, left = stock; for (let i = 0; i < 90; i++) { const k = Math.floor(t), r = rate * mult(bid,k), c = r * (k + 1 - t); if (r > 0 && c >= left) return t + left / r; left -= c; t = k + 1; } return t; }
+const nowT = bid => biz(bid).log[0] ? 1 : 0.5;
+function theo(bid, pid, useBase){ return biz(bid).menu.reduce((t,d) => t + (useBase ? d.base : d.perDay) * d.ing.filter(i => i.p === pid).reduce((s,i) => s + i.q, 0), 0); }
+function menuProducts(bid){ const s = new Set(); biz(bid).menu.forEach(d => d.ing.forEach(i => { if (PR[i.p] && PR[i.p].active) s.add(i.p); })); return s; }
+const NOTIF_DELAY = 30, NOTIF_REMIND = 60;   // minutos después del cierre del servicio
+const addMin = (t, m) => { const [h,mi] = t.split(':').map(Number), x = (h * 60 + mi + m) % 1440; return `${String(Math.floor(x / 60)).padStart(2,'0')}:${String(x % 60).padStart(2,'0')}`; };
+function minsNow(){ const n = new Date(); return n.getHours() * 60 + n.getMinutes(); }
+function checkinDay(bid){
+  const b = biz(bid), [h,m] = b.close.split(':').map(Number), sent = minsNow() >= h * 60 + m + NOTIF_DELAY;
+  for (const d of [0,-1,-2]) { if (d === 0 && !sent) continue; if (b.open.includes(wd(d)) && b.log[d] !== 'cerrado') return b.log[d] ? null : d; }
+  return null;
+}
+
+/* ---------- inventario predictivo del restaurante ---------- */
+const CORR = {};
+const fApprox = (q,u) => { const v = u === 'kg' ? Math.round(q * 2) / 2 : Math.round(q); return u === 'kg' ? `${v.toLocaleString('es-CO',{maximumFractionDigits:1})} kg` : u === 'und' ? `${v} und` : `${v} ${v === 1 ? 'atado' : 'atados'}`; };
+const fRate = (r,u) => `${r.toLocaleString('es-CO',{maximumFractionDigits:1})} ${u === 'atado' ? 'atados' : u}/día`;
+function deliveriesOf(bid,pid){ const r = []; for (const o of delivered(bid)) for (const it of o.items) if (it.p === pid) r.push({day:o.day, q:it.del}); return r; }
+function invModel(bid, pid){
+  const all = deliveriesOf(bid,pid), th = theo(bid,pid), thBase = theo(bid,pid,true);
+  if (!all.length || (all.length < 2 && !th)) return null;
+  const w = all.slice(-7), p = PR[pid], s = pstats(bid,pid), now = nowT(bid);
+  let hist = 0;
+  if (w.length >= 2) { const used = w.slice(0,-1).reduce((t,r) => t + r.q, 0), days = consume(bid, 1, w[0].day, w[w.length-1].day); hist = days > 0 ? used / days : s.rate; }
+  const wt = Math.min(1, (w.length - 1) / 5);
+  const base = w.length >= 2 ? (th ? wt * hist + (1 - wt) * th : hist) : th;
+  const rate0 = Math.max(1e-6, base + (th - thBase));
+  const c = CORR[bid + '|' + pid] || {f:1}, rate = rate0 * c.f;
+  let stock = 0, prev = w[0].day;
+  for (const r of w) { stock = Math.max(0, stock - consume(bid, rate, prev, r.day)) + r.q; prev = r.day; }
+  const last = w[w.length-1], anchored = c.anchor && c.anchor.day >= last.day;
+  const current = anchored ? Math.max(0, c.anchor.q - consume(bid, rate, c.anchor.t, now)) : Math.max(0, stock - consume(bid, rate, last.day, now));
+  const incoming = ORDERS.filter(o => o.b === bid && o.status !== 'Entregado').flatMap(o => o.items.filter(it => it.p === pid).map(it => ({day:o.deliver, q:it.del})));
+  const ints = w.slice(1).map((r,i) => r.day - w[i].day), qs = w.map(r => r.q);
+  const cv = a => { const m = a.reduce((t,x) => t + x, 0) / a.length; return m ? Math.sqrt(a.reduce((t,x) => t + (x - m) ** 2, 0) / a.length) / m : 1; };
+  const noise = w.length >= 2 ? (cv(ints) + cv(qs)) / 2 : 1;
+  const conf = all.length >= 6 && noise < 0.25 ? 'alta' : all.length >= 3 && noise < 0.5 ? 'media' : 'baja';
+  return {pid, p, rate, rate0, current, out: current > 0 ? runout(bid, rate, current, now) : now, now, last, stockAtLast: stock, incoming, conf,
+    intTyp: s && s.n >= 2 ? s.intTyp : 3, share: th ? Math.min(1, th / rate) : 0, menuDelta: th - thBase, onlyMenu: w.length < 2,
+    corrected: c.f !== 1 || anchored};
+}
+const URG = {bad:0, warn:1, info:2, ok:3};
+function inventory(bid){
+  const D = nextDelivery(), cad = delivered(bid).length >= 2 ? cadence(bid) : 3;
+  const pids = new Set([...boughtSet(bid), ...menuProducts(bid)]);
+  return [...pids].map(pid => invModel(bid,pid)).filter(Boolean).map(m => {
+    const inc = m.incoming.length ? Math.min(...m.incoming.map(x => x.day)) : null, out = m.out, u = m.p.u, H = Math.max(cad, m.intTyp);
+    if (m.current < STEP[u] / 2 && inc == null) Object.assign(m, {cls:'bad', label:'Agotado'});
+    else if (inc != null) Object.assign(m, out < inc ? {cls:'bad', label:'Se acaba antes de que llegue'} : {cls:'info', label:`Llega ${relDay(inc)}`});
+    else if (out < D) Object.assign(m, {cls:'bad', label:'No alcanza a la entrega'});
+    else if (out < D + cad) Object.assign(m, {cls:'warn', label:'Pídelo en este pedido'});
+    else Object.assign(m, {cls:'ok', label:'Alcanza'});
+    m.until = m.current < STEP[u] / 2 ? 'Sin existencias' : out < 1 ? 'Se acaba hoy' : `Alcanza hasta el ${fDate(Math.floor(out))}`;
+    const atD = Math.max(0, m.current - consume(bid, m.rate, m.now, D));
+    m.need = roundStep(Math.max(STEP[u], consume(bid, m.rate, D, D + H) - atD), u);
+    return m;
+  }).sort((a,b) => URG[a.cls] - URG[b.cls] || a.out - b.out);
+}
 function suggestions(bid){
-  const cad = cadence(bid), D = nextDelivery(), due = [], later = [];
-  for (const pid of boughtSet(bid)) {
-    const s = pstats(bid, pid), p = PR[pid];
-    if (s.daysSince + D >= 0.8 * s.intTyp) {
-      const q = s.n < 3 ? s.lastQ : roundStep(s.rate * Math.max(cad, s.intTyp), p.u);
-      due.push({pid, q, s});
-    } else later.push({pid, s});
-  }
-  due.sort((a,b) => (b.s.daysSince / b.s.intTyp) - (a.s.daysSince / a.s.intTyp));
-  later.sort((a,b) => a.s.next - b.s.next);
+  const inv = inventory(bid), due = [], later = [], known = new Set(inv.map(m => m.pid)), D = nextDelivery();
+  for (const m of inv) { const s = pstats(bid, m.pid); if ((m.cls === 'bad' || m.cls === 'warn') && !m.incoming.length) due.push({pid:m.pid, q:m.need, m, s}); else later.push({pid:m.pid, m, s}); }
+  for (const pid of boughtSet(bid)) if (!known.has(pid)) { const s = pstats(bid,pid); if (s.daysSince + D >= 0.8 * cadence(bid)) due.push({pid, q:s.lastQ, s}); else later.push({pid, s}); }
+  for (const pid of menuProducts(bid)) if (!known.has(pid) && !boughtSet(bid).has(pid)) { const q = roundStep(consume(bid, theo(bid,pid), D, D + 3), PR[pid].u); due.push({pid, q, menuOnly:true}); }
   return {due, later};
 }
 function buyerStats(){
@@ -300,6 +398,15 @@ function buyerStats(){
 }
 const SEGCLS = {'Clave':'ok','Por desarrollar':'info','Fiel':'mute','Ocasional':'mute','Nuevo':'warn'};
 
+/* memoria de ejemplo: GAINS Diamante abre de martes a domingo y ya reportó su movimiento varias semanas */
+{ const b = biz('gd'); b.open = [0,2,3,4,5,6]; b.close = '21:30';
+  const pat = {0:'normal', 2:'suave', 3:'suave', 4:'normal', 5:'alto', 6:'alto'};
+  for (let d = -21; d <= -2; d++) { const w = wd(d); if (b.open.includes(w)) b.log[d] = rnd() < 0.2 ? 'normal' : pat[w]; }
+  b.menu = [
+    {id:'m1', name:'Bowl de pollo y aguacate', perDay:30, base:30, ing:[{p:'agu',q:0.05},{p:'tom',q:0.03},{p:'lec',q:0.08},{p:'ceb',q:0.02}]},
+    {id:'m2', name:'Wrap de pollo', perDay:25, base:25, ing:[{p:'agu',q:0.03},{p:'tom',q:0.02},{p:'lec',q:0.06},{p:'pim',q:0.02}]},
+    {id:'m3', name:'Ensalada verde con espinaca', perDay:15, base:15, ing:[{p:'esp',q:0.04},{p:'lec',q:0.12},{p:'pep',q:0.03},{p:'lim',q:0.02}]}];
+}
 /* pedidos de otros clientes para la próxima entrega (ejemplo) */
 { const D = nextDelivery();
   for (const bid of ['sg','ca']) { const {due} = suggestions(bid);
@@ -387,29 +494,143 @@ function buyerPedir(){
   const {due, later} = suggestions(bid), hasHistory = delivered(bid).length > 0;
   const head = `<div class="delivery"><div class="day">${dateOf(D).getDate()}<small>${fDow(D)}</small></div>
     <div><b>Entrega ${relDay(D)} · ${fDate(D)}</b><span>${esc(SUPPLIER.name)} · pide antes de las ${fCut()}${cutoffPassed() ? ' (ya pasó el cierre de hoy)' : ''}</span></div></div>`;
-  if (!hasHistory) return head + `
-    <div class="card" style="margin-bottom:12px"><b>Tu primer pedido</b><p class="sub" style="margin:4px 0 0">Elige del catálogo. Después de 2 o 3 pedidos, aquí aparece tu pedido sugerido listo para repetir.</p></div>
-    ${catalogBlock()}`;
-  const dueHtml = due.length ? due.map(x => {
-    const s = x.s, p = PR[x.pid];
-    const late = s.daysSince + D > s.intTyp * 1.25 ? ' <span class="tag warn">Atrasado</span>' : '';
-    return itemRow(x.pid, `Último pedido hace ${s.daysSince} ${s.daysSince === 1 ? 'día' : 'días'} · sueles pedir ${fQty(s.qtyTyp,p.u)} cada ${Math.round(s.intTyp)} días${late}`);
-  }).join('') : `<div class="empty">Nada por reponer para esta entrega.</div>`;
-  const laterHtml = later.map(x => itemRow(x.pid, `Te alcanza hasta el ${fDate(Math.round(x.s.next))}`)).join('');
+  if (!hasHistory) return head + (due.length ? `
+    <div class="sec-h"><h2>Sugerido con tus best sellers</h2><button class="act" data-act="reset">Repetir sugerido</button></div>
+    <p class="sub">Para cubrir unos 3 días de servicio. Mientras más pidas, más se ajusta a tu consumo real.</p>
+    <div class="list">${due.map(x => itemRow(x.pid, `Tus platos usan ≈ ${fRate(theo(bid,x.pid), PR[x.pid].u)} en un día normal`)).join('')}${Object.keys(S.cart).filter(pid => S.cart[pid] > 0 && !due.some(x => x.pid === pid)).map(pid => itemRow(pid, 'Agregado por ti')).join('')}</div>
+    <details class="more" id="cat-d" ${S.det['cat-d'] ? 'open' : ''}><summary>Agregar otro producto</summary>${catalogBlock()}</details>` : `
+    <div class="card" style="margin-bottom:12px"><b>Tu primer pedido</b><p class="sub" style="margin:4px 0 0">Elige del catálogo. Si agregas tus best sellers en <button class="link" data-act="btab" data-v="negocio">Mi negocio</button>, te armamos un pedido sugerido desde hoy.</p></div>
+    ${catalogBlock()}`);
+  const whyDue = x => { const p = PR[x.pid];
+    if (x.menuOnly) return `Tus best sellers usan ≈ ${fRate(theo(bid,x.pid), p.u)} en un día normal`;
+    const ago = x.s ? `Último pedido hace ${x.s.daysSince} ${x.s.daysSince === 1 ? 'día' : 'días'}` : '';
+    return x.m ? `${ago ? ago + ' · ' : ''}te queda ≈ ${fApprox(x.m.current, p.u)} · ${x.m.until.toLowerCase()}` : ago; };
+  const dueHtml = due.length ? due.map(x => itemRow(x.pid, whyDue(x))).join('') : `<div class="empty">Nada por reponer para esta entrega.</div>`;
+  const short = inventory(bid).filter(x => x.cls === 'bad');
+  const alertHtml = short.length ? `<div class="alert"><span><b>${short.length === 1 ? 'Un producto no alcanza' : `${short.length} productos no alcanzan`}</b> a esta entrega: ${esc(short.slice(0,3).map(x => x.p.n.toLowerCase()).join(', '))}${short.length > 3 ? ` y ${short.length - 3} más` : ''}.</span><button class="link" data-act="btab" data-v="inv">Ver inventario</button></div>` : '';
+  const laterHtml = later.map(x => itemRow(x.pid, x.m ? (x.m.cls === 'info' ? x.m.label : x.m.until) : `Último pedido hace ${x.s.daysSince} días`)).join('');
   const extra = Object.keys(S.cart).filter(pid => S.cart[pid] > 0 && !due.some(x => x.pid === pid) && !later.some(x => x.pid === pid));
-  return head + `
+  return head + checkinCard(bid) + alertHtml + `
   <div class="sec-h"><h2>Tu pedido sugerido</h2><button class="act" data-act="reset">Repetir sugerido</button></div>
-  <p class="sub">Calculado con tus últimos pedidos. Ajusta con − y +.</p>
+  <p class="sub">Calculado con tu inventario estimado, tu movimiento y tus best sellers. Ajusta con − y +.</p>
   <div class="list">${dueHtml}${extra.map(pid => itemRow(pid, 'Agregado por ti')).join('')}</div>
   ${later.length ? `<details class="more" id="later-d" ${S.det['later-d'] ? 'open' : ''}><summary>Aún no te toca (${later.length})</summary><div class="list">${laterHtml}</div></details>` : ''}
   <details class="more" id="cat-d" ${S.det['cat-d'] ? 'open' : ''}><summary>Agregar otro producto</summary>${catalogBlock()}</details>
   <details class="how"><summary>Así se calcula la sugerencia</summary><ul>
-    <li>Cantidad típica = mediana de lo que te entregaron en tus últimos 6 pedidos del producto.</li>
-    <li>Intervalo típico = mediana de días entre esos pedidos.</li>
-    <li>Se sugiere cuando, al día de entrega, ya pasó el 80% de tu intervalo típico.</li>
-    <li>Cantidad sugerida = consumo diario × días hasta tu siguiente pedido (${esc(b.name)} pide cada ${cadence(bid)} días).</li>
+    <li>Se sugiere lo que, según tu inventario estimado, no alcanza hasta tu siguiente pedido después de esta entrega (${esc(b.name)} pide cada ${cadence(bid)} días).</li>
+    <li>Cantidad sugerida = lo que vas a gastar entre esta entrega y la siguiente, según el movimiento esperado de cada día, menos lo que te quede al recibir.</li>
+    <li>El detalle del cálculo está en Inventario.</li>
   </ul></details>`;
 }
+/* ---------- vistas del inventario ---------- */
+function invRow(x, D){
+  const max = Math.max(8, D + 3), pct = Math.min(100, x.out / max * 100), dpct = D / max * 100, u = x.p.u;
+  return `<div class="inv"><div class="inv-h"><div><b>${esc(x.p.n)}</b> ${x.corrected ? '<span class="tag mute">Corregido por ti</span>' : ''}${x.onlyMenu ? ' <span class="tag info">Según tu menú</span>' : x.menuDelta > 0.001 ? ' <span class="tag info">Sube por tu menú</span>' : x.menuDelta < -0.001 ? ' <span class="tag info">Baja por tu menú</span>' : ''}
+      <div class="why">Un día normal usas ≈ ${fRate(x.rate,u)}${x.share && !x.onlyMenu ? ` · ${Math.round(x.share * 100)}% en tus best sellers` : ''} · confianza ${x.conf}</div></div>
+    <div class="inv-q"><b>≈ ${fApprox(x.current,u)}</b><span class="tag ${x.cls}">${x.label}</span></div></div>
+    <div class="cov" role="img" aria-label="${esc(x.until)}"><i class="${x.cls}" style="width:${pct}%"></i><s style="left:${dpct}%"></s></div>
+    <div class="inv-f"><span>${x.until}</span><button class="link" data-act="fix" data-p="${x.pid}">Corregir</button></div>
+    ${S.fix === x.pid ? `<form class="fix" id="f-fix" data-p="${x.pid}" novalidate><label for="fix-q">¿Cuánto te queda hoy?</label>
+      <div class="row-btns"><input id="fix-q" type="number" inputmode="decimal" min="0" step="${STEP[u]}" value="${u === 'kg' ? Math.round(x.current * 2) / 2 : Math.round(x.current)}"><span class="unit">${u}</span>
+      <button class="primary" type="submit">Guardar</button><button class="ghost" type="button" data-act="fix-zero" data-p="${x.pid}">Se acabó</button><button class="link" type="button" data-act="fix-close">Cancelar</button></div></form>` : ''}
+  </div>`;
+}
+function buyerInv(){
+  const bid = S.session.bid, D = nextDelivery(), inv = inventory(bid);
+  if (!inv.length) return checkinCard(bid) + `<div class="sec-h"><h2>Inventario</h2></div><div class="card empty">Tu inventario aparece cuando pides un producto al menos 2 veces, o desde el primer pedido si agregas tus best sellers en Mi negocio. No tienes que contar nada.</div>`;
+  const bad = inv.filter(x => x.cls === 'bad'), warn = inv.filter(x => x.cls === 'warn'), val = inv.reduce((t,x) => t + x.current * x.p.pr, 0);
+  return checkinCard(bid) + `<div class="sec-h"><h2>Inventario</h2>${bad.length + warn.length ? `<button class="act" data-act="inv-add">Agregar lo que falta al pedido</button>` : ''}</div>
+  <p class="sub">Estimado con tus pedidos, tu movimiento diario y tus best sellers, sin contar nada. Si algo no cuadra, corrígelo y la app ajusta tu consumo.</p>
+  <div class="grid2">
+    <div class="stat"><b>${bad.length}</b><span>No alcanzan a la entrega del ${fDate(D)}</span></div>
+    <div class="stat"><b>${warn.length}</b><span>Conviene pedirlos en este pedido</span></div>
+    <div class="stat"><b>${money(val)}</b><span>Valor aproximado de lo que tienes</span></div>
+  </div>
+  <div class="list">${inv.map(x => invRow(x, D)).join('')}</div>
+  <p class="sub" style="margin-top:8px">La barra muestra cuántos días te alcanza cada producto. La raya negra marca tu próxima entrega.</p>
+  <details class="how"><summary>Así se calcula</summary><ul>
+    <li>Consumo de un día normal = lo que te entregaron en tus últimos pedidos ÷ los días de servicio entre el primero y el último. Cada día pesa según su movimiento: suave 0,7, normal 1, alto 1,4 y cerrado 0.</li>
+    <li>Los días que no reportas toman el promedio de ese día de la semana. Los días que marcas en Próximos días cambian lo que esperamos que gastes.</li>
+    <li>Best sellers: con pocos pedidos, el consumo se mezcla con lo que usan tus platos. Si cambias los platos por día, el consumo sube o baja en esa diferencia.</li>
+    <li>Existencia hoy = lo que tenías + lo que llegó en cada entrega − lo consumido cada día según su movimiento.</li>
+    <li>Cuando corriges una cantidad, la app compara lo que estimó con lo que tienes y ajusta tu consumo diario a la mitad del camino. Con cada corrección se acerca más a tu consumo real.</li>
+    <li>La confianza baja cuando pides en fechas o cantidades muy irregulares, o cuando hay pocos pedidos.</li>
+  </ul></details>`;
+}
+function applyFix(pid, q){
+  const bid = S.session.bid, m = invModel(bid, pid), key = bid + '|' + pid, c = CORR[key] || {f:1}, nd = consume(bid, 1, m.last.day, m.now);
+  if (nd >= 0.5 && m.rate0 > 0) { const obs = Math.max(0, (m.stockAtLast - q) / nd); c.f = Math.min(2.5, Math.max(0.4, 0.5 * c.f + 0.5 * Math.min(2.5, Math.max(0.4, obs / m.rate0)))); }
+  c.anchor = {day:0, t:m.now, q}; CORR[key] = c; S.fix = null;
+  const n = invModel(bid, pid); toast(`Listo. Ahora calculamos que usas ≈ ${fRate(n.rate, n.p.u)} de ${n.p.n.toLowerCase()}.`);
+}
+
+const plural = w => w.endsWith('s') ? w : w + 's';
+const whenTxt = d => d === 0 ? 'hoy' : d === -1 ? 'ayer' : `el ${DOWL[wd(d)]}`;
+function checkinCard(bid){
+  const d = checkinDay(bid); if (d == null) return '';
+  const b = biz(bid), late = d === 0 && minsNow() >= (([h,m]) => h * 60 + m)(b.close.split(':').map(Number)) + NOTIF_REMIND;
+  return `<div class="card checkin"><div class="sub" style="margin:0 0 2px">${late ? 'Recordatorio' : 'Notificación'} · ${fDate(d)} · ${fHour(addMin(b.close, late ? NOTIF_REMIND : NOTIF_DELAY))}</div><b>¿Cómo estuvo el movimiento ${whenTxt(d)}?</b>
+    <div class="row-btns" style="margin-top:10px">${['suave','normal','alto'].map(l => `<button class="ghost" data-act="lvl" data-v="${l}" data-d="${d}">${LEVELS[l].l}</button>`).join('')}</div>
+    <p class="sub" style="margin:8px 0 0">Con tu respuesta ajustamos lo que se gastó ${whenTxt(d)} y lo que esperamos para los próximos ${plural(DOWL[wd(d)])}.</p></div>`;
+}
+const fHour = t => { const [h,m] = t.split(':').map(Number); return `${h % 12 || 12}:${String(m).padStart(2,'0')} ${h < 12 ? 'a. m.' : 'p. m.'}`; };
+function buyerBiz(){
+  const bid = S.session.bid, b = biz(bid), order = [1,2,3,4,5,6,0];
+  const reps = w => Object.entries(b.log).filter(([d,l]) => +d <= 0 && l !== 'cerrado' && wd(+d) === w).length;
+  const levelOf = f => f === 0 ? 'cerrado' : f < 0.85 ? 'suave' : f > 1.15 ? 'alto' : 'normal';
+  const strip = []; for (let d = -13; d <= 0; d++) { const l = b.log[d] || (b.open.includes(wd(d)) ? '' : 'cerrado');
+    strip.push(`<div class="${l}"><span>${DOW[wd(d)]} ${dateOf(d).getDate()}</span><b>${l ? LEVELS[l].l : '—'}</b></div>`); }
+  const menuRows = [...menuProducts(bid)].map(pid => { const m = invModel(bid,pid), th = theo(bid,pid); return {pid, th, m}; }).sort((a,b) => b.th * PR[b.pid].pr - a.th * PR[a.pid].pr);
+  const opts = PRODUCTS.filter(p => p.active).map(p => `<option value="${p.id}">${esc(p.n)} (${p.u})</option>`).join('');
+  return `${checkinCard(bid)}
+  <div class="sec-h"><h2>Servicio</h2></div>
+  <div class="card form">
+    <div class="field"><label>Días que abres</label><div class="daychips">${order.map(w => `<button data-act="open" data-v="${w}" aria-pressed="${b.open.includes(w)}">${DOW[w]}</button>`).join('')}</div></div>
+    <div class="field" style="max-width:220px"><label for="close-t">Hora en que termina el servicio</label><input id="close-t" type="time" value="${b.close}"></div>
+    <div class="field"><label>Notificaciones de cierre</label>
+      <ul class="ing" style="margin:0">
+        <li><span><b>${fHour(addMin(b.close, NOTIF_DELAY))}</b> · 30 min después del cierre</span><span style="color:var(--muted)">«¿Cómo estuvo el movimiento hoy? Suave, normal o alto»</span></li>
+        <li><span><b>${fHour(addMin(b.close, NOTIF_REMIND))}</b> · 1 hora después, solo si no respondió</span><span style="color:var(--muted)">«Te falta contarnos cómo estuvo hoy. Un toque y listo»</span></li>
+      </ul>
+      <span class="hint">Si no responde ninguna, ese día se toma como el promedio de ese día de la semana.</span></div>
+  </div>
+  <div class="sec-h"><h2>Movimiento</h2></div>
+  <p class="sub">Últimos 14 días. Un día suave cuenta como 0,7 de un día normal y uno alto como 1,4.</p>
+  <div class="strip">${strip.join('')}</div>
+  <div class="tbl-wrap" style="margin-top:12px"><table><thead><tr><th>Día</th><th class="l">Suele ser</th><th>Reportes</th></tr></thead><tbody>
+    ${order.map(w => { const f = wdFactor(bid,w), n = reps(w), l = b.open.includes(w) ? (n ? levelOf(f) : null) : 'cerrado';
+      return `<tr><td>${DOWL[w][0].toUpperCase() + DOWL[w].slice(1)}</td><td class="l">${l ? `<span class="tag ${LEVELS[l].c}">${LEVELS[l].l}</span>` : '<span style="color:var(--muted)">Sin datos, se toma como normal</span>'}</td><td>${b.open.includes(w) ? n : '—'}</td></tr>`; }).join('')}
+  </tbody></table></div>
+  <div class="sec-h"><h2>Próximos días</h2></div>
+  <p class="sub">Si esperas un festivo, un evento o un día cerrado, márcalo. Cambia tu inventario y tu pedido sugerido.</p>
+  <div class="tbl-wrap"><table><thead><tr><th>Día</th><th class="l">Esperamos</th><th class="l">Tú dices</th></tr></thead><tbody>
+    ${[1,2,3,4,5,6,7].map(d => { const auto = levelOf(b.open.includes(wd(d)) ? wdFactor(bid, wd(d)) : 0), set = b.log[d] || '';
+      return `<tr><td>${fDate(d)}</td><td class="l"><span class="tag ${LEVELS[auto].c}">${LEVELS[auto].l}</span></td><td class="l"><select id="plan-${d}" data-act="plan" data-d="${d}" aria-label="Movimiento esperado ${fDate(d)}">
+        <option value="" ${set ? '' : 'selected'}>Automático</option>${['suave','normal','alto','cerrado'].map(l => `<option value="${l}" ${set === l ? 'selected' : ''}>${LEVELS[l].l}</option>`).join('')}</select></td></tr>`; }).join('')}
+  </tbody></table></div>
+  <div class="sec-h"><h2>Best sellers</h2><button class="act" data-act="dish-open">Agregar plato</button></div>
+  <p class="sub">Tus platos más vendidos y lo que lleva cada uno. Sirven para predecir desde el primer pedido y para anticipar cambios: si esperas vender más de un plato, súbele los platos por día.</p>
+  ${S.dishForm ? `<form class="form card" id="f-dish" novalidate style="margin-bottom:10px"><b>Nuevo plato</b>
+    <div class="cols"><div class="field"><label for="dish-name">Nombre del plato</label><input id="dish-name" placeholder="Arepa de pollo"></div>
+    <div class="field"><label for="dish-per">Platos en un día normal</label><input id="dish-per" type="number" inputmode="numeric" min="1" step="1" placeholder="20"></div></div>
+    <label style="display:flex;gap:8px;align-items:center;font-size:14px"><input id="dish-new" type="checkbox"> Es un plato nuevo que todavía no se ve en mis pedidos</label>
+    ${S.dishErr ? `<div class="err">${S.dishErr}</div>` : ''}
+    <div class="row-btns"><button class="primary" type="submit">Agregar</button><button class="ghost" type="button" data-act="dish-close">Cancelar</button></div></form>` : ''}
+  ${b.menu.length ? b.menu.map(d => `<div class="card dish">
+    <div class="order-h"><div><h3>${esc(d.name)}</h3>${d.base === 0 ? '<span class="tag info">Plato nuevo</span>' : d.perDay !== d.base ? `<span class="tag warn">Antes ${d.base} al día</span>` : ''}</div><button class="link" data-act="dish-del" data-v="${d.id}">Quitar</button></div>
+    <div class="field" style="max-width:220px;margin-top:8px"><label for="pd-${d.id}">Platos en un día normal</label><input id="pd-${d.id}" type="number" inputmode="numeric" min="0" step="1" value="${d.perDay}" data-act="perday" data-v="${d.id}"></div>
+    <ul class="ing">${d.ing.map((i,k) => `<li><span>${esc(PR[i.p].n)}</span><span style="white-space:nowrap">${String(i.q).replace('.', ',')} ${PR[i.p].u} por plato <button class="link" data-act="ing-del" data-v="${d.id}" data-i="${k}" aria-label="Quitar ${esc(PR[i.p].n)}">Quitar</button></span></li>`).join('') || '<li><span style="color:var(--muted)">Sin ingredientes todavía</span></li>'}</ul>
+    <form class="ing-add" id="f-ing-${d.id}" data-v="${d.id}" novalidate><select id="ing-p-${d.id}" aria-label="Ingrediente">${opts}</select><input id="ing-q-${d.id}" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0,05" aria-label="Cantidad por plato"><button class="ghost" type="submit">Agregar ingrediente</button></form>
+  </div>`).join('') : `<div class="card empty">Todavía no tienes best sellers. Agrega 3 a 5 platos con sus ingredientes principales.</div>`}
+  ${menuRows.length ? `<div class="sec-h"><h2 style="font-size:17px">Lo que usan en un día normal</h2></div>
+  <div class="tbl-wrap"><table><thead><tr><th>Producto</th><th>Por tus best sellers</th><th>Consumo total estimado</th><th>Parte de best sellers</th></tr></thead><tbody>
+    ${menuRows.map(r => `<tr><td>${esc(PR[r.pid].n)}</td><td>${fRate(r.th, PR[r.pid].u)}</td><td>${r.m ? fRate(r.m.rate, PR[r.pid].u) : '—'}</td><td>${r.m && !r.m.onlyMenu ? Math.round(Math.min(1, r.th / r.m.rate) * 100) + '%' : 'solo menú'}</td></tr>`).join('')}
+  </tbody></table></div>
+  <p class="sub" style="margin-top:8px">La diferencia entre lo que usan tus best sellers y tu consumo total es lo que se va en otros platos, pruebas y merma.</p>` : ''}`;
+}
+function cartUntouched(){ const a = Object.entries(S.cart).filter(([,q]) => q > 0), k = Object.keys(S.sugQ); return a.length === k.length && a.every(([p,q]) => S.sugQ[p] === q); }
+function bizChanged(){ if (!S.placed && cartUntouched()) resetCart(); }
+
 function buyerPlaced(){
   const o = ORDERS.find(x => x.id === S.placed); const b = BY[o.b];
   const txt = `Hola, pedido de ${b.name} para ${fDate(o.deliver)}:\n` + o.items.map(it => `• ${PR[it.p].n}: ${fQty(it.qty, PR[it.p].u)}`).join('\n') + `\nTotal aprox: ${money(orderTotal(o,'qty'))}`;
@@ -645,7 +866,7 @@ function render(){
   who.innerHTML = `<b>${esc(isB ? BY[S.session.bid].name : SUPPLIER.name)}</b><button class="link" data-act="logout">Salir</button>`;
   if (isB) {
     app.className = 'wrap';
-    app.innerHTML = `<nav class="tabs">${[['pedir','Pedir'],['hist','Mis pedidos']].map(([k,l]) => `<button data-act="btab" data-v="${k}" aria-pressed="${S.btab === k}">${l}</button>`).join('')}</nav>` + (S.btab === 'pedir' ? buyerPedir() : buyerHist());
+    app.innerHTML = `<nav class="tabs">${[['pedir','Pedir'],['inv','Inventario'],['hist','Mis pedidos'],['negocio','Mi negocio']].map(([k,l]) => `<button data-act="btab" data-v="${k}" aria-pressed="${S.btab === k}">${l}</button>`).join('')}</nav>` + ({pedir:buyerPedir, inv:buyerInv, hist:buyerHist, negocio:buyerBiz}[S.btab])();
     const items = Object.entries(S.cart).filter(([,q]) => q > 0);
     if (S.btab === 'pedir' && !S.placed) {
       const tot = items.reduce((t,[pid,q]) => t + q * PR[pid].pr, 0);
@@ -681,6 +902,15 @@ document.addEventListener('submit', e => {
     else if (ph.length !== 10) S.obErr = 'Escribe un celular de 10 dígitos.';
     else { const b = {id:'n' + inv.code, name, kind:inv.kind, phone:ph, addr, contact:$('ob-contact').value.trim(), prof:{}}; BUYERS.push(b); syncBY(); inv.status = 'Aceptada'; S.obErr = ''; S.lastInvite = null; signIn({role:'buyer', bid:b.id}); S.det['cat-d'] = true; toast(`Cuenta creada. Ya puedes pedirle a ${SUPPLIER.name}.`); }
   }
+  else if (f === 'f-fix') { const v = parseFloat(String($('fix-q').value).replace(',', '.')); if (isNaN(v) || v < 0) { toast('Escribe una cantidad de 0 o más.'); return; } applyFix(e.target.dataset.p, v); }
+  else if (f === 'f-dish') { const name = $('dish-name').value.trim(), per = parseInt($('dish-per').value, 10), b = biz(S.session.bid);
+    if (!name) S.dishErr = 'Escribe el nombre del plato.';
+    else if (!(per > 0)) S.dishErr = 'Escribe cuántos platos vendes en un día normal.';
+    else { b.menu.push({id:'d' + Date.now().toString(36), name, perDay:per, base: $('dish-new').checked ? 0 : per, ing:[]}); S.dishForm = false; S.dishErr = ''; toast('Plato agregado. Ahora ponle sus ingredientes principales.'); }
+  }
+  else if (f.startsWith('f-ing-')) { const id = e.target.dataset.v, d = biz(S.session.bid).menu.find(x => x.id === id), pid = $('ing-p-' + id).value, q = parseFloat(String($('ing-q-' + id).value).replace(',', '.'));
+    if (!(q > 0)) { toast('Escribe cuánto lleva cada plato, por ejemplo 0,05.'); return; }
+    const ex = d.ing.find(i => i.p === pid); if (ex) ex.q = q; else d.ing.push({p:pid, q}); bizChanged(); toast(`${PR[pid].n} agregado a ${d.name}`); }
   else if (f === 'f-prod') { const n = $('np-name').value.trim(), c = $('np-cat').value.trim() || 'Otros', u = $('np-unit').value, pr = parsePrice($('np-price').value);
     if (!n) S.prodErr = 'Escribe el nombre del producto.';
     else if (PRODUCTS.some(p => norm(p.n) === norm(n))) S.prodErr = 'Ya tienes un producto con ese nombre.';
@@ -696,7 +926,23 @@ document.addEventListener('click', e => {
   else if (a === 'login-back') S.login = {step:'phone', phone:S.login.phone, err:''};
   else if (a === 'logout') { S.session = null; saveSession(); S.placed = null; window.scrollTo(0,0); }
   else if (a === 'ob-cancel') S.inviteCode = null;
-  else if (a === 'btab') S.btab = v;
+  else if (a === 'btab') { S.btab = v; S.fix = null; window.scrollTo(0,0); }
+  else if (a === 'fix') S.fix = S.fix === pid ? null : pid;
+  else if (a === 'lvl') { const d = +el.dataset.d; biz(S.session.bid).log[d] = v; bizChanged();
+    toast(`Anotado: ${whenTxt(d)} fue un día ${LEVELS[v].l.toLowerCase()}. ${v === 'alto' ? 'Descontamos más consumo' : v === 'suave' ? 'Descontamos menos consumo' : 'Tu consumo queda igual'} y ajustamos tus ${plural(DOWL[wd(d)])}.`); }
+  else if (a === 'open') { const b = biz(S.session.bid), w = +v, has = b.open.includes(w);
+    if (has && b.open.length === 1) { toast('Debes abrir al menos un día'); return; }
+    b.open = has ? b.open.filter(x => x !== w) : [...b.open, w]; bizChanged(); }
+  else if (a === 'dish-open') { S.dishForm = true; S.dishErr = ''; }
+  else if (a === 'dish-close') S.dishForm = false;
+  else if (a === 'dish-del') { const b = biz(S.session.bid); b.menu = b.menu.filter(x => x.id !== v); bizChanged(); toast('Plato quitado'); }
+  else if (a === 'ing-del') { const d = biz(S.session.bid).menu.find(x => x.id === v); d.ing.splice(+el.dataset.i, 1); bizChanged(); }
+  else if (a === 'fix-close') S.fix = null;
+  else if (a === 'fix-zero') applyFix(pid, 0);
+  else if (a === 'inv-add') { const list = inventory(S.session.bid).filter(x => (x.cls === 'bad' || x.cls === 'warn') && !x.incoming.length);
+    if (S.placed) resetCart();
+    list.forEach(x => { S.cart[x.pid] = Math.max(S.cart[x.pid] || 0, x.need); });
+    S.btab = 'pedir'; window.scrollTo(0,0); toast(`${list.length} productos agregados a tu pedido`); }
   else if (a === 'stab') S.stab = v;
   else if (a === 'inc') { const u = PR[pid].u; S.cart[pid] = (S.cart[pid] || 0) + STEP[u]; }
   else if (a === 'dec') { const u = PR[pid].u; S.cart[pid] = Math.max(0, (S.cart[pid] || 0) - STEP[u]); }
@@ -748,6 +994,11 @@ document.addEventListener('change', e => {
   else if (t.dataset.act === 'price') { const v = parsePrice(t.value); if (v > 0) { PR[t.dataset.p].pr = v; toast(`Precio de ${PR[t.dataset.p].n}: ${money(v)}`); } else t.value = PR[t.dataset.p].pr; }
   else if (t.dataset.act === 'active') { PR[t.dataset.p].active = t.checked; render(); }
   else if (t.id === 'cutoff' && t.value) { SUPPLIER.cutoff = t.value; render(); }
+  else if (t.id === 'close-t' && t.value) { biz(S.session.bid).close = t.value; render(); }
+  else if (t.dataset.act === 'plan') { const b = biz(S.session.bid), d = +t.dataset.d; if (t.value) b.log[d] = t.value; else delete b.log[d]; bizChanged(); toast(`${fDate(d)}: ${t.value ? LEVELS[t.value].l.toLowerCase() : 'automático'}. Ajustamos tu inventario y tu pedido sugerido.`); render(); }
+  else if (t.dataset.act === 'perday') { const d = biz(S.session.bid).menu.find(x => x.id === t.dataset.v), v = parseInt(t.value, 10);
+    if (!(v >= 0)) { t.value = d.perDay; return; } d.perDay = v; bizChanged();
+    toast(v === d.base ? `${d.name}: vuelve a lo de siempre` : `${d.name}: ${v > d.base ? 'sube' : 'baja'} a ${v} al día. Ajustamos sus ingredientes.`); render(); }
   else if (t.id === 'imp-file' && t.files[0]) readImportFile(t.files[0]);
 });
 document.addEventListener('toggle', e => { if (e.target.id) S.det[e.target.id] = e.target.open; }, true);

@@ -9,7 +9,7 @@ Prototipo clicable de una app de pedidos B2B entre proveedores de frescos y rest
 
 ## Vistas
 
-- **Restaurante:** pedido sugerido según su historial, ajuste con + y −, confirmación, estado del pedido y recepción.
+- **Restaurante:** pedido sugerido según su historial, inventario predictivo (cuánto le queda y hasta qué día le alcanza, con corrección que aprende su consumo), pregunta de cierre sobre el movimiento del día y best sellers con ingredientes por plato en Mi negocio, ajuste con + y −, confirmación, estado del pedido y recepción.
 - **Proveedor:** pedidos para mañana con ajuste de peso real, alistamiento consolidado, clientes por segmento con alertas de riesgo y previsión de compra a 7 días.
 
 ## Siguiente paso

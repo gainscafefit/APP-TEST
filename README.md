@@ -4,7 +4,8 @@ Prototipo clicable de una app de pedidos B2B entre proveedores de frescos y rest
 
 - `index.html`: el prototipo completo en un solo archivo. Ábrelo en el navegador.
 - `plantilla-catalogo.xlsx`: plantilla que descarga el proveedor para cargar su catálogo. Debe quedar en la misma carpeta que `index.html`.
-- Todos los datos son de ejemplo: 4 proveedores (2 en la app y 2 por WhatsApp), 4 restaurantes y 8 semanas de pedidos generados.
+- Mockup con datos de GAINS: 6 platos reales de gainscol.com (La Anabólica, Peak Fries, Mighty Birria, Primal Wings, Soda Probiótica y Tibbika) con sus ingredientes por plato, 10 proveedores por categoría (Tibbika como proveedor de prueba) y 8 semanas de pedidos generados desde el consumo del menú. Precios de proveedor, ventas por día y sub-recetas son estimados.
+- Interfaz estilo iOS: barra de pestañas, títulos grandes, listas agrupadas, hojas que suben desde abajo, modo claro y oscuro.
 - Las sugerencias de pedido, la clasificación de clientes y la previsión de compra usan las fórmulas del plan del MVP.
 
 ## Vistas

@@ -1,3 +1,7 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <title>Surtido</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta name="theme-color" media="(prefers-color-scheme: light)" content="#F2F2F7">
@@ -26,7 +30,8 @@
 
 *{box-sizing:border-box}
 html{-webkit-tap-highlight-color:transparent;-webkit-text-size-adjust:100%;overscroll-behavior:none}
-body{background:var(--bg);color:var(--label);font-family:var(--font);font-size:17px;line-height:1.35;letter-spacing:-.01em;
+html{padding-top:env(safe-area-inset-top,0px)}
+body{background:var(--bg);color:var(--label);font-family:var(--font);margin:0;font-size:17px;line-height:1.35;letter-spacing:-.01em;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
   padding-block:0 calc(var(--tabh) + 120px + env(safe-area-inset-bottom,0px));font-variant-numeric:tabular-nums}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--bg)}
@@ -218,6 +223,80 @@ td input{width:92px;text-align:right;background:var(--fill);border:0;border-radi
 .toast{position:fixed;left:50%;bottom:calc(var(--tabh) + 82px + env(safe-area-inset-bottom,0px));z-index:50;transform:translateX(-50%);background:var(--label);color:var(--bg);padding:11px 16px;border-radius:14px;font-size:15px;font-weight:500;max-width:calc(100% - 32px);width:max-content;box-shadow:var(--shadow);
   transition:opacity 220ms ease,transform 260ms var(--ease-out)}
 .toast[data-hide]{opacity:0;transform:translate(-50%,8px)}
+.chips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin:14px calc(-1 * max(16px,env(safe-area-inset-left,0px))) 0;padding:0 16px 2px max(16px,env(safe-area-inset-left,0px))}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;padding:7px 14px;border-radius:17px;background:var(--surface);font-size:15px;font-weight:500;color:var(--label);white-space:nowrap;transition:background-color 140ms ease,transform 120ms var(--ease-out)}
+.chip:active{transform:scale(.96)}
+.chip small{color:var(--label2);font-size:13px;margin-left:4px}
+.chip[aria-pressed="true"]{background:var(--label);color:var(--bg)}
+.chip[aria-pressed="true"] small{color:var(--bg);opacity:.7}
+.ngrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.ntile{background:var(--surface);border-radius:14px;padding:12px;text-align:left;display:grid;gap:2px;min-width:0;transition:transform 120ms var(--ease-out),background-color 120ms ease}
+.ntile:active{transform:scale(.97);background:var(--fill)}
+.ntile b{font-size:22px;font-weight:700;line-height:1.1}
+.ntile span{font-size:13px;color:var(--label2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ntile.bad b{color:var(--red)} .ntile.warn b{color:var(--orange)} .ntile.ok b{color:var(--green)} .ntile.info b{color:var(--accent)}
+.cgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.ctile{background:var(--surface);border-radius:16px;padding:14px;text-align:left;display:grid;gap:10px;min-width:0;min-height:118px;align-content:space-between;transition:transform 120ms var(--ease-out),background-color 120ms ease}
+.ctile:active{transform:scale(.97);background:var(--fill)}
+.ctile .top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.ctile b{font-size:17px;font-weight:600;line-height:21px}
+.ctile .s{font-size:13px;color:var(--label2)}
+.newslist{display:grid;gap:10px}
+.newslist .fc{min-height:0}
+.task{background:var(--surface);border-radius:16px;padding:16px;display:grid;gap:8px;box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--accent) 35%,transparent)}
+.task-k{font-size:13px;color:var(--accent);font-weight:600}
+.task b{font-size:20px;line-height:25px}
+.task p{font-size:15px;color:var(--label2)}
+.aicta{width:100%;display:flex;align-items:center;gap:12px;text-align:left;background:var(--surface);border-radius:16px;padding:14px 16px;margin-top:12px;box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--accent) 30%,transparent);transition:transform 120ms var(--ease-out)}
+.aicta:active{transform:scale(.98)}
+.aicta>span:nth-child(2){flex:1;min-width:0;display:grid}
+.aicta b{font-size:17px}
+.aicta>span:nth-child(2)>span{font-size:14px;color:var(--label2)}
+.spark{width:38px;height:38px;border-radius:11px;flex:none;display:grid;place-items:center;color:#fff;background:linear-gradient(135deg,var(--accent),#AF52DE)}
+.spark svg{width:22px;height:22px}
+.aisteps{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:2px}
+.aisteps i{height:4px;border-radius:2px;background:var(--fill)}
+.aisteps i.on{background:var(--accent)}
+.aik{font-size:13px;color:var(--label2);margin:10px 4px 2px;font-weight:500}
+.aih{font-size:22px;line-height:28px;font-weight:700;margin:4px 4px 16px}
+textarea.inp.plain{font-family:inherit;font-size:17px;min-height:84px;resize:vertical}
+.aiex,.aicats{display:flex;flex-wrap:wrap;gap:8px}
+.aicats{margin-top:16px}
+.aiex .chip{font-size:14px;padding:7px 12px}
+.ainav{display:flex;gap:10px;margin-top:22px;padding-bottom:6px}
+.ainav .btn{flex:1}
+.why{margin-top:18px;padding:0 4px}
+.why p{font-size:15px;color:var(--label2);line-height:21px;margin-top:4px}
+.aisum{display:flex;gap:12px;align-items:center;background:var(--surface);border-radius:14px;padding:12px 14px;margin-top:8px}
+.aisum div{display:grid;min-width:0}
+.aisum b{font-size:17px}
+.aisum span:not(.spark){font-size:14px;color:var(--label2)}
+.aisub{background:var(--fill);margin:0 12px 10px;border-radius:10px;padding:10px 12px;display:grid;gap:8px}
+.aisub .mini{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:15px}
+.aisub .ginp{background:var(--surface)}
+.aisub .mini>span:last-child{flex:none;white-space:nowrap}
+.aitog{text-align:left;background:none;padding:0;color:inherit}
+.aitog .row-s{color:var(--accent)}
+.aiadd{margin-top:14px;padding:0 4px}
+.aithink{display:grid;justify-items:center;text-align:center;gap:8px;padding:34px 16px 22px}
+.aithink .spark{width:52px;height:52px;border-radius:15px;animation:aipulse 1.1s ease-in-out infinite}
+.aithink b{font-size:19px}
+.aithink p{font-size:15px;color:var(--label2)}
+@keyframes aipulse{50%{transform:scale(.9);opacity:.7}}
+.skel .row-main{display:grid;gap:6px}
+.skel i{display:block;height:12px;width:70%;border-radius:6px;background:var(--fill);animation:aipulse 1.1s ease-in-out infinite}
+.skel i.s{width:40%;height:10px}
+@media (prefers-reduced-motion:reduce){.aithink .spark,.skel i{animation:none}}
+.lgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.ltile{background:var(--surface);border-radius:14px;padding:12px;text-align:left;display:grid;gap:4px;min-width:0;transition:transform 120ms var(--ease-out)}
+.ltile:active{transform:scale(.97)}
+.ltile.on{box-shadow:inset 0 0 0 2px var(--accent)}
+.ltile .lnum{width:22px;height:22px;border-radius:11px;background:var(--fill);display:grid;place-items:center;font-size:12px;font-weight:700}
+.ltile.on .lnum{background:var(--accent);color:#fff}
+.ltile b{font-size:15px}
+.ltile .s{font-size:12px;color:var(--label2);line-height:15px}
+.ginp{width:64px;text-align:right;background:var(--fill);border:0;border-radius:8px;padding:6px 8px;font-size:16px;flex:none}
 .empty{padding:28px 16px;text-align:center;color:var(--label2);font-size:15px}
 .how{margin-top:12px;font-size:13px;color:var(--label2);padding:0 4px}
 .how summary{cursor:pointer;color:var(--accent);font-size:15px;padding:6px 0}
@@ -290,18 +369,21 @@ let seed = 20261026; const rnd = () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0
 
 /* ---------- 10 proveedores por categoría (nombres genéricos salvo Tibbika) ---------- */
 const SUPPLIERS = [
-  {id:'tb', name:'Tibbika', kind:'Bebidas fermentadas', color:'#AF52DE', inApp:true,  phone:'3001112233', days:[1,3,5], cutoff:'17:00'},
-  {id:'fv', name:'Fruver del Norte', kind:'Frutas y verduras', color:'#34C759', inApp:true,  phone:'3002223344', days:[1,2,3,4,5,6], cutoff:'20:00'},
-  {id:'po', name:'Avícola San Gil', kind:'Pollo', color:'#FF9500', inApp:true, phone:'3003334455', days:[2,4,6], cutoff:'19:00'},
-  {id:'rs', name:'Carnes La Res', kind:'Carne de res', color:'#FF3B30', inApp:false, owner:'gd', phone:'3014445566', days:[2,4,6], cutoff:'18:00'},
-  {id:'ce', name:'Cerdo y Charcutería', kind:'Cerdo y charcutería', color:'#FF2D55', inApp:false, owner:'gd', phone:'3015556677', days:[3,6], cutoff:'17:00'},
-  {id:'pa', name:'Papas del Páramo', kind:'Papa y tubérculos', color:'#A2845E', inApp:false, owner:'gd', phone:'3016667788', days:[2,5], cutoff:'18:00'},
-  {id:'la', name:'Lácteos La Pradera', kind:'Lácteos', color:'#30B0C7', inApp:false, owner:'gd', phone:'3017778899', days:[1,3,5], cutoff:'18:00'},
-  {id:'hm', name:'Harinas y Tortillas', kind:'Harinas y tortillas', color:'#FFCC00', ink:true, inApp:false, owner:'gd', phone:'3018889900', days:[2,5], cutoff:'16:00'},
-  {id:'ab', name:'Abarrotes Saludables', kind:'Abarrotes y endulzantes', color:'#5856D6', inApp:false, owner:'gd', phone:'3019990011', days:[3], cutoff:'16:00'},
-  {id:'be', name:'Distribuidora de Bebidas', kind:'Bebidas y sodas', color:'#32ADE6', inApp:false, owner:'gd', phone:'3020001122', days:[4], cutoff:'15:00'}
+  {id:'tb', cat:'Bebidas', name:'Tibbika', kind:'Bebidas fermentadas', color:'#AF52DE', inApp:true,  phone:'3001112233', days:[1,3,5], cutoff:'17:00'},
+  {id:'fv', cat:'Frutas y verduras', name:'Fruver del Norte', kind:'Frutas y verduras', color:'#34C759', inApp:true,  phone:'3002223344', days:[1,2,3,4,5,6], cutoff:'20:00'},
+  {id:'po', cat:'Proteínas', name:'Avícola San Gil', kind:'Pollo', color:'#FF9500', inApp:true, phone:'3003334455', days:[2,4,6], cutoff:'19:00'},
+  {id:'rs', cat:'Proteínas', name:'Carnes La Res', kind:'Carne de res', color:'#FF3B30', inApp:false, owner:'gd', phone:'3014445566', days:[2,4,6], cutoff:'18:00'},
+  {id:'ce', cat:'Proteínas', name:'Cerdo y Charcutería', kind:'Cerdo y charcutería', color:'#FF2D55', inApp:false, owner:'gd', phone:'3015556677', days:[3,6], cutoff:'17:00'},
+  {id:'pa', cat:'Frutas y verduras', name:'Papas del Páramo', kind:'Papa y tubérculos', color:'#A2845E', inApp:false, owner:'gd', phone:'3016667788', days:[2,5], cutoff:'18:00'},
+  {id:'la', cat:'Lácteos', name:'Lácteos La Pradera', kind:'Lácteos', color:'#30B0C7', inApp:false, owner:'gd', phone:'3017778899', days:[1,3,5], cutoff:'18:00'},
+  {id:'hm', cat:'Panadería y harinas', name:'Harinas y Tortillas', kind:'Harinas y tortillas', color:'#FFCC00', ink:true, inApp:false, owner:'gd', phone:'3018889900', days:[2,5], cutoff:'16:00'},
+  {id:'ab', cat:'Abarrotes', name:'Abarrotes Saludables', kind:'Abarrotes y endulzantes', color:'#5856D6', inApp:false, owner:'gd', phone:'3019990011', days:[3], cutoff:'16:00'},
+  {id:'be', cat:'Bebidas', name:'Distribuidora de Bebidas', kind:'Bebidas y sodas', color:'#32ADE6', inApp:false, owner:'gd', phone:'3020001122', days:[4], cutoff:'15:00'}
 ];
 const sup = id => SUPPLIERS.find(s => s.id === id);
+const CATS = ['Proteínas','Frutas y verduras','Lácteos','Panadería y harinas','Bebidas','Abarrotes','Otros'];
+const CAT_COLOR = {'Proteínas':'#FF3B30','Frutas y verduras':'#34C759','Lácteos':'#30B0C7','Panadería y harinas':'#FFCC00','Bebidas':'#AF52DE','Abarrotes':'#5856D6','Otros':'#8E8E93'};
+const catOf = sid => (sup(sid) && sup(sid).cat) || 'Otros';
 const fCut = sid => fHour(sup(sid).cutoff);
 const cutoffPassed = sid => minsNow() >= toMin(sup(sid).cutoff);
 function nextDelivery(sid){ const s = sup(sid); let d = cutoffPassed(sid) ? 2 : 1; for (let k = 0; k < 14; k++, d++) if (s.days.includes(wd(d))) return d; return 1; }
@@ -325,20 +407,54 @@ const PR = {}; const syncPR = () => { for (const k in PR) delete PR[k]; PRODUCTS
 const productsOf = sid => PRODUCTS.filter(p => p.s === sid);
 const categories = sid => [...new Set(productsOf(sid).map(p => p.c))];
 
-/* ---------- platos reales de GAINS (gramajes de gainscol.com; sub-recetas convertidas a materia prima, estimadas) ---------- */
+/* ---------- recetas: platos → sub-recetas → ingredientes ---------- */
+// gramos por unidad de compra (para productos que se compran por unidad o atado)
+const GPU = {lec:150, cil:80, ceo:60, lev:1030, ttm:360, bre:300, agm:600, tbg:5000, tbj:5000, tbb:300, soj:1000};
+// rendimientos de referencia: ap = parte aprovechable tras limpiar, coc = peso cocido / peso crudo
+const YREF = {
+  tom:{ap:.95, tip:'Quítale el cabito y pesa. Si llega muy maduro se bota más.'},
+  lec:{ap:.75, tip:'Se van las hojas externas y el corazón. Pesa una unidad antes y después de limpiar.'},
+  ceb:{ap:.88, coc:.4, tip:'Cáscara y raíz. Caramelizada pierde cerca del 60% de su peso.'},
+  cer:{ap:.88, tip:'Cáscara y raíz.'},
+  pin:{ap:.5, tip:'Cáscara y corazón son la mitad. Con la cáscara puedes hacer tepache.'},
+  agu:{ap:.7, tip:'Pepa y cáscara. Si llega muy maduro pierdes más por partes oscuras.'},
+  cil:{ap:.6, tip:'Tallos gruesos y hojas dañadas. Los tallos sirven para fondos y salsas.'},
+  ceo:{ap:.85, tip:'Raíz y puntas secas.'},
+  lim:{ap:.45, tip:'Si solo usas el jugo, aprovechas menos de la mitad.'},
+  ajo:{ap:.85, tip:'Cáscara y base.'},
+  pec:{ap:.95, coc:.75, tip:'Se le quita grasa y nervio. A la plancha pierde cerca del 25%.'},
+  ali:{ap:1, coc:.78, tip:'Fritas pierden cerca del 22% de su peso.'},
+  mus:{ap:.95, coc:.72, tip:'Piel y grasa al limpiar.'},
+  c90:{ap:1, coc:.75, tip:'Una carne 90/10 pierde cerca del 25% al sellarse.'},
+  fal:{ap:.9, coc:.6, tip:'Cocinada lento, como la birria, pierde cerca del 40%.'},
+  toc:{ap:1, coc:.45, tip:'Crocante pierde más de la mitad de su peso en grasa.'},
+  bon:{ap:.95, coc:.65, tip:'Cocinado lento pierde cerca del 35%.'},
+  pap:{ap:.85, coc:.5, tip:'Pelada pierde cerca del 15%; frita, cerca de la mitad del peso.'},
+  mtq:{ap:1, coc:.8, tip:'Hecha ghee te queda cerca del 80%.'}
+};
+// sub-recetas de GAINS: entradas en peso de compra (g), rinde = peso final (g). Estimadas salvo las marcadas como pesadas.
+const GAINS_SUBS = () => [
+  {id:'s_pan', name:'Pan de masa madre', inp:[{p:'hpt',g:1000},{p:'mtq',g:40}], out:1650, ok:true},
+  {id:'s_ghe', name:'Ghee', inp:[{p:'mtq',g:1000}], out:800, ok:true},
+  {id:'s_sal', name:'Salsa GAINS (yogur griego)', inp:[{p:'lev',g:3000},{p:'ajo',g:20}], out:1000},
+  {id:'s_mer', name:'Mermelada de piña', inp:[{p:'pin',g:1000},{p:'alu',g:60}], out:450},
+  {id:'s_ceb', name:'Cebolla caramelizada', inp:[{p:'ceb',g:1000},{p:'mtq',g:30}], out:400},
+  {id:'s_tar', name:'Pollo en tártara', inp:[{p:'pec',g:1000},{p:'lev',g:450}], out:900},
+  {id:'s_stt', name:'Salsa tártara', inp:[{p:'lev',g:1200},{p:'ajo',g:10}], out:420},
+  {id:'s_pap', name:'Papas GAINS triple cocción', inp:[{p:'pap',g:1000},{p:'man',g:80}], out:500},
+  {id:'s_bir', name:'Carne birria', inp:[{p:'fal',g:1000},{p:'ajo',g:30}], out:600},
+  {id:'s_cra', name:'Crema de aguacate', inp:[{p:'agu',g:1000},{p:'lim',g:80}], out:720},
+  {id:'s_enc', name:'Cebollitas encurtidas', inp:[{p:'cer',g:1000}], out:880},
+  {id:'s_ala', name:'Alitas marinadas y fritas', inp:[{p:'ali',g:1000},{p:'lev',g:150},{p:'har',g:80},{p:'man',g:100}], out:800}
+];
+// platos reales de GAINS (gainscol.com). comp: k='p' producto o 'r' sub-receta, g = gramos como se sirven
 const GAINS_MENU = f => [
-  {id:'ana', name:'La Anabólica', price:38500, perDay:Math.round(18*f), base:Math.round(18*f), note:'Pan de masa madre 112 g, carne 150 g, cheddar 22 g, salsa GAINS 40 g, mermelada de piña 35 g, cebolla caramelizada 20 g, cogollo 11 g, tomate 20 g',
-   ing:[{p:'c90',q:0.15},{p:'hpt',q:0.065},{p:'mtq',q:0.006},{p:'ched',q:0.022},{p:'lev',q:0.13},{p:'pin',q:0.06},{p:'ceb',q:0.04},{p:'lec',q:0.08},{p:'tom',q:0.02}]},
-  {id:'pkf', name:'Peak Fries', price:45500, perDay:Math.round(12*f), base:Math.round(12*f), note:'Papas GAINS 240 g, pollo en tártara, mozzarella 65 g, tocineta 10 g, tártara 40 g, mermelada de piña 35 g, cebollín',
-   ing:[{p:'pap',q:0.4},{p:'pec',q:0.1},{p:'moz',q:0.065},{p:'toc',q:0.01},{p:'lev',q:0.13},{p:'pin',q:0.06},{p:'ceo',q:0.05},{p:'man',q:0.03}]},
-  {id:'bir', name:'Mighty Birria', price:44900, perDay:Math.round(10*f), base:Math.round(10*f), note:'4 tortillas de maíz, carne birria, costra de mozzarella, crema de aguacate, cebollitas encurtidas, cilantro',
-   ing:[{p:'ttm',q:0.34},{p:'fal',q:0.18},{p:'moz',q:0.06},{p:'agu',q:0.05},{p:'cer',q:0.02},{p:'cil',q:0.05},{p:'lim',q:0.01}]},
-  {id:'wng', name:'Primal Wings x4', price:33900, perDay:Math.round(14*f), base:Math.round(14*f), note:'Marinadas 48 h en yogur, apanado sin gluten, triple cocción en grasa de cerdo',
-   ing:[{p:'ali',q:0.36},{p:'lev',q:0.05},{p:'har',q:0.03},{p:'man',q:0.04},{p:'alu',q:0.004},{p:'dij',q:0.005}]},
-  {id:'sod', name:'Soda Probiótica', price:17000, perDay:Math.round(15*f), base:Math.round(15*f), note:'Agua de kéfir Tibbika y soda Bretaña',
-   ing:[{p:'tbg',q:0.04},{p:'bre',q:1}]},
-  {id:'tib', name:'Tibbika (botella)', price:10000, perDay:Math.round(8*f), base:Math.round(8*f), note:'Botella Tibbika servida fría',
-   ing:[{p:'tbb',q:1}]}
+  {id:'ana', name:'La Anabólica', price:38500, perDay:Math.round(18*f), base:Math.round(18*f), ok:true, comp:[{k:'r',id:'s_pan',g:112},{k:'r',id:'s_ghe',g:5},{k:'p',id:'c90',g:150},{k:'p',id:'ched',g:22},{k:'r',id:'s_sal',g:40},{k:'r',id:'s_mer',g:35},{k:'r',id:'s_ceb',g:20},{k:'p',id:'lec',g:11},{k:'p',id:'tom',g:20}]},
+  {id:'pkf', name:'Peak Fries', price:45500, perDay:Math.round(12*f), base:Math.round(12*f), ok:true, comp:[{k:'r',id:'s_pap',g:240},{k:'r',id:'s_tar',g:100},{k:'p',id:'moz',g:65},{k:'p',id:'toc',g:10},{k:'r',id:'s_stt',g:40},{k:'r',id:'s_mer',g:35},{k:'p',id:'ceo',g:1}]},
+  {id:'bir', name:'Mighty Birria', price:44900, perDay:Math.round(10*f), base:Math.round(10*f), ok:true, comp:[{k:'p',id:'ttm',g:120},{k:'r',id:'s_bir',g:120},{k:'p',id:'moz',g:60},{k:'r',id:'s_cra',g:40},{k:'r',id:'s_enc',g:15},{k:'p',id:'cil',g:3}]},
+  {id:'wng', name:'Primal Wings x4', price:33900, perDay:Math.round(14*f), base:Math.round(14*f), ok:false, comp:[{k:'r',id:'s_ala',g:290},{k:'r',id:'s_sal',g:30}]},
+  {id:'sod', name:'Soda Probiótica', price:17000, perDay:Math.round(15*f), base:Math.round(15*f), ok:true, comp:[{k:'p',id:'tbg',g:200},{k:'p',id:'bre',g:300}]},
+  {id:'tib', name:'Tibbika (botella)', price:10000, perDay:Math.round(8*f), base:Math.round(8*f), ok:true, comp:[{k:'p',id:'tbb',g:300}]}
 ];
 
 /* ---------- restaurantes ---------- */
@@ -358,7 +474,7 @@ const INVITES = [];
 const LEVELS = {suave:{f:0.7, l:'Suave', c:'info'}, normal:{f:1, l:'Normal', c:'ok'}, alto:{f:1.4, l:'Alto', c:'warn'}, cerrado:{f:0, l:'Cerrado', c:'mute'}};
 const NOTIF_DELAY = 30, NOTIF_REMIND = 60;
 const BIZ = {};
-const biz = bid => BIZ[bid] ||= {open:[0,1,2,3,4,5,6], close:'22:00', log:{}, menu:[]};
+const biz = bid => BIZ[bid] ||= {open:[0,1,2,3,4,5,6], close:'22:00', log:{}, menu:[], subs:[], yields:{}, streak:0, lastTaskDay:null};
 function wdFactor(bid, w){
   const b = biz(bid); if (!b.open.includes(w)) return 0;
   const v = Object.entries(b.log).filter(([d,l]) => +d <= 0 && l !== 'cerrado' && wd(+d) === w).map(([,l]) => LEVELS[l].f);
@@ -368,8 +484,24 @@ function mult(bid, d){ const b = biz(bid), l = b.log[d]; if (l) return LEVELS[l]
 function consume(bid, rate, a, b){ let t = 0; for (let k = Math.floor(a); k < b; k++) { const lo = Math.max(a,k), hi = Math.min(b,k+1); if (hi > lo) t += (hi - lo) * mult(bid,k); } return rate * t; }
 function runout(bid, rate, stock, from){ let t = from, left = stock; for (let i = 0; i < 90; i++) { const k = Math.floor(t), r = rate * mult(bid,k), c = r * (k + 1 - t); if (r > 0 && c >= left) return t + left / r; left -= c; t = k + 1; } return t; }
 const nowT = bid => biz(bid).log[0] ? 1 : 0.5;
-function theo(bid, pid, useBase){ return biz(bid).menu.reduce((t,d) => t + (useBase ? d.base : d.perDay) * d.ing.filter(i => i.p === pid).reduce((s,i) => s + i.q, 0), 0); }
-function menuProducts(bid, sid){ const s = new Set(); biz(bid).menu.forEach(d => d.ing.forEach(i => { const p = PR[i.p]; if (p && p.active && (!sid || p.s === sid)) s.add(i.p); })); return s; }
+const gpu = p => p.u === 'kg' ? 1000 : (GPU[p.id] || 1000);
+const yld = (bid, pid) => { const y = biz(bid).yields[pid], r = YREF[pid] || {}; return {ap: y && y.ap != null ? y.ap : (r.ap ?? 1), coc: y && y.coc != null ? y.coc : (r.coc ?? 1), ok: !!(y && y.ok), tip: r.tip || ''}; };
+const subOf = (bid, id) => biz(bid).subs.find(x => x.id === id);
+let KV = 0; const XC = new Map();
+function expand(bid, d){   // compra por plato, en unidades de compra de cada producto
+  const key = bid + '|' + d.id + '|' + KV; if (XC.has(key)) return XC.get(key);
+  const out = {}, addP = (pid, g) => { const p = PR[pid]; if (p) out[pid] = (out[pid] || 0) + g / gpu(p); };
+  for (const c of d.comp) { if (c.k === 'p') addP(c.id, c.g / yld(bid, c.id).ap); else { const sb = subOf(bid, c.id); if (sb && sb.out > 0) sb.inp.forEach(i => addP(i.p, i.g * c.g / sb.out)); } }
+  XC.set(key, out); return out;
+}
+function theo(bid, pid, useBase){ return biz(bid).menu.reduce((t,d) => t + (useBase ? d.base : d.perDay) * (expand(bid, d)[pid] || 0), 0); }
+function menuProducts(bid, sid){ const s = new Set(); biz(bid).menu.forEach(d => Object.keys(expand(bid, d)).forEach(pid => { const p = PR[pid]; if (p && p.active && (!sid || p.s === sid)) s.add(pid); })); return s; }
+const ppg = pid => PR[pid].pr / gpu(PR[pid]);   // $ por gramo comprado
+const subCostG = (bid, sb) => sb.out > 0 ? sb.inp.reduce((t,i) => t + i.g * ppg(i.p), 0) / sb.out : 0;
+function compCost(bid, c){ if (c.k === 'p') return c.g / yld(bid, c.id).ap * ppg(c.id); const sb = subOf(bid, c.id); return sb ? c.g * subCostG(bid, sb) : 0; }
+const dishCost = (bid, d) => d.comp.reduce((t,c) => t + compCost(bid, c), 0);
+const foodCost = (bid, d) => d.price ? dishCost(bid, d) / (d.price / 1.08) : 0;
+const compName = (bid, c) => c.k === 'p' ? PR[c.id].n : (subOf(bid, c.id) || {name:'Sub-receta'}).name;
 function checkinDay(bid){
   const b = biz(bid), sent = minsNow() >= toMin(b.close) + NOTIF_DELAY;
   for (const d of [0,-1,-2]) { if (d === 0 && !sent) continue; if (b.open.includes(wd(d)) && b.log[d] !== 'cerrado') return b.log[d] ? null : d; }
@@ -378,10 +510,10 @@ function checkinDay(bid){
 
 /* memoria de ejemplo */
 { const pat = {0:'normal', 2:'suave', 3:'suave', 4:'normal', 5:'alto', 6:'alto'};
-  for (const [bid, f, close] of [['gd',1,'21:30'],['gc',0.7,'22:00']]) { const b = biz(bid); b.open = [0,2,3,4,5,6]; b.close = close; b.menu = GAINS_MENU(f);
+  for (const [bid, f, close] of [['gd',1,'21:30'],['gc',0.7,'22:00']]) { const b = biz(bid); b.open = [0,2,3,4,5,6]; b.close = close; b.subs = GAINS_SUBS(); b.menu = GAINS_MENU(f); b.yields = {agu:{ap:.68, ok:true}}; b.streak = 3; b.lastTaskDay = -1;
     for (let d = -21; d <= -2; d++) { const w = wd(d); if (b.open.includes(w)) b.log[d] = rnd() < 0.2 ? 'normal' : pat[w]; } }
-  biz('ca').menu = [{id:'kc', name:'Kéfir de la casa', price:9000, perDay:12, base:12, ing:[{p:'tbb',q:1}]}, {id:'bf', name:'Bowl de frutas', price:14000, perDay:10, base:10, ing:[{p:'pin',q:0.12},{p:'lim',q:0.01}]}];
-  biz('jn').menu = [{id:'sp', name:'Smoothie probiótico', price:12000, perDay:25, base:25, ing:[{p:'tbg',q:0.05},{p:'pin',q:0.1}]}];
+  biz('ca').menu = [{id:'kc', name:'Kéfir de la casa', price:9000, perDay:12, base:12, ok:true, comp:[{k:'p',id:'tbb',g:300}]}, {id:'bf', name:'Bowl de frutas', price:14000, perDay:10, base:10, ok:true, comp:[{k:'p',id:'pin',g:60},{k:'p',id:'lim',g:5}]}];
+  biz('jn').menu = [{id:'sp', name:'Smoothie probiótico', price:12000, perDay:25, base:25, ok:true, comp:[{k:'p',id:'tbg',g:250},{k:'p',id:'pin',g:50}]}];
 }
 
 /* ---------- historial: 8 semanas generadas desde el consumo de cada menú ---------- */
@@ -489,6 +621,7 @@ function buyerStats(sid){
     r.seg = r.isNew ? 'Nuevo' : r.big && r.freq ? 'Clave' : r.big ? 'Por desarrollar' : r.freq ? 'Fiel' : 'Ocasional'; }
   return rows;
 }
+const SEGL = {'Clave':'Top','Por desarrollar':'Por crecer','Fiel':'Fiel','Ocasional':'De vez en cuando','Nuevo':'Nuevo'};
 const SEGCLS = {'Clave':'ok','Por desarrollar':'info','Fiel':'mute','Ocasional':'mute','Nuevo':'warn'};
 function clientToday(sid, bid){
   const pend = ORDERS.find(o => o.s === sid && o.b === bid && o.status !== 'Entregado');
@@ -507,7 +640,7 @@ function growth(sid, bid){
 }
 
 /* ---------- ofertas ---------- */
-const REASONS = {vence:{l:'Vence pronto', c:'warn', d:'Consumir en 1 a 2 días'}, defecto:{l:'Detalle visual', c:'info', d:'Forma o color irregular, mismo sabor y calidad'}, excedente:{l:'Excedente', c:'ok', d:'Producto en buen estado que sobró'}};
+const REASONS = {vence:{l:'Se vence pronto', c:'warn', d:'Para usar en 1 o 2 días'}, defecto:{l:'Feo pero bueno', c:'info', d:'Raro de forma o color, sabe igual'}, excedente:{l:'Me sobró', c:'ok', d:'Está bien, solo que sobró'}};
 const DEALS = [
   {id:'k1', s:'tb', p:'tbb', r:'vence', pct:25, qty:24, sold:6, until:1, note:'Lote con 5 días de vida útil', on:true},
   {id:'k2', s:'fv', p:'agu', r:'vence', pct:30, qty:6, sold:1, until:1, note:'Maduro, ideal para crema de aguacate', on:true},
@@ -546,10 +679,12 @@ for (const [bid, sid] of [['gc','tb'],['ca','tb'],['gd','po'],['gc','fv']]) { co
 
 /* ================= interfaz ================= */
 const ICON = {
+  spark:'<path d="M12 3.5l1.9 5.1 5.1 1.9-5.1 1.9L12 17.5l-1.9-5.1L5 10.5l5.1-1.9z"/><path d="M18.5 15.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z"/>',
   prov:'<path d="M3.5 7.5 12 3.5l8.5 4v9L12 20.5l-8.5-4z"/><path d="M3.5 7.5 12 11.5l8.5-4M12 11.5v9"/>',
   inv:'<path d="M4 20V11M9.5 20V5M15 20v-6M20.5 20V8"/>',
   orders:'<path d="M6 3.5h12v17l-3-2-3 2-3-2-3 2z"/><path d="M9 8.5h6M9 12.5h6"/>',
   biz:'<path d="M4 9.5 5.5 4h13L20 9.5"/><path d="M4 9.5a2.7 2.7 0 0 0 5.3 0 2.7 2.7 0 0 0 5.4 0 2.7 2.7 0 0 0 5.3 0"/><path d="M5.5 12.5V20h13v-7.5M10 20v-4.5h4V20"/>',
+  chef:'<path d="M7 17.5h10v3H7z"/><path d="M7 17.5v-4.1A4.2 4.2 0 0 1 8.4 5.6a4.3 4.3 0 0 1 7.2 0A4.2 4.2 0 0 1 17 13.4v4.1"/>',
   more:'<circle cx="12" cy="12" r="9"/><circle cx="7.8" cy="12" r=".9" fill="currentColor"/><circle cx="12" cy="12" r=".9" fill="currentColor"/><circle cx="16.2" cy="12" r=".9" fill="currentColor"/>',
   clients:'<circle cx="9" cy="8" r="3.4"/><path d="M2.8 20a6.2 6.2 0 0 1 12.4 0"/><path d="M15.5 4.8a3.4 3.4 0 0 1 0 6.4M17.5 14.2a6.2 6.2 0 0 1 3.7 5.8"/>',
   tag:'<path d="M3.5 12.2V3.5h8.7l8.3 8.3-8.7 8.7z"/><circle cx="8" cy="8" r="1.4"/>',
@@ -580,7 +715,7 @@ const refKey = () => isB() ? 'b:' + BID() : 's:' + SID();
 const cart = (sid = S.sid) => S.carts[sid] ||= {items:{}, sugQ:{}};
 function resetCart(sid = S.sid){ if (!isB() || !sid) return; const {due} = suggestions(BID(), sid), c = cart(sid); c.items = {}; c.sugQ = {}; due.forEach(x => { c.items[x.pid] = x.q; c.sugQ[x.pid] = x.q; }); }
 function cartUntouched(sid){ const c = cart(sid), a = Object.entries(c.items).filter(([,q]) => q > 0), k = Object.keys(c.sugQ); return a.length === k.length && a.every(([p,q]) => c.sugQ[p] === q); }
-function bizChanged(){ if (!isB()) return; for (const sid of BY[BID()].sups) if (S.carts[sid] && cartUntouched(sid)) resetCart(sid); }
+function bizChanged(){ KV++; XC.clear(); if (!isB()) return; for (const sid of BY[BID()].sups) if (S.carts[sid] && cartUntouched(sid)) resetCart(sid); }
 function openSup(sid){ S.sid = sid; S.tab = 'prov'; S.placed = null; S.q = ''; S.cat = 'Todos'; if (!S.carts[sid]) resetCart(sid); window.scrollTo(0,0); }
 const $ = id => document.getElementById(id);
 function toast(msg){ const t = $('toast'); t.textContent = msg; t.hidden = false; requestAnimationFrame(() => t.removeAttribute('data-hide')); clearTimeout(toast.t); toast.t = setTimeout(() => { t.setAttribute('data-hide',''); setTimeout(() => t.hidden = true, 260); }, 2600); }
@@ -590,6 +725,15 @@ const whenTxt = d => d === 0 ? 'hoy' : d === -1 ? 'ayer' : `el ${DOWL[wd(d)]}`;
 function waText(o){ const b = BY[o.b]; return `Hola, pedido de ${b.name} para el ${fDate(o.deliver)}:\n` + o.items.map(it => `• ${PR[it.p].n}: ${fQty(it.qty, PR[it.p].u)}${it.deal ? ' (oferta)' : ''}`).join('\n') + `\nTotal aprox: ${money(orderTotal(o,'qty'))}`; }
 
 /* ---------- novedades ---------- */
+const NEWSG = {'Cocina':'Cocina','Cierre del servicio':'Cierre','Inventario':'Inventario','Oferta':'Ofertas','Oferta activa':'Ofertas','Ofertas':'Ofertas','Cierre de pedidos':'Pedidos','Pedidos':'Pedidos','Precio':'Precios','Invita y gana':'Invitar','Cliente':'Clientes','En riesgo':'Clientes','Crece':'Clientes'};
+const NEWS_ORDER = ['Cierre','Cocina','Inventario','Pedidos','Clientes','Ofertas','Precios','Invitar'];
+const NEWS_LABEL = {Cocina:'Cocina', Cierre:'Cierre del día', Inventario:'Inventario', Pedidos:'Pedidos', Clientes:'Clientes', Ofertas:'Promociones', Precios:'Precios', Invitar:'Invitaciones'};
+function news(items){
+  if (!items.length) return '';
+  const gs = NEWS_ORDER.filter(g => items.some(x => NEWSG[x.k] === g));
+  return `<section class="grp"><h2 class="grp-h">Novedades</h2><div class="ngrid">${gs.map(g => { const its = items.filter(x => NEWSG[x.k] === g), cls = its.some(x => x.cls === 'bad') ? 'bad' : its.some(x => x.cls === 'warn') ? 'warn' : its[0].cls;
+    return `<button class="ntile ${cls}" data-act="sheet" data-v="news" data-d="${g}"><b>${its.length}</b><span>${NEWS_LABEL[g]}</span></button>`; }).join('')}</div></section>`;
+}
 function feed(items){
   if (!items.length) return '';
   return `<section class="grp"><h2 class="grp-h">Novedades</h2><div class="feed" role="list">${items.map(x => `<div class="fc" role="listitem">${tag(x.cls, x.k)}<p>${x.t}</p>
@@ -599,6 +743,7 @@ const segLevels = d => `<div class="seg" role="group" aria-label="Movimiento">${
 function buyerFeed(bid){
   const f = [], b = BY[bid], cd = checkinDay(bid);
   if (cd != null) f.push({k:'Cierre del servicio', cls:'info', t:`¿Cómo estuvo el movimiento ${whenTxt(cd)}?`, btns: segLevels(cd)});
+  const kt = todayTask(bid); if (kt && biz(bid).lastTaskDay !== 0) f.push({k:'Cocina', cls:'info', t:`Tarea de hoy, 5 minutos: ${esc(kt.t.toLowerCase())}.`, act:'go-tab', v:'kit', b:'Ir a Cocina'});
   const inv = inventory(bid);
   const bad = inv.filter(m => m.cls === 'bad');
   if (bad.length) { const bySup = [...new Set(bad.map(m => m.p.s))];
@@ -666,19 +811,24 @@ function viewOnboard(){
 function supRow(bid, sid){
   const sp = sup(sid), D = nextDelivery(sid), pend = ORDERS.find(o => o.b === bid && o.s === sid && o.status !== 'Entregado');
   const n = pend ? 0 : suggestions(bid, sid).due.length, nd = activeDeals(sid).length;
-  const s = pend ? `${pend.status === 'Enviado' ? 'Enviado por WhatsApp' : pend.status} · llega ${relDay(pend.deliver)}` : `${sp.inApp ? '' : 'WhatsApp · '}Entrega ${relDay(D)} · cierra ${fCut(sid)}`;
-  const r = `${nd ? tag('ok', `${nd} ${nd === 1 ? 'oferta' : 'ofertas'}`) : ''}${n ? `<span class="badge">${n}</span>` : ''}`;
+  const s = (pend ? `${pend.status === 'Enviado' ? 'Enviado por WhatsApp' : pend.status} · llega ${relDay(pend.deliver)}` : `${sp.inApp ? '' : 'WhatsApp · '}Entrega ${relDay(D)} · cierra ${fCut(sid)}`) + (nd ? ` · <span style="color:var(--green)">${nd} ${nd === 1 ? 'oferta' : 'ofertas'}</span>` : '');
+  const r = n ? `<span class="badge">${n}</span>` : '';
   return row({left:av(sp), t:esc(sp.name), s, r, act:'go-sup', v:sid, nav:true, inset:64});
 }
 function buyerProv(){
   if (S.sid) return S.placed ? buyerPlaced() : buyerSup();
-  const bid = BID(), b = BY[bid], groups = {pedir:[], camino:[], dia:[]};
-  for (const sid of b.sups) { const pend = ORDERS.some(o => o.b === bid && o.s === sid && o.status !== 'Entregado'); groups[pend ? 'camino' : suggestions(bid, sid).due.length ? 'pedir' : 'dia'].push(sid); }
-  return lt('Proveedores', todayTxt(), `<button class="navbtn" data-act="sheet" data-v="sup-new" aria-label="Agregar proveedor">${ico('plus')}</button>`) + feed(buyerFeed(bid)) +
-    (groups.pedir.length ? grp('Por pedir', groups.pedir.map(sid => supRow(bid, sid)).join(''), 'El número rojo es cuántos productos no te alcanzan.') : '') +
-    (groups.camino.length ? grp('En camino', groups.camino.map(sid => supRow(bid, sid)).join('')) : '') +
-    (groups.dia.length ? grp('Al día', groups.dia.map(sid => supRow(bid, sid)).join('')) : '') +
-    grp('', row({t:'<span style="color:var(--accent)">Agregar proveedor</span>', s:'Uno que no usa la app; el pedido sale por WhatsApp', act:'sheet', v:'sup-new'}));
+  const bid = BID(), b = BY[bid], C = S.supCat;
+  const info = Object.fromEntries(b.sups.map(sid => { const pend = ORDERS.some(o => o.b === bid && o.s === sid && o.status !== 'Entregado'); return [sid, pend ? 0 : suggestions(bid, sid).due.length]; }));
+  const cats = CATS.filter(c => b.sups.some(sid => catOf(sid) === c));
+  if (C) { const list = (C === 'Todas' ? b.sups : b.sups.filter(sid => catOf(sid) === C)).sort((x,y) => info[y] - info[x]);
+    return `<div class="navbar"><button class="back" data-act="supcat" data-v="">${ico('back')}Proveedores</button></div>` + lt(C, `${list.length} ${list.length === 1 ? 'proveedor' : 'proveedores'}`) +
+      grp('', list.map(sid => supRow(bid, sid)).join(''), 'El número rojo es cuántos productos no te alcanzan con ese proveedor.') +
+      grp('', row({t:'<span style="color:var(--accent)">Agregar proveedor</span>', s:'Uno que no usa la app; el pedido sale por WhatsApp', act:'sheet', v:'sup-new'})); }
+  const tiles = cats.map(c => { const list = b.sups.filter(sid => catOf(sid) === c), n = list.reduce((t,sid) => t + (info[sid] ? 1 : 0), 0), col = CAT_COLOR[c] || '#8E8E93';
+    return `<button class="ctile" data-act="supcat" data-v="${c}"><span class="top"><span class="av ${c === 'Panadería y harinas' ? 'ink' : ''}" style="background:${col}" aria-hidden="true">${c[0]}</span>${n ? `<span class="badge">${n}</span>` : ''}</span>
+      <span><b>${c}</b><br><span class="s">${list.length} ${list.length === 1 ? 'proveedor' : 'proveedores'} · ${n ? `${n} por pedir` : 'al día'}</span></span></button>`; }).join('');
+  return lt('Proveedores', todayTxt(), `<button class="navbtn" data-act="sheet" data-v="sup-new" aria-label="Agregar proveedor">${ico('plus')}</button>`) + news(buyerFeed(bid)) +
+    `<section class="grp"><h2 class="grp-h"><span>Categorías</span><button class="navbtn" data-act="supcat" data-v="Todas">Ver todos</button></h2><div class="cgrid">${tiles}</div><p class="grp-f">El número rojo es cuántos proveedores tienen algo por pedir.</p></section>`;
 }
 function stepper(key, q, u, name, deal){
   return q > 0 ? `<span class="stepper"><button data-act="${deal ? 'ddec' : 'dec'}" data-v="${key}" aria-label="Menos ${esc(name)}">−</button><output>${fQty(q,u)}</output><button data-act="${deal ? 'dinc' : 'inc'}" data-v="${key}" aria-label="Más ${esc(name)}">+</button></span>`
@@ -719,7 +869,7 @@ function buyerSup(){
   const sugTitle = !hasHistory && due.length ? 'Sugerido con tus platos' : 'Tu pedido sugerido';
   return head + dealsHtml +
     (due.length || dealLines || extra ? grp(`<span>${sugTitle}</span><button class="navbtn" data-act="reset">Restablecer</button>`, due.map(x => itemRow(x.pid, whyDue(x))).join('') + extra + dealLines,
-      hasHistory ? 'Calculado con tu inventario, tu movimiento diario y tus best sellers.' : 'Para unos 3 días de servicio. Se afina con cada pedido.') :
+      hasHistory ? 'Lo calculamos con lo que te queda, cómo te ha ido y lo que más vendes.' : 'Para unos 3 días de servicio. Se afina con cada pedido.') :
       grp('Tu pedido sugerido', `<div class="empty">${hasHistory ? 'Nada por reponer para esta entrega.' : 'Elige del catálogo. Si cargas tus platos en Negocio, te sugerimos el pedido desde hoy.'}</div>`)) +
     (later.length ? grp(`Aún no te toca · ${later.length}`, later.map(x => itemRow(x.pid, x.m ? (x.m.cls === 'info' ? x.m.label : x.m.until) : `Último pedido hace ${x.s.daysSince} días`)).join('')) : '') +
     catalog +
@@ -746,16 +896,19 @@ function invRowHtml(x){
 function buyerInv(){
   const bid = BID(), all = inventory(bid);
   if (!all.length) return lt('Inventario', 'Estimado automáticamente') + grp('', '<div class="empty">Aparece cuando pides un producto 2 veces, o desde el primer pedido si cargas tus platos en Negocio.</div>');
-  const F = S.invFilter, inv = F === 'pedir' ? all.filter(x => x.cls === 'bad' || x.cls === 'warn') : F === 'dia' ? all.filter(x => x.cls === 'ok' || x.cls === 'info') : all;
+  const need = x => x.cls === 'bad' || x.cls === 'warn', cats = CATS.filter(c => all.some(x => catOf(x.p.s) === c));
+  const F = S.invCat || (all.some(need) ? 'pedir' : cats[0]), inv = F === 'pedir' ? all.filter(need) : all.filter(x => catOf(x.p.s) === F);
   const bad = all.filter(x => x.cls === 'bad').length, warn = all.filter(x => x.cls === 'warn').length, val = all.reduce((t,x) => t + x.current * x.p.pr, 0);
-  return lt('Inventario', 'Sin contar nada', bad + warn ? `<button class="btn sm" data-act="inv-add">Pedir lo que falta</button>` : '') +
+  return lt('Inventario', 'Sin contar nada') +
   `<div class="stats"><div class="stat"><b style="color:var(--red)">${bad}</b><span>No alcanzan a su entrega</span></div><div class="stat"><b style="color:var(--orange)">${warn}</b><span>Pídelos en el próximo pedido</span></div><div class="stat"><b>${money(val / 1000)}k</b><span>En bodega, aprox.</span></div></div>
-  <div class="seg" style="margin-top:14px">${[['todo','Todo'],['pedir','Por pedir'],['dia','Al día']].map(([k,l]) => `<button data-act="invf" data-v="${k}" aria-pressed="${F === k}">${l}</button>`).join('')}</div>
-  ${grp('', inv.length ? inv.map(invRowHtml).join('') : '<div class="empty">Nada en esta vista.</div>', 'La barra es cuántos días te alcanza; la raya marca la próxima entrega de ese proveedor. Toca un producto para corregirlo.')}
+  ${bad + warn ? `<button class="btn full" data-act="inv-add" style="margin-top:10px">Agregar lo que falta a los pedidos</button>` : ''}
+  <div class="chips" role="tablist" aria-label="Vista del inventario">${[['pedir', 'Por pedir', all.filter(need).length], ...cats.map(c => [c, c, all.filter(x => catOf(x.p.s) === c).length])].map(([k,l,n]) => `<button class="chip" role="tab" data-act="invcat" data-v="${k}" aria-pressed="${F === k}" aria-selected="${F === k}">${l}<small>${n}</small></button>`).join('')}</div>
+  ${grp('', inv.length ? inv.map(invRowHtml).join('') : '<div class="empty">Nada por pedir. Todo alcanza hasta la próxima entrega.</div>')}
+  <p class="grp-f">La barra es cuántos días te alcanza; la raya marca la próxima entrega de ese proveedor. Toca un producto para corregirlo.</p>
   <details class="how"><summary>Cómo se calcula</summary><ul>
-    <li>Consumo de un día normal = lo que te entregaron en tus últimos pedidos ÷ los días de servicio entre ellos. Un día suave pesa 0,7, uno alto 1,4 y uno cerrado 0.</li>
-    <li>Tus platos: si cambias cuántos vendes al día, el consumo sube o baja en esa diferencia.</li>
-    <li>Existencia hoy = lo que tenías + lo que llegó − lo consumido cada día. Suponemos un día de colchón al empezar; cada corrección tuya lo afina.</li>
+    <li>Lo que gastas en un día normal sale de lo que te han entregado dividido entre los días que abriste. Un día suave cuenta como 0,7 y uno alto como 1,4.</li>
+    <li>Si cambias cuántos platos vendes al día, lo que gastas sube o baja con eso.</li>
+    <li>Lo que tienes hoy es lo que tenías, más lo que llegó, menos lo que gastaste. Al principio suponemos que guardas un día de reserva; cada vez que corriges, se ajusta.</li>
   </ul></details>`;
 }
 function applyFix(pid, q){
@@ -777,18 +930,244 @@ function buyerBiz(){
   const bid = BID(), b = biz(bid), order = [1,2,3,4,5,6,0], cd = checkinDay(bid);
   const levelOf = f => f === 0 ? 'cerrado' : f < 0.85 ? 'suave' : f > 1.15 ? 'alto' : 'normal';
   const strip = []; for (let d = -13; d <= 0; d++) { const l = b.log[d] || (b.open.includes(wd(d)) ? '' : 'cerrado'); strip.push(`<div class="${l}">${DOW[wd(d)]} ${dateOf(d).getDate()}<b>${l ? LEVELS[l].l : '—'}</b></div>`); }
-  return lt('Negocio', esc(BY[bid].name)) +
+  return `<div class="navbar"><button class="back" data-act="more-back">${ico('back')}Más</button></div>` + lt('Horario y cómo te fue', esc(BY[bid].name)) +
   (cd != null ? grp(`Cierre del servicio · ${fDate(cd)}`, `<div class="rowx" style="padding:12px 16px"><p class="row-t" style="margin-bottom:10px">¿Cómo estuvo el movimiento ${whenTxt(cd)}?</p>${segLevels(cd)}</div>`, `Con tu respuesta ajustamos lo que se gastó y lo que esperamos para los próximos ${plural(DOWL[wd(cd)])}.`) : '') +
-  grp('Best sellers', b.menu.map(d => row({t:esc(d.name), s:`${d.perDay} al día · ${d.ing.length} ${d.ing.length === 1 ? 'ingrediente' : 'ingredientes'}${d.perDay !== d.base ? ` · antes ${d.base}` : ''}${d.base === 0 ? ' · plato nuevo' : ''}`, r: d.price ? money(d.price) : '', act:'sheet', v:'dish', d:d.id, nav:true})).join('') +
-    row({t:'<span style="color:var(--accent)">Agregar plato</span>', act:'sheet', v:'dish-new'}), 'Con los gramajes de cada plato predecimos desde el primer pedido y anticipamos cambios antes de que se vean en los pedidos.') +
-  grp('Servicio', `<div class="rowx" style="padding:12px 16px"><p class="flabel" style="padding:0 0 8px">Días que abres</p><div class="days">${order.map(w => `<button data-act="open" data-v="${w}" aria-pressed="${b.open.includes(w)}" aria-label="${DOWL[w]}">${DOW[w][0].toUpperCase()}</button>`).join('')}</div></div>
-    <label class="row" for="close-t"><span class="row-main"><span class="row-t">Fin del servicio</span></span><input id="close-t" type="time" value="${b.close}" style="border:0;background:var(--fill);border-radius:8px;padding:6px 8px;font-size:17px"></label>
+  grp('Horario', `<div class="rowx" style="padding:12px 16px"><p class="flabel" style="padding:0 0 8px">Días que abres</p><div class="days">${order.map(w => `<button data-act="open" data-v="${w}" aria-pressed="${b.open.includes(w)}" aria-label="${DOWL[w]}">${DOW[w][0].toUpperCase()}</button>`).join('')}</div></div>
+    <label class="row" for="close-t"><span class="row-main"><span class="row-t">Hora de cierre</span></span><input id="close-t" type="time" value="${b.close}" style="border:0;background:var(--fill);border-radius:8px;padding:6px 8px;font-size:17px"></label>
     ${row({t:`Pregunta de cierre`, s:`${fHour(addMin(b.close, NOTIF_DELAY))} · 30 min después del cierre`})}
-    ${row({t:`Recordatorio`, s:`${fHour(addMin(b.close, NOTIF_REMIND))} · solo si no respondió`})}`, 'Si no responde ninguna, ese día cuenta como el promedio de ese día de la semana.') +
-  `<section class="grp"><h2 class="grp-h">Movimiento · últimos 14 días</h2><div class="strip">${strip.join('')}</div></section>` +
+    ${row({t:`Recordatorio`, s:`${fHour(addMin(b.close, NOTIF_REMIND))} · solo si no respondió`})}`, 'Si no respondes, tomamos lo que normalmente pasa ese día de la semana.') +
+  `<section class="grp"><h2 class="grp-h">Cómo te fue · últimos 14 días</h2><div class="strip">${strip.join('')}</div></section>` +
   grp('Próximos días', [1,2,3,4,5,6,7].map(d => { const auto = levelOf(b.open.includes(wd(d)) ? wdFactor(bid, wd(d)) : 0), set = b.log[d] || '';
     return `<label class="row" for="plan-${d}"><span class="row-main"><span class="row-t">${relDayC(d)}</span><span class="row-s">${fDate(d)} · esperamos ${LEVELS[auto].l.toLowerCase()}</span></span>
-      <select id="plan-${d}" data-act="plan" data-d="${d}" style="border:0;background:var(--fill);border-radius:8px;padding:6px 8px;font-size:15px;color:var(--accent)"><option value="" ${set ? '' : 'selected'}>Automático</option>${['suave','normal','alto','cerrado'].map(l => `<option value="${l}" ${set === l ? 'selected' : ''}>${LEVELS[l].l}</option>`).join('')}</select></label>`; }).join(''), 'Marca festivos, eventos o días cerrados. Cambia tu inventario y tus pedidos sugeridos.');
+      <select id="plan-${d}" data-act="plan" data-d="${d}" style="border:0;background:var(--fill);border-radius:8px;padding:6px 8px;font-size:15px;color:var(--accent)"><option value="" ${set ? '' : 'selected'}>Automático</option>${['suave','normal','alto','cerrado'].map(l => `<option value="${l}" ${set === l ? 'selected' : ''}>${LEVELS[l].l}</option>`).join('')}</select></label>`; }).join(''), 'Si viene un festivo, un evento o vas a cerrar, márcalo y ajustamos tu inventario y tus pedidos.');
+}
+
+/* ---------- cocina: recetas, sub-recetas, rendimiento ---------- */
+function kitProgress(bid){
+  const b = biz(bid), ings = [...new Set(b.menu.flatMap(d => Object.keys(expand(bid, d))))].filter(pid => PR[pid] && (YREF[pid] || b.yields[pid]));   // solo lo que tiene merma o cocción
+  return {l1:[b.menu.filter(d => d.ok).length, b.menu.length], l2:[b.subs.filter(x => x.ok).length, b.subs.length], l3:[ings.filter(pid => yld(bid, pid).ok).length, ings.length], ings};
+}
+function mermaMes(bid, pid){ const buy = delivered(bid).filter(o => o.day >= -28).reduce((t,o) => t + o.items.filter(i => i.p === pid).reduce((x,i) => x + i.del * i.price, 0), 0); return buy * 30 / 28 * (1 - yld(bid, pid).ap); }
+function todayTask(bid){
+  const b = biz(bid), pr = kitProgress(bid);
+  const d = b.menu.find(x => !x.ok); if (d) return {lvl:1, t:`Confirma los gramos de ${d.name}`, s:'Pesa un plato servido, cosa por cosa. Con eso sabemos cuánto te cuesta y cuánto gastas de cada ingrediente.', v:'dish', d:d.id};
+  const sb = b.subs.find(x => !x.ok); if (sb) return {lvl:2, t:`¿Cuánto rinde tu ${sb.name}?`, s:'La próxima vez que la hagas, pesa lo que echas y lo que te sale. Por ahora usamos un cálculo aproximado.', v:'sub', d:sb.id};
+  const i = pr.ings.filter(pid => !yld(bid, pid).ok).sort((x,y) => mermaMes(bid, y) - mermaMes(bid, x))[0];
+  if (i) return {lvl:3, t:`Pesa ${PR[i].n.toLowerCase()} antes y después de limpiar`, s:`Según el promedio, se te van cerca de ${money(mermaMes(bid, i))} al mes en lo que botas. Pesa 1 kg, límpialo y vuelve a pesarlo.`, v:'yield', d:i};
+  return null;
+}
+function taskDone(){ const b = biz(BID()); if (b.lastTaskDay !== 0) { b.streak++; b.lastTaskDay = 0; setTimeout(() => toast(`Tarea de hoy lista. Llevas ${b.streak} días seguidos.`), 60); } }
+const fcCls = f => f <= 0.3 ? 'ok' : f <= 0.35 ? 'warn' : 'bad';
+const pctTxt = f => `${Math.round(f * 100)}%`;
+/* ---------- asistente de recetas (IA simulada en el prototipo) ---------- */
+// preparaciones que la IA sabe armar: entradas en peso de compra (g) y lo que sale (g)
+const SUBLIB = {
+  pan:{name:'Pan de masa madre', inp:[{p:'hpt',g:1000},{p:'mtq',g:40}], out:1650},
+  ghe:{name:'Ghee', inp:[{p:'mtq',g:1000}], out:800},
+  sal:{name:'Salsa GAINS (yogur griego)', inp:[{p:'lev',g:3000},{p:'ajo',g:20}], out:1000},
+  mer:{name:'Mermelada de piña', inp:[{p:'pin',g:1000},{p:'alu',g:60}], out:450},
+  ceb:{name:'Cebolla caramelizada', inp:[{p:'ceb',g:1000},{p:'mtq',g:30}], out:400},
+  stt:{name:'Salsa tártara', inp:[{p:'lev',g:1200},{p:'ajo',g:10}], out:420},
+  pap:{name:'Papas GAINS triple cocción', inp:[{p:'pap',g:1000},{p:'man',g:80}], out:500},
+  bir:{name:'Carne birria', inp:[{p:'fal',g:1000},{p:'ajo',g:30}], out:600},
+  cra:{name:'Crema de aguacate', inp:[{p:'agu',g:1000},{p:'lim',g:80}], out:720},
+  enc:{name:'Cebollitas encurtidas', inp:[{p:'cer',g:1000}], out:880},
+  ala:{name:'Alitas marinadas y fritas', inp:[{p:'ali',g:1000},{p:'lev',g:150},{p:'har',g:80},{p:'man',g:100}], out:800},
+  pol:{name:'Pollo a la plancha', inp:[{p:'pec',g:1000},{p:'ajo',g:10},{p:'lim',g:30}], out:720},
+  pcr:{name:'Pollo crocante sin gluten', inp:[{p:'pec',g:1000},{p:'har',g:120},{p:'man',g:120}], out:900},
+  res:{name:'Res salteada', inp:[{p:'fal',g:1000},{p:'soj',g:40},{p:'ajo',g:15}], out:620},
+  cer:{name:'Cerdo desmechado', inp:[{p:'bon',g:1000},{p:'ajo',g:20},{p:'soj',g:50}], out:620},
+  gua:{name:'Guacamole', inp:[{p:'agu',g:1000},{p:'lim',g:60},{p:'cer',g:80},{p:'cil',g:20}], out:850},
+  pic:{name:'Pico de gallo', inp:[{p:'tom',g:500},{p:'cer',g:200},{p:'cil',g:30},{p:'lim',g:50}], out:700},
+  dij:{name:'Vinagreta de mostaza', inp:[{p:'dij',g:200},{p:'lim',g:80},{p:'alu',g:10}], out:260},
+  mas:{name:'Masa de pizza', inp:[{p:'hpt',g:1000},{p:'mtq',g:30}], out:1550},
+  tsa:{name:'Salsa de tomate', inp:[{p:'tom',g:1000},{p:'ajo',g:20},{p:'ceb',g:100}], out:650},
+  lmn:{name:'Base de limonada', inp:[{p:'lim',g:1000},{p:'alu',g:80}], out:450}
+};
+const P_ = (id, g) => ({k:'p', id, g}), R_ = (key, g) => ({k:'r', key, g}), X_ = (n, g) => ({k:'x', n, g});
+// proteína según lo que escriban: plancha (en trozo) o desmechada
+const PROT = [
+  [/birria/, {shred:R_('bir',0), grill:R_('bir',0)}],
+  [/crocante|apanad|crispy|frito/, {shred:R_('pcr',0), grill:R_('pcr',0)}],
+  [/pollo|chicken|pechuga/, {shred:R_('pol',0), grill:R_('pol',0)}],
+  [/cerdo|bondiola|pork|lechona/, {shred:R_('cer',0), grill:R_('cer',0)}],
+  [/\bres\b|carne|beef|steak|lomo/, {shred:R_('res',0), grill:R_('res',0), burger:P_('c90',0)}],
+  [/camaron|langostino/, {grill:X_('Camarón',0)}], [/salmon/, {grill:X_('Salmón',0)}], [/atun/, {grill:X_('Atún',0)}],
+  [/pescado|tilapia|mojarra|robalo/, {grill:X_('Filete de pescado',0)}], [/mariscos|marisco/, {grill:X_('Mix de mariscos',0)}]
+];
+const TPL = [
+  {re:/hambur|burger|smash/, kind:'burger', prot:150, items:[R_('pan',112), R_('ghe',5), 'PROT', P_('ched',22), R_('sal',35), R_('ceb',20), P_('lec',11), P_('tom',20)], why:'pan y proteína'},
+  {re:/taco|quesabirria|quesadilla/, kind:'shred', protDef:'bir', prot:120, items:[P_('ttm',120), 'PROT', P_('moz',50), R_('cra',40), R_('enc',15), P_('cil',3)], why:'tortilla de maíz'},
+  {re:/wrap|burrito/, kind:'shred', prot:120, items:[P_('ttm',90), 'PROT', P_('lec',20), R_('pic',40), P_('moz',30), R_('sal',25)], why:'tortilla y proteína'},
+  {re:/alita|wing/, kind:'grill', fixed:true, items:[R_('ala',290), R_('sal',30)], why:'alitas'},
+  {re:/papa|fries|salchipapa/, kind:'shred', protOpt:true, prot:90, items:[R_('pap',240), 'PROT', P_('ched',40), P_('toc',10), R_('stt',35), P_('ceo',1)], why:'papas como base'},
+  {re:/bowl|poke|ensalada|salad/, kind:'grill', protDefP:'pol', prot:130, items:[P_('lec',70), 'PROT', P_('agu',50), P_('tom',40), P_('cer',15), R_('dij',25)], why:'una base de verdes'},
+  {re:/sandw|sanduch|sanduc|club/, kind:'grill', protDefP:'pol', prot:110, items:[R_('pan',112), 'PROT', P_('moz',30), P_('lec',11), P_('tom',20), R_('sal',25)], why:'pan y proteína'},
+  {re:/pizza/, kind:'grill', protOpt:true, prot:60, items:[R_('mas',220), R_('tsa',70), P_('moz',120), 'PROT'], why:'masa de pizza'},
+  {re:/pasta|spaghetti|espagueti|lasa|penne/, kind:'shred', protOpt:true, prot:100, items:[X_('Pasta seca',120), R_('tsa',100), 'PROT', P_('moz',30)], why:'pasta'},
+  {re:/arepa/, kind:'shred', protOpt:true, prot:90, items:[X_('Harina de maíz precocida',90), 'PROT', P_('moz',40), R_('gua',30)], why:'arepa'},
+  {re:/limonada/, drink:true, items:[R_('lmn',60), P_('agm',300)], why:'bebida'},
+  {re:/soda|kefir|kéfir|kombucha|probiot/, drink:true, items:[P_('tbg',200), P_('bre',300)], why:'bebida'},
+  {re:/smoothie|batido|jugo|malteada/, drink:true, items:[P_('pin',150), P_('lev',200), P_('alu',10)], why:'bebida'}
+];
+const EXTRAS = [
+  [/tocin|bacon/, P_('toc',15)], [/guacamole/, R_('gua',40)], [/aguacate|avocado/, P_('agu',40)], [/cheddar/, P_('ched',25)],
+  [/mozzarella|queso fundido/, P_('moz',30)], [/caramelizad/, R_('ceb',20)], [/pina|piña/, R_('mer',30)], [/pico de gallo/, R_('pic',40)],
+  [/picante|jalape/, X_('Jalapeños',10)], [/champi/, X_('Champiñones',30)], [/huevo/, X_('Huevo',50)], [/maiz|maíz|mazorca/, X_('Maíz tierno',30)],
+  [/coco/, X_('Coco',60)], [/mango/, X_('Mango',80)], [/fresa/, X_('Fresa',80)], [/cilantro/, P_('cil',3)]
+];
+const sameItem = (a, b) => a.k === b.k && (a.k === 'p' ? a.id === b.id : a.k === 'r' ? a.key === b.key : norm(a.n) === norm(b.n));
+function aiDraft(bid, name, desc){
+  const txt = norm(name + ' ' + desc), b = biz(bid);
+  const tpl = TPL.find(t => t.re.test(txt)) || {kind:'grill', protDefP:'pol', prot:150, items:['PROT', R_('pap',150), P_('lec',30), P_('tom',30), R_('sal',30)], why:'una proteína con acompañante', generic:true};
+  const pm = PROT.find(([re]) => re.test(txt));
+  let prot = pm ? (pm[1][tpl.kind || 'grill'] || pm[1].grill) : tpl.protOpt ? null : tpl.protDef ? R_(tpl.protDef, 0) : tpl.protDefP ? R_(tpl.protDefP, 0) : P_('c90', 0);
+  const items = [];
+  for (const it of tpl.items) { if (it === 'PROT') { if (prot) items.push({...prot, g:tpl.prot}); } else items.push({...it}); }
+  for (const [re, it] of EXTRAS) if (re.test(txt) && !items.some(x => sameItem(x, it) || (it.k === 'p' && it.id === 'agu' && x.k === 'r' && ['gua','cra'].includes(x.key)))) items.push({...it});
+  // las preparaciones que ya existen en el negocio se reutilizan, las otras se crean
+  const out = items.map(it => { if (it.k !== 'r') return it; const L = SUBLIB[it.key], ex = b.subs.find(x => norm(x.name) === norm(L.name));
+    return {k:'r', key:it.key, g:it.g, name:L.name, inp:ex ? ex.inp.map(i => ({...i})) : L.inp.map(i => ({...i})), out:ex ? ex.out : L.out, exist:ex ? ex.id : null}; });
+  return {items:out, why:tpl.why, generic:!!tpl.generic};
+}
+// costo de un ítem del borrador o de un componente de plato
+const draftSubCostG = it => it.out > 0 ? it.inp.reduce((t,i) => t + i.g * ppg(i.p), 0) / it.out : 0;
+const draftCost = (bid, items) => items.reduce((t,it) => t + (it.k === 'p' ? it.g / yld(bid, it.id).ap * ppg(it.id) : it.k === 'r' ? it.g * draftSubCostG(it) : 0), 0);
+// categorías: la IA las saca de los ingredientes (lo que lleva, no el nombre)
+const DCATS = ['Hamburguesas y sánduches','Tacos y wraps','Alitas','Papas para compartir','Bowls y ensaladas','Pizzas','Pastas','Arepas','Platos fuertes','Bebidas'];
+const DCAT_COLOR = {'Hamburguesas y sánduches':'#FF9500','Tacos y wraps':'#FF3B30','Alitas':'#FF2D55','Papas para compartir':'#FFCC00','Bowls y ensaladas':'#34C759','Pizzas':'#AF52DE','Pastas':'#5856D6','Arepas':'#A2845E','Platos fuertes':'#007AFF','Bebidas':'#30B0C7'};
+const dcatColor = c => DCAT_COLOR[c] || '#8E8E93';
+function catGuess(items){   // items: {k:'p',id,g} | {k:'r',name,inp,g} | {k:'x',n,g}
+  const pids = new Set(), names = [], g = {};
+  for (const it of items) { if (it.k === 'p') { pids.add(it.id); g[it.id] = (g[it.id] || 0) + it.g; } else if (it.k === 'r') { names.push(norm(it.name)); it.inp.forEach(i => pids.add(i.p)); g['r:' + norm(it.name)] = it.g; } else names.push(norm(it.n)); }
+  const has = n => names.some(x => x.includes(n)), tot = items.reduce((t,it) => t + it.g, 0) || 1;
+  const LIQ = ['tbg','tbb','tbj','bre','agm','lim','alu','pin','lev'];
+  if (pids.size && [...pids].every(p => LIQ.includes(p)) && items.every(it => it.k !== 'r' || norm(it.name).includes('limonada'))) return {cat:'Bebidas', why:'es para tomar'};
+  if (pids.has('ttm')) return {cat:'Tacos y wraps', why:'lleva tortilla'};
+  if (has('masa de pizza')) return {cat:'Pizzas', why:'lleva masa de pizza'};
+  if (has('pasta')) return {cat:'Pastas', why:'lleva pasta'};
+  if (has('harina de maiz')) return {cat:'Arepas', why:'lleva harina de maíz'};
+  if (has('pan')) return {cat:'Hamburguesas y sánduches', why:'va en pan'};
+  if (pids.has('ali')) return {cat:'Alitas', why:'lleva alitas'};
+  const papas = items.filter(it => it.k === 'r' && norm(it.name).includes('papas')).reduce((t,it) => t + it.g, 0);
+  if (papas / tot >= 0.45) return {cat:'Papas para compartir', why:'la base son papas'};
+  if ((g.lec || 0) >= 40) return {cat:'Bowls y ensaladas', why:'la base son verdes'};
+  return {cat:'Platos fuertes', why:'es una proteína con acompañante'};
+}
+const compItems = (bid, d) => d.comp.map(c => c.k === 'p' ? c : (sb => sb ? {k:'r', name:sb.name, inp:sb.inp, g:c.g} : {k:'x', n:'', g:c.g})(subOf(bid, c.id))).concat((d.miss || []).map(m => ({k:'x', n:m.n, g:m.g})));
+const dishCat = (bid, d) => d.cat || (d.cat = catGuess(compItems(bid, d)).cat);
+
+/* ---------- asistente: pantallas ---------- */
+const AI_STEPS = ['Tu plato','Lo que lleva','Precio','Categoría'];
+const AI_WHY = {
+  1:'Con el nombre y una idea de lo que lleva, la IA arma la receta completa: las preparaciones (salsas, bases, carnes) y los ingredientes, con gramos. Tú solo corriges lo que no cuadre.',
+  2:'Separamos lo que preparas antes (salsas, bases, carnes) de lo que va directo al plato. Así cada preparación se calcula una vez y la puedes usar en otros platos. Con los gramos sabemos cuánto te cuesta y qué pedirle a cada proveedor.',
+  3:'Con el precio vemos cuánto de lo que cobras se va en ingredientes. Con cuántos vendes al día ajustamos tu inventario y tus pedidos.',
+  4:'La categoría ordena tu carta y te deja comparar platos parecidos. La IA la saca de los ingredientes, pero tú decides.'
+};
+const aiNew = () => ({step:1, name:'', desc:'', items:[], price:'', per:'', isNew:true, cat:'', catx:'', open:-1, made:''});
+function aiStats(){ const A = S.sheet.ai, bid = BID(), cost = draftCost(bid, A.items), pr = parsePrice(A.price), f = pr ? cost / (pr / 1.08) : 0;
+  return `<div class="stats"><div class="stat"><b style="font-size:19px">${money(cost)}</b><span>Te cuesta</span></div><div class="stat"><b style="font-size:19px;color:var(--${!pr ? 'label2' : fcCls(f) === 'ok' ? 'green' : fcCls(f) === 'warn' ? 'orange' : 'red'})">${pr ? pctTxt(f) : '—'}</b><span>Se va en ingredientes</span></div><div class="stat"><b style="font-size:19px">${pr ? money(pr / 1.08 - cost) : '—'}</b><span>Te queda</span></div></div>
+    ${pr ? `<p class="hint" style="margin-top:8px">${fcCls(f) === 'ok' ? 'Vas bien: menos del 30% se va en ingredientes.' : fcCls(f) === 'warn' ? 'Ojo: está entre 30% y 35%. Revisa porciones o precio.' : 'Estás dejando plata: más del 35% se va en ingredientes.'}</p>` : ''}`; }
+function aiSheet(err){
+  const A = S.sheet.ai, bid = BID(), b = biz(bid);
+  const head = `<div class="aisteps" role="progressbar" aria-valuemin="1" aria-valuemax="4" aria-valuenow="${A.step}">${[1,2,3,4].map(n => `<i class="${n <= A.step ? 'on' : ''}"></i>`).join('')}</div><p class="aik">Paso ${A.step} de 4 · ${AI_STEPS[A.step - 1]}</p>`;
+  const why = `<details class="how why"><summary>¿Para qué sirve este paso?</summary><p>${AI_WHY[A.step]}</p></details>`;
+  const nav = (next, act) => `<div class="ainav">${A.step > 1 ? `<button class="btn gray" data-act="ai-step" data-v="${A.step - 1}">Atrás</button>` : ''}<button class="btn" data-act="${act}" data-v="${A.step + 1}">${next}</button></div>`;
+  if (A.thinking) return `${head}<div class="aithink"><span class="spark" aria-hidden="true">${ico('spark')}</span><b>Armando tu receta…</b><p>Buscando preparaciones e ingredientes para ${esc(A.name)}</p></div>
+    <div class="grp-b skel">${'<div class="row"><span class="row-main"><i></i><i class="s"></i></span></div>'.repeat(4)}</div>`;
+  if (A.step === 1) return `${head}<h3 class="aih">¿Qué plato quieres crear?</h3>
+    <div class="fgrid"><div class="field"><label for="ai-name">Nombre del plato</label><input class="inp" id="ai-name" value="${esc(A.name)}" placeholder="Smash burger de pollo" autocomplete="off"></div>
+    <div class="field"><label for="ai-desc">¿Qué lleva? <span style="color:var(--label2);font-weight:400">(opcional)</span></label><textarea class="inp plain" id="ai-desc" rows="3" placeholder="Pan brioche, pollo crocante, tocineta y salsa de la casa">${esc(A.desc)}</textarea></div>
+    <div><p class="hint" style="margin-bottom:8px">¿Sin ideas? Prueba con uno:</p><div class="aiex">${['Smash burger de pollo crocante','Bowl de res con aguacate','Tacos de cerdo con piña','Limonada de coco'].map(x => `<button class="chip" data-act="ai-ex" data-v="${x}">${x}</button>`).join('')}</div></div>${err}</div>
+    ${why}${nav('Armar mi receta', 'ai-go')}`;
+  if (A.step === 2) {
+    const subs = A.items.map((it,i) => [it,i]).filter(([it]) => it.k === 'r'), dir = A.items.map((it,i) => [it,i]).filter(([it]) => it.k !== 'r');
+    const gin = (i, it, nm) => `<input class="ginp" type="number" inputmode="decimal" min="0" value="${it.g}" data-act="ai-g" data-v="${i}" aria-label="Gramos de ${esc(nm)}"><span class="row-s">g</span>`;
+    const subRow = ([it,i]) => { const open = A.open === i;
+      return `<div class="row"><button class="row-main aitog" data-act="ai-open" data-v="${i}" aria-expanded="${open}"><span class="row-t">${esc(it.name)}</span><span class="row-s">${it.exist ? 'Ya la tienes' : 'Nueva'} · ${open ? 'ocultar' : 'ver cómo se hace'}</span></button>${gin(i, it, it.name)}</div>` +
+        (open ? `<div class="aisub">${it.exist ? `<p class="hint">Ya la tienes en Preparaciones. Si quieres cambiarla, hazlo allá y se actualiza en todos tus platos.</p>${it.inp.map(x => `<div class="mini"><span>${esc(PR[x.p].n)}</span><span>${x.g} g</span></div>`).join('')}<div class="mini"><span><b>Te salen</b></span><span><b>${it.out} g</b></span></div>`
+          : `<label class="field"><span class="hint">Nombre</span><input class="inp" value="${esc(it.name)}" data-act="ai-sn" data-v="${i}"></label>
+          ${it.inp.map((x,k) => `<div class="mini"><span>${esc(PR[x.p].n)} · <button class="link" data-act="ai-sdel" data-v="${i}" data-d="${k}">Quitar</button></span><span><input class="ginp" type="number" inputmode="decimal" min="0" value="${x.g}" data-act="ai-sg" data-v="${i}" data-d="${k}" aria-label="Gramos de ${esc(PR[x.p].n)}"> g</span></div>`).join('')}
+          <div class="mini"><span><b>Te salen</b><br><span class="hint" style="padding:0">Lo que pesa cuando está lista</span></span><span><input class="ginp" type="number" inputmode="decimal" min="0" value="${it.out}" data-act="ai-out" data-v="${i}" aria-label="Lo que sale"> g</span></div>`}
+          <button class="link" style="justify-self:start;color:var(--red)" data-act="ai-del" data-v="${i}">Quitar del plato</button></div>` : ''); };
+    const dirRow = ([it,i]) => { const nm = it.k === 'p' ? PR[it.id].n : it.n;
+      return `<div class="row"><span class="row-main"><span class="row-t">${esc(nm)}${it.k === 'x' ? ' ' + tag('warn','Sin proveedor') : ''}</span><span class="row-s">${it.k === 'p' ? `${esc(sup(PR[it.id].s).name)} · ` : ''}<button class="link" data-act="ai-del" data-v="${i}">Quitar</button></span></span>${gin(i, it, nm)}</div>`; };
+    const opts = [...b.subs.map(x => ['r:' + x.id, `${x.name} · preparación`]), ...BY[bid].sups.flatMap(sid => productsOf(sid).filter(p => p.active).map(p => ['p:' + p.id, p.n]))];
+    return `${head}<div class="aisum"><span class="spark" aria-hidden="true">${ico('spark')}</span><div><b>${esc(A.name)}</b><span>${subs.length} ${subs.length === 1 ? 'preparación' : 'preparaciones'} · ${dir.length} ${dir.length === 1 ? 'ingrediente' : 'ingredientes'} · te cuesta ≈ ${money(draftCost(bid, A.items))}</span></div></div>
+      ${A.generic ? '<p class="hint" style="margin:10px 0 0">No reconocimos bien el plato, así que armamos una base. Cámbiala a tu gusto.</p>' : ''}
+      ${subs.length ? grp('Preparaciones', subs.map(subRow).join(''), 'Lo que haces antes: salsas, bases, carnes.') : ''}
+      ${grp('Directo al plato', dir.map(dirRow).join('') || '<div class="empty">Nada por ahora.</div>', 'Pon los gramos como sale servido.')}
+      <details class="how aiadd" ${A.adding ? 'open' : ''}><summary>Agregar algo más</summary><div class="fgrid" style="margin-top:10px">
+        <div class="field"><label for="ai-ap">De tus proveedores o preparaciones</label><select class="inp" id="ai-ap"><option value="">Elige…</option>${opts.map(([v,l]) => `<option value="${v}">${esc(l)}</option>`).join('')}</select></div>
+        <div class="field"><label for="ai-ax">O escribe uno que no tengas</label><input class="inp" id="ai-ax" placeholder="Huevo de codorniz"></div>
+        <div class="field"><label for="ai-ag">Gramos en el plato</label><input class="inp" id="ai-ag" type="number" inputmode="decimal" min="0" placeholder="30"></div>
+        <button class="btn tint full" data-act="ai-add">Agregar</button></div></details>
+      ${err}${why}${nav('Siguiente', 'ai-step')}`;
+  }
+  if (A.step === 3) return `${head}<h3 class="aih">¿A cuánto lo vendes?</h3>
+    <div class="fgrid"><div class="two"><div class="field"><label for="ai-price">Precio en carta</label><input class="inp" id="ai-price" type="number" inputmode="numeric" value="${esc(A.price)}" placeholder="38500"></div>
+    <div class="field"><label for="ai-per">Platos en un día normal</label><input class="inp" id="ai-per" type="number" inputmode="numeric" min="1" value="${esc(A.per)}" placeholder="15"></div></div>
+    <label class="row" style="border-radius:10px"><span class="row-main"><span class="row-t">Es un plato nuevo</span><span class="row-s">Todavía no se ve en mis pedidos</span></span><input id="ai-new" type="checkbox" ${A.isNew ? 'checked' : ''} style="width:22px;height:22px;accent-color:var(--green-b)"></label>
+    <div id="ai-stats">${aiStats()}</div>${err}</div>${why}${nav('Siguiente', 'ai-step')}`;
+  const g = catGuess(A.items), cats = [...new Set([g.cat, ...b.menu.map(d => dishCat(bid, d)), ...DCATS])], cur = A.catx ? '' : (A.cat || g.cat);
+  return `${head}<h3 class="aih">¿En qué parte de tu carta va?</h3>
+    <div class="aisum"><span class="spark" aria-hidden="true">${ico('spark')}</span><div><span>La IA lo puso en</span><b>${esc(g.cat)}</b><span>porque ${g.why}.</span></div></div>
+    <div class="aicats">${cats.map(c => `<button class="chip" data-act="ai-cat" data-v="${esc(c)}" aria-pressed="${c === cur}">${esc(c)}</button>`).join('')}</div>
+    <div class="field" style="margin-top:14px"><label for="ai-catx">¿Otra? Escríbela</label><input class="inp" id="ai-catx" value="${esc(A.catx)}" placeholder="Desayunos"></div>${err}
+    ${why}${nav('Guardar receta', 'ai-save')}`;
+}
+function aiSave(){
+  const A = S.sheet.ai, bid = BID(), b = biz(bid), comp = [], miss = [];
+  for (const it of A.items) {
+    if (it.k === 'p') { const ex = comp.find(c => c.k === 'p' && c.id === it.id); if (ex) ex.g += it.g; else comp.push({k:'p', id:it.id, g:it.g}); }
+    else if (it.k === 'x') miss.push({n:it.n, g:it.g});
+    else { let id = it.exist || (b.subs.find(x => norm(x.name) === norm(it.name)) || {}).id;
+      if (!id) { id = 's' + Math.random().toString(36).slice(2, 8); b.subs.push({id, name:it.name, inp:it.inp.map(x => ({...x})), out:it.out, ok:false}); }
+      comp.push({k:'r', id, g:it.g}); }
+  }
+  const per = parseInt(A.per, 10), cat = A.catx.trim() || A.cat || catGuess(A.items).cat, id = 'd' + Date.now().toString(36);
+  b.menu.push({id, name:A.name, price:parsePrice(A.price), perDay:per, base:A.isNew ? 0 : per, ok:false, comp, miss, cat});
+  const nNew = A.items.filter(it => it.k === 'r' && !it.exist).length;
+  bizChanged(); S.kitSeg = 'platos'; S.kitCat = cat; S.sheet = null;
+  toast(nNew ? `${A.name} quedó guardado. Sus ${nNew} preparaciones nuevas están en Preparaciones.` : `${A.name} quedó guardado en ${cat}.`);
+}
+
+function kitView(){
+  const bid = BID(), b = biz(bid), pr = kitProgress(bid), task = todayTask(bid), seg = S.kitSeg || 'platos';
+  const merma = pr.ings.reduce((t,pid) => t + mermaMes(bid, pid), 0);
+  const lv = (n, key, name, [a,t], txt) => `<button class="ltile ${seg === key ? 'on' : ''}" data-act="kitseg" data-v="${key}"><span class="lnum">${n}</span><b>${name}</b><span class="meter"><i style="width:${t ? a / t * 100 : 0}%"></i></span><span class="s">${a} de ${t} · ${txt}</span></button>`;
+  const dishRow = d => { const f = foodCost(bid, d); return row({t:`${esc(d.name)}${d.ok ? '' : ' ' + tag('warn','Por confirmar')}`, s:`Te cuesta ${money(dishCost(bid, d))} · ${d.perDay} al día`, r:tag(fcCls(f), pctTxt(f)), act:'sheet', v:'dish', d:d.id, nav:true}); };
+  const cats = [...new Set(b.menu.map(d => dishCat(bid, d)))], C = cats.includes(S.kitCat) ? S.kitCat : null;
+  const list = seg === 'platos'
+    ? (C ? `<section class="grp"><h2 class="grp-h"><span>${esc(C)}</span><button class="navbtn" data-act="kitcat" data-v="">Todas</button></h2><div class="grp-b">${b.menu.filter(d => dishCat(bid, d) === C).map(dishRow).join('')}</div>
+          <p class="grp-f">El porcentaje es cuánto de lo que cobras se va en ingredientes. Verde: vas bien. Naranja: ojo. Rojo: estás dejando plata.</p></section>`
+       : `<section class="grp"><h2 class="grp-h">Tu carta</h2><div class="cgrid">${cats.map(c => { const ds = b.menu.filter(d => dishCat(bid, d) === c), pend = ds.filter(d => !d.ok).length;
+          return `<button class="ctile" data-act="kitcat" data-v="${esc(c)}"><span class="top"><span class="av" style="background:${dcatColor(c)}" aria-hidden="true">${esc(c[0])}</span>${pend ? `<span class="badge" style="background:var(--orange-b)">${pend}</span>` : ''}</span>
+            <span><b>${esc(c)}</b><br><span class="s">${ds.length} ${ds.length === 1 ? 'plato' : 'platos'}${pend ? ` · ${pend} por confirmar` : ''}</span></span></button>`; }).join('')}</div>
+          <p class="grp-f">La IA arma las categorías según lo que lleva cada plato. Puedes cambiarlas cuando quieras.</p></section>`) +
+      grp('', row({t:'<span style="color:var(--accent)">Crear plato a mano</span>', s:'Si prefieres poner todo tú', act:'sheet', v:'dish-new'}))
+    : seg === 'subs'
+    ? grp('', b.subs.map(x => { const inG = x.inp.reduce((t,i) => t + i.g, 0); return row({t:esc(x.name), s:`De ${inG} g te salen ${x.out} g · el kilo te cuesta ${money(subCostG(bid, x) * 1000)}`, r:tag(x.ok ? 'ok' : 'mute', x.ok ? 'Ya la pesaste' : 'Aproximada'), act:'sheet', v:'sub', d:x.id, nav:true}); }).join('') +
+        row({t:'<span style="color:var(--accent)">Nueva preparación</span>', s:'Una salsa, una base o una masa', act:'sheet', v:'sub-new'}), 'Las salsas, bases y masas que haces en tu cocina. Pesa lo que echas y lo que te sale, y te decimos cuánto te cuesta el kilo.')
+    : grp('', pr.ings.sort((x,y) => mermaMes(bid, y) - mermaMes(bid, x)).map(pid => { const y = yld(bid, pid); return row({t:esc(PR[pid].n), s:`Usas el ${pctTxt(y.ap)}${y.coc < 1 ? ` · cocinado queda el ${pctTxt(y.coc)}` : ''} · botas ≈ ${money(mermaMes(bid, pid))} al mes`, r:tag(y.ok ? 'ok' : 'mute', y.ok ? 'Lo pesaste' : 'Promedio'), act:'sheet', v:'ing', d:pid, nav:true}); }).join('') +
+        row({t:'<span style="color:var(--accent)">Prueba de pesaje</span>', s:'Pesas antes y después de limpiar, y la app hace las cuentas', act:'sheet', v:'yield'}), 'Solo lo que se limpia o se cocina. Usamos promedios de cocina hasta que lo peses tú.');
+  return lt('Cocina', '5 minutos al día') +
+  `<button class="aicta" data-act="ai-start"><span class="spark" aria-hidden="true">${ico('spark')}</span><span><b>Crear receta con IA</b><span>Escribe el nombre y te armamos el resto</span></span>${chev()}</button>` +
+  (task ? `<section class="grp"><div class="task"><span class="task-k">Tarea de hoy · 5 minutos</span><b>${esc(task.t)}</b><p>${task.s}</p><button class="btn full" data-act="sheet" data-v="${task.v}" data-d="${task.d}">Empezar</button></div>
+    <p class="grp-f">${b.lastTaskDay === 0 ? `Hoy ya cumpliste · ${b.streak} días seguidos` : `Racha: ${b.streak} días seguidos`}</p></section>` : grp('', row({t:'Todo al día', s:'Tus platos, preparaciones e ingredientes ya están pesados.'}))) +
+  `<section class="grp"><h2 class="grp-h">Tu camino</h2><div class="lgrid">
+    ${lv(1, 'platos', 'Platos', pr.l1, 'cuánto te cuesta cada uno')}${lv(2, 'subs', 'Preparaciones', pr.l2, 'salsas y bases')}${lv(3, 'ings', 'Ingredientes', pr.l3, `botas ≈ ${money(merma / 1000)}k al mes`)}</div>
+    <details class="how" style="padding:4px 4px 0"><summary>¿Cómo funciona?</summary><p class="hint" style="padding:0">Arranca por lo que ya sabes: cuánto lleva cada plato. Cada paso hace que tus costos, tu inventario y tus pedidos salgan más exactos. Toca un paso para ver lo que tienes ahí.</p></details></section>` + list +
+  grp('Próximamente', row({t:'Asistente de sabor', s:'Con tus recetas va a entender qué sabores son los que más te compran y te va a decir qué tipo de plato le falta a tu carta.', r:tag('info','IA')}));
+}
+function yieldRes(){
+  const pid = ($('yl-p') || {}).value, b = parseFloat(($('yl-b') || {}).value), l = parseFloat(($('yl-l') || {}).value), c = parseFloat(($('yl-c') || {}).value);
+  if (!pid || !(b > 0) || !(l > 0)) return '<p class="hint">Escribe cuánto pesó como llegó y ya limpio.</p>';
+  if (l > b) return '<p class="err">Lo limpio no puede pesar más que como llegó.</p>';
+  const ap = l / b, coc = c > 0 ? c / l : null, real = PR[pid].pr / gpu(PR[pid]) / ap * 1000 / (coc || 1);
+  return `<div class="stats"><div class="stat"><b>${pctTxt(ap)}</b><span>Usas</span></div><div class="stat"><b>${coc ? pctTxt(coc) : '—'}</b><span>Queda al cocinar</span></div><div class="stat"><b style="font-size:17px">${money(real)}</b><span>El kilo ${coc ? 'cocinado' : 'limpio'} te sale a</span></div></div>
+    <p class="hint" style="margin-top:8px">Pagas ${money(PR[pid].pr / gpu(PR[pid]) * 1000)}/kg; lo que botas ${coc ? 'y lo que se reduce al cocinar ' : ''}lo ${real > PR[pid].pr / gpu(PR[pid]) * 1000 * 1.05 ? `suben ${pctTxt(real / (PR[pid].pr / gpu(PR[pid]) * 1000) - 1)}` : 'cambian poco'}.</p>`;
 }
 
 /* ---------- invita y gana ---------- */
@@ -796,20 +1175,21 @@ function refView(){
   const key = refKey(), R = ref(key), c = refCalc(R);
   return `<div class="navbar"><button class="back" data-act="more-back">${ico('back')}Más</button></div>${lt('Invita y gana', `${REF_PCT}% por cada negocio que se una`)}
   <div class="stats"><div class="stat"><b>${c.now}%</b><span>Este mes</span><div class="meter"><i style="width:${c.now / REF_CAP * 100}%"></i></div></div><div class="stat"><b>${c.next}%</b><span>Ganado para el próximo mes</span></div><div class="stat"><b>${R.list.filter(x => x.status === 'Activo').length}/${R.list.length}</b><span>Invitados activos</span></div></div>
-  ${grp('Tu código', `<div class="rowx" style="padding:14px 16px;display:grid;gap:10px"><span class="code">${R.code}</span><div class="wa" id="ref-text" style="background:var(--surface2)">${esc(refMsg(key))}</div><button class="btn tint" data-act="copy" data-v="ref-text">Copiar invitación</button></div>`, `Se suman hasta ${REF_CAP}% al mes; lo que pase del tope se guarda para el siguiente.${R.welcome ? ` Incluye tu bono de bienvenida de ${esc(R.welcome.from)}.` : ''}`)}
+  ${grp('Tu código', `<div class="rowx" style="padding:14px 16px;display:grid;gap:10px"><span class="code">${R.code}</span><div class="wa" id="ref-text" style="background:var(--surface2)">${esc(refMsg(key))}</div><button class="btn tint" data-act="copy" data-v="ref-text">Copiar invitación</button></div>`, `Puedes juntar hasta ${REF_CAP}% en un mes; si te pasas, lo que sobra queda para el siguiente.${R.welcome ? ` Incluye tu bono de bienvenida de ${esc(R.welcome.from)}.` : ''}`)}
   ${grp('Invitados', R.list.map((x,i) => row({t:esc(x.name), s:`${x.kind}${x.status === 'Activo' ? ` · te dio ${REF_PCT}%` : ''}`, r: x.status === 'Activo' ? tag('ok','Activo') : `<button class="link" data-act="ref-sim" data-v="${i}">Simular que se unió</button>`})).join('') +
     row({t:'<span style="color:var(--accent)">Invitar a un negocio</span>', act:'sheet', v:'ref-new'}))}
   <details class="how"><summary>Reglas</summary><ul>
-    <li>Cuenta cuando el invitado se activa: un restaurante con su primer pedido, un proveedor con su primer pedido recibido.</li>
-    <li>Cada activación da ${REF_PCT}% a quien invita y ${REF_PCT}% al invitado en su primer mes. Se descuenta de la mensualidad, no de los productos. Porcentajes de prueba.</li>
+    <li>Cuenta cuando el invitado arranca de verdad: un restaurante cuando hace su primer pedido y un proveedor cuando recibe el primero.</li>
+    <li>Ganan los dos: tú ${REF_PCT}% y el otro negocio ${REF_PCT}% en su primer mes. Es descuento en lo que pagas por la app, no en los productos. Los porcentajes son de prueba.</li>
   </ul></details>`;
 }
 function moreView(){
   if (S.more === 'ref') return refView();
   if (S.more === 'alist') return supAlist();
   if (S.more === 'ajustes') return supAjustes();
+  if (S.more === 'servicio') return buyerBiz();
   const name = isB() ? BY[BID()].name : sup(SID()).name;
-  return lt('Más', esc(name)) + grp('', (isB() ? '' : row({t:'Alistamiento', s:'Lo que sale en la próxima entrega', act:'go-more', v:'alist', nav:true}) + row({t:'Entregas y catálogo', s:'Días, hora de cierre, precios, importar Excel', act:'go-more', v:'ajustes', nav:true})) +
+  return lt('Más', esc(name)) + grp('', (isB() ? row({t:'Horario y cómo te fue', s:'Días que abres, la pregunta de cada noche y los próximos días', act:'go-more', v:'servicio', nav:true}) : row({t:'Qué alistar', s:'Lo que sale en la próxima entrega', act:'go-more', v:'alist', nav:true}) + row({t:'Entregas y catálogo', s:'Días, hora de cierre, precios, importar Excel', act:'go-more', v:'ajustes', nav:true})) +
     row({t:'Invita y gana', s:`${refCalc(ref(refKey())).now}% de descuento este mes`, act:'go-more', v:'ref', nav:true})) +
     grp('', row({t:'<span style="color:var(--red)">Cerrar sesión</span>', act:'logout'}));
 }
@@ -817,14 +1197,14 @@ function moreView(){
 /* ---------- proveedor ---------- */
 function supClientes(){
   const sid = SID(), rows = buyerStats(sid), by = s => rows.filter(r => r.seg === s);
-  const cell = (s, d, key) => `<div class="cell ${key ? 'key' : ''}"><b>${s}</b><small>${d}</small>${by(s).map(r => `<div>${esc(r.b.name)}</div>`).join('') || '<div style="color:var(--label3)">—</div>'}</div>`;
+  const cell = (s, d, key) => `<div class="cell ${key ? 'key' : ''}"><b>${SEGL[s]}</b><small>${d}</small>${by(s).map(r => `<div>${esc(r.b.name)}</div>`).join('') || '<div style="color:var(--label3)">—</div>'}</div>`;
   const order = {risk:0, due:1, ok:2, later:3, new:4}, list = rows.map(r => ({r, t:clientToday(sid, r.b.id)})).sort((a,b) => order[a.t.k] - order[b.t.k]);
-  return lt('Clientes', todayTxt(), `<button class="navbtn" data-act="sheet" data-v="inv-client" aria-label="Invitar cliente">${ico('plus')}</button>`) + feed(supFeed(sid)) +
-    grp('Hoy', list.map(({r, t}) => row({t:esc(r.b.name), s:`${money(r.sales)} en 4 semanas · ${r.seg.toLowerCase()}`, r:tag(t.cls, t.label), act:'client', v:r.b.id, nav:true})).join('')) +
-    `<section class="grp"><h2 class="grp-h">Segmentos · 4 semanas</h2><div class="quad"><div></div><div class="ax">Frecuente</div><div class="ax">Esporádico</div>
-      <div class="ax v">Grande</div>${cell('Clave','Prioridad en despacho y stock', true)}${cell('Por desarrollar','Ofrecer más días de entrega')}
-      <div class="ax v">Pequeño</div>${cell('Fiel','Mantener servicio')}${cell('Ocasional','Atención estándar')}</div>
-      <p class="grp-f">Grande = clientes que suman el 80% de tus ventas. Frecuente = 2 o más pedidos por semana.</p></section>`;
+  return lt('Clientes', todayTxt(), `<button class="navbtn" data-act="sheet" data-v="inv-client" aria-label="Invitar cliente">${ico('plus')}</button>`) + news(supFeed(sid)) +
+    grp('Hoy', list.map(({r, t}) => row({t:esc(r.b.name), s:`${money(r.sales)} en el último mes · ${SEGL[r.seg].toLowerCase()}`, r:tag(t.cls, t.label), act:'client', v:r.b.id, nav:true})).join('')) +
+    `<section class="grp"><h2 class="grp-h">Tipos de cliente · último mes</h2><div class="quad"><div></div><div class="ax">Piden seguido</div><div class="ax">Piden poco</div>
+      <div class="ax v">Compran mucho</div>${cell('Clave','Que nunca les falte nada', true)}${cell('Por desarrollar','Ofréceles más días de entrega')}
+      <div class="ax v">Compran poco</div>${cell('Fiel','Sigue atendiéndolos igual')}${cell('Ocasional','Atención normal')}</div>
+      <p class="grp-f">Compran mucho: entre todos te dejan el 80% de lo que vendes. Piden seguido: 2 o más veces por semana.</p></section>`;
 }
 function supPedidos(){
   const sid = SID(), os = pendingOrders(sid).sort((a,b) => a.deliver - b.deliver || (a.status === 'Recibido' ? -1 : 1));
@@ -835,18 +1215,18 @@ function supPedidos(){
         return `<div class="row"><span class="row-main"><span class="row-t">${esc(p.n)}${it.deal ? ' ' + tag('bad','oferta') : ''}</span><span class="row-s">Pidió ${fQty(it.qty,p.u)}${it.del !== it.qty ? ` · entregas ${fQty(it.del,p.u)}` : ''}</span></span>
           ${o.status === 'Recibido' && p.u === 'kg' ? `<input id="d-${o.id}-${i}" type="number" inputmode="decimal" step="0.1" min="0" value="${it.del}" data-act="del" data-o="${o.id}" data-i="${i}" aria-label="Peso real de ${esc(p.n)}" style="width:84px;text-align:right;background:var(--fill);border:0;border-radius:8px;padding:6px 8px;font-size:16px">` : `<span class="row-r">${fQty(it.del,p.u)}</span>`}</div>`; }).join('') +
       `<div class="rowx" style="padding:12px 16px">${o.status === 'Recibido' ? `<button class="btn full" data-act="confirm" data-o="${o.id}">Confirmar · ${money(orderTotal(o))}</button>` : o.status === 'Confirmado' ? `<button class="btn full tint" data-act="ship" data-o="${o.id}">Marcar en camino</button>` : '<p class="row-s">Esperando que el cliente confirme la recepción.</p>'}</div>`,
-      o.status === 'Recibido' ? 'Ajusta el peso real en productos por kilo antes de confirmar.' : '')).join(''); }).join('');
+      o.status === 'Recibido' ? 'Si pesó distinto, cambia el peso antes de confirmar.' : '')).join(''); }).join('');
 }
 function supAlist(){
   const sid = SID(), D = nextDelivery(sid), agg = {};
   pendingOrders(sid).filter(o => o.deliver === D).forEach(o => o.items.forEach(it => { const a = agg[it.p] ||= {q:0, who:[]}; a.q += it.del; a.who.push(BY[o.b].name); }));
   const rows = Object.entries(agg).sort((a,b) => b[1].q * PR[b[0]].pr - a[1].q * PR[a[0]].pr);
-  return `<div class="navbar"><button class="back" data-act="more-back">${ico('back')}Más</button></div>` + lt('Alistamiento', `${relDayC(D)} · ${fDate(D)}`) +
+  return `<div class="navbar"><button class="back" data-act="more-back">${ico('back')}Más</button></div>` + lt('Qué alistar', `${relDayC(D)} · ${fDate(D)}`) +
     grp('Total por producto', rows.map(([pid,a]) => row({t:esc(PR[pid].n), s:esc(a.who.join(', ')), r:`<b style="color:var(--label)">${fQty(a.q, PR[pid].u)}</b>`})).join('') || '<div class="empty">Sin pedidos para esa entrega.</div>');
 }
 function supOfertas(){
   const sid = SID(), ds = DEALS.filter(d => d.s === sid && d.until >= 0), cl = clientsOf(sid);
-  return lt('Ofertas', 'Vence pronto, detalle visual o excedente', `<button class="navbtn" data-act="sheet" data-v="deal-new" aria-label="Crear oferta">${ico('plus')}</button>`) +
+  return lt('Ofertas', 'Lo que se vence, se ve feo o te sobró', `<button class="navbtn" data-act="sheet" data-v="deal-new" aria-label="Crear oferta">${ico('plus')}</button>`) +
     (ds.length ? ds.map(d => { const p = PR[d.p], R = REASONS[d.r], buyers = cl.filter(b => boughtSet(b.id, sid).has(d.p)).length, left = dealLeft(d);
       return grp(`<span>${esc(p.n)}</span>${tag(!d.on ? 'mute' : left ? 'ok' : 'mute', !d.on ? 'Pausada' : left ? 'Activa' : 'Agotada')}`,
         `<div class="rowx" style="padding:12px 16px;display:grid;gap:6px"><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span class="pct">−${d.pct}%</span>${tag(R.c, R.l)}<span class="row-s">${money(dealPrice(d))}/${p.u} · antes ${money(p.pr)}</span></div>
@@ -873,17 +1253,17 @@ function supPrev(){
   const D = nextDelivery(sid), dd = days.filter(d => sp.days.includes(wd(d)));
   const rows = Object.entries(f).filter(([pid,r]) => PR[pid].active && days.some(d => r[d] > 0));
   const buyTotal = rows.reduce((t,[pid,r]) => t + (r[D] ? roundStep(r[D] * 1.1, PR[pid].u) * PR[pid].pr : 0), 0);
-  return lt('Previsión', 'Próximos 7 días') + `<div class="stats" style="grid-template-columns:repeat(2,minmax(0,1fr))"><div class="stat"><b>${money(buyTotal)}</b><span>Compra sugerida para ${relDay(D)} (+10% de colchón)</span></div><div class="stat"><b>${rows.length}</b><span>Productos con demanda</span></div></div>` +
+  return lt('Qué comprar', 'Próximos 7 días') + `<div class="stats" style="grid-template-columns:repeat(2,minmax(0,1fr))"><div class="stat"><b>${money(buyTotal)}</b><span>Te toca comprar para ${relDay(D)}, con 10% extra por si acaso</span></div><div class="stat"><b>${rows.length}</b><span>Productos que te van a pedir</span></div></div>` +
     grp(`Comprar para ${relDay(D)}`, rows.filter(([,r]) => r[D]).map(([pid,r]) => row({t:esc(PR[pid].n), r:`<b style="color:var(--accent)">${fQty(roundStep(r[D] * 1.1, PR[pid].u), PR[pid].u)}</b>`})).join('') || '<div class="empty">Nada para esa entrega.</div>') +
     `<section class="grp"><h2 class="grp-h">Por día de entrega</h2><div class="tbl"><table><thead><tr><th>Producto</th>${dd.map(d => `<th>${fDow(d)} ${dateOf(d).getDate()}</th>`).join('')}</tr></thead><tbody>
     ${rows.map(([pid,r]) => `<tr><td>${esc(PR[pid].n)}</td>${dd.map(d => `<td>${r[d] ? fQty(roundStep(r[d], PR[pid].u), PR[pid].u) : '—'}</td>`).join('')}</tr>`).join('')}</tbody></table></div>
-    <p class="grp-f">Según el ritmo de cada cliente y los pedidos ya recibidos. No incluye clientes en riesgo.</p></section>`;
+    <p class="grp-f">Sale de cada cuánto te compra cada cliente y de los pedidos que ya tienes. No cuenta a los que llevan rato sin pedir.</p></section>`;
 }
 function supAjustes(){
   const sid = SID(), sp = sup(sid), order = [1,2,3,4,5,6,0], mine = productsOf(sid);
   return `<div class="navbar"><button class="back" data-act="more-back">${ico('back')}Más</button></div>` + lt('Entregas y catálogo', esc(sp.name)) +
   grp('Entregas', `<div class="rowx" style="padding:12px 16px"><p class="flabel" style="padding:0 0 8px">Días en que entregas</p><div class="days">${order.map(d => `<button data-act="day" data-v="${d}" aria-pressed="${sp.days.includes(d)}" aria-label="${DOWL[d]}">${DOW[d][0].toUpperCase()}</button>`).join('')}</div></div>
-    <label class="row" for="cutoff"><span class="row-main"><span class="row-t">Cierre de pedidos</span></span><input id="cutoff" type="time" value="${sp.cutoff}" style="border:0;background:var(--fill);border-radius:8px;padding:6px 8px;font-size:17px"></label>`, `Próxima entrega disponible: ${fDate(nextDelivery(sid))}. Lo que llegue después del cierre pasa a la siguiente.`) +
+    <label class="row" for="cutoff"><span class="row-main"><span class="row-t">Recibes pedidos hasta</span></span><input id="cutoff" type="time" value="${sp.cutoff}" style="border:0;background:var(--fill);border-radius:8px;padding:6px 8px;font-size:17px"></label>`, `Próxima entrega disponible: ${fDate(nextDelivery(sid))}. Si alguien pide más tarde, le llega en la siguiente entrega.`) +
   grp(`<span>Catálogo · ${mine.filter(p => p.active).length} activos</span><button class="navbtn" data-act="sheet" data-v="import">Importar</button>`,
     mine.map(p => `<div class="row"><span class="row-main"><span class="row-t" style="${p.active ? '' : 'color:var(--label2)'}">${esc(p.n)}</span><span class="row-s">${esc(p.c)} · ${p.u}</span></span>
       <input type="number" id="pr-${p.id}" min="0" step="100" value="${p.pr}" data-act="price" data-p="${p.id}" aria-label="Precio de ${esc(p.n)}" style="width:96px;text-align:right;background:var(--fill);border:0;border-radius:8px;padding:6px 8px;font-size:16px">
@@ -900,40 +1280,71 @@ function sheetContent(){
     case 'sup-new': return {title:'Nuevo proveedor', form:'f-sup', ok:'Agregar', html:`<form class="fgrid" id="f-sup" novalidate>
       <p class="hint">Para uno que no usa la app. Le haces el pedido aquí y sale como mensaje de WhatsApp; su consumo entra en tu inventario.</p>
       <div class="field"><label for="ns-name">Nombre</label><input class="inp" id="ns-name" placeholder="Distribuidora El Trigal"></div>
-      <div class="field"><label for="ns-kind">Qué te vende</label><input class="inp" id="ns-kind" placeholder="Abarrotes"></div>
+      <div class="field"><label for="ns-cat">Categoría</label>${sel('ns-cat', CATS.map(c => [c, c]), 'Abarrotes')}</div>
+      <div class="field"><label for="ns-kind">Qué te vende</label><input class="inp" id="ns-kind" placeholder="Granos y enlatados"></div>
       <div class="field"><label for="ns-phone">WhatsApp</label><input class="inp" id="ns-phone" type="tel" inputmode="tel" placeholder="300 123 4567"></div>
       <div class="field"><label>Días de entrega</label><div class="days">${order.map(w => `<button type="button" data-act="nsday" data-v="${w}" aria-pressed="${(sh.days || []).includes(w)}" aria-label="${DOWL[w]}">${DOW[w][0].toUpperCase()}</button>`).join('')}</div></div>
       <div class="field"><label for="ns-cut">Recibe pedidos hasta</label><input class="inp" id="ns-cut" type="time" value="18:00"></div>${e}</form>`};
     case 'xprod': return {title:'Productos', form:'f-xprod', ok:'Agregar', html:`${grp(esc(sup(S.sid).name), productsOf(S.sid).map(p => row({t:esc(p.n), r:`${money(p.pr)}/${p.u}`})).join('') || '<div class="empty">Sin productos.</div>')}
       <form class="fgrid" id="f-xprod" novalidate style="margin-top:18px"><div class="field"><label for="xp-name">Nuevo producto</label><input class="inp" id="xp-name" placeholder="Nombre"></div>
-      <div class="two"><div class="field"><label for="xp-unit">Unidad</label>${sel('xp-unit', [['und','und'],['kg','kg'],['atado','atado']], 'und')}</div><div class="field"><label for="xp-price">Precio de referencia</label><input class="inp" id="xp-price" type="number" inputmode="numeric" placeholder="0"></div></div>${e}</form>`};
+      <div class="two"><div class="field"><label for="xp-unit">Unidad</label>${sel('xp-unit', [['und','und'],['kg','kg'],['atado','atado']], 'und')}</div><div class="field"><label for="xp-price">Precio aproximado</label><input class="inp" id="xp-price" type="number" inputmode="numeric" placeholder="0"></div></div>${e}</form>`};
     case 'inv-item': { const m = inventory(BID()).find(x => x.pid === sh.v); if (!m) return {title:'Inventario', html:'<div class="empty">Sin datos.</div>'}; const u = m.p.u;
       return {title:esc(m.p.n), form:'f-fix', ok:'Guardar', html:`
-      <div class="stats"><div class="stat"><b>${fApprox(m.current,u)}</b><span>Te queda, aprox.</span></div><div class="stat"><b style="font-size:17px">${fRate(m.rate,u)}</b><span>Un día normal</span></div><div class="stat"><b style="font-size:17px">${m.conf[0].toUpperCase() + m.conf.slice(1)}</b><span>Confianza</span></div></div>
-      ${grp('', row({t:m.until, s:`${esc(sup(m.p.s).name)} · próxima entrega ${fDate(m.D)}`, r:tag(m.cls, m.label)}) + (m.share && !m.onlyMenu ? row({t:`${Math.round(m.share * 100)}% se va en tus best sellers`, s:'El resto en otros platos, pruebas y merma'}) : '') + (m.corrected ? row({t:'Corregido por ti', s:'Ya ajustamos tu consumo con tu dato'}) : ''))}
+      <div class="stats"><div class="stat"><b>${fApprox(m.current,u)}</b><span>Te queda, aprox.</span></div><div class="stat"><b style="font-size:17px">${fRate(m.rate,u)}</b><span>Un día normal</span></div><div class="stat"><b style="font-size:17px">${m.conf[0].toUpperCase() + m.conf.slice(1)}</b><span>Qué tan seguros</span></div></div>
+      ${grp('', row({t:m.until, s:`${esc(sup(m.p.s).name)} · próxima entrega ${fDate(m.D)}`, r:tag(m.cls, m.label)}) + (m.share && !m.onlyMenu ? row({t:`${Math.round(m.share * 100)}% se va en tus platos estrella`, s:'El resto en otros platos, pruebas y lo que se bota'}) : '') + (m.corrected ? row({t:'Corregido por ti', s:'Ya ajustamos con lo que nos dijiste'}) : ''))}
       <form class="fgrid" id="f-fix" novalidate style="margin-top:18px"><div class="field"><label for="fix-q">¿Cuánto te queda hoy? (${u})</label><input class="inp" id="fix-q" type="number" inputmode="decimal" min="0" step="${STEP[u]}" value="${u === 'kg' ? Math.round(m.current * 2) / 2 : Math.round(m.current)}"></div>
       <button class="btn danger full" type="button" data-act="fix-zero" data-v="${m.pid}">Se acabó</button>
-      <p class="hint">La app compara tu dato con lo que estimó y ajusta tu consumo a mitad de camino.</p>${e}</form>`}; }
+      <p class="hint">Comparamos lo que nos dices con lo que calculamos y nos vamos ajustando.</p>${e}</form>`}; }
     case 'order': { const o = ORDERS.find(x => x.id === +sh.v), sp = sup(o.s), canRecv = o.status === 'En camino' || o.status === 'Enviado';
       return {title:`Pedido #${o.id}`, html:`${grp(`${esc(sp.name)} · ${fDate(o.deliver)}`, o.items.map(it => row({t:`${esc(PR[it.p].n)}${it.deal ? ' ' + tag('bad','oferta') : ''}`, s: it.del !== it.qty ? `Pediste ${fQty(it.qty, PR[it.p].u)}` : '', r:fQty(it.del, PR[it.p].u)})).join('') + row({t:'<b>Total</b>', r:`<b style="color:var(--label)">${money(orderTotal(o))}</b>`}))}
         <div class="fgrid" style="margin-top:16px">${canRecv ? `<button class="btn full" data-act="receive" data-o="${o.id}">Recibí todo bien</button>` : `<p class="hint">Estado: ${o.status}.</p>`}</div>`}; }
-    case 'dish': { const d = biz(BID()).menu.find(x => x.id === sh.v); if (!d) return {title:'Plato', html:''};
-      const opts = BY[BID()].sups.flatMap(sid => productsOf(sid).filter(p => p.active).map(p => [p.id, `${p.n} (${p.u}) · ${sup(sid).name}`]));
-      return {title:esc(d.name), html:`${d.note ? `<p class="hint" style="margin-bottom:6px">Ficha: ${esc(d.note)}.</p>` : ''}
-        ${grp('Platos en un día normal', `<div class="row"><span class="row-main"><span class="row-t">${d.perDay} al día</span><span class="row-s">${d.perDay === d.base ? 'Como siempre' : d.base === 0 ? 'Plato nuevo' : `Antes ${d.base}: el consumo de sus ingredientes ${d.perDay > d.base ? 'sube' : 'baja'}`}</span></span><span class="stepper"><button data-act="per-dec" data-v="${d.id}" aria-label="Menos">−</button><output>${d.perDay}</output><button data-act="per-inc" data-v="${d.id}" aria-label="Más">+</button></span></div>`)}
-        ${grp('Por plato (materia prima)', d.ing.map((i,k) => row({t:esc(PR[i.p].n), s:esc(sup(PR[i.p].s).name), r:`${String(i.q).replace('.', ',')} ${PR[i.p].u} <button class="link" data-act="ing-del" data-v="${d.id}" data-d="${k}" aria-label="Quitar ${esc(PR[i.p].n)}">Quitar</button>`})).join('') || '<div class="empty">Sin ingredientes.</div>', 'Las sub-recetas (salsas, mermeladas, pan) están convertidas a materia prima de forma estimada; reemplázalas con tu costeo.')}
-        <form class="fgrid" id="f-ing" data-v="${d.id}" novalidate style="margin-top:18px"><div class="field"><label for="ing-p">Agregar ingrediente</label>${sel('ing-p', opts, opts[0] && opts[0][0])}</div>
-        <div class="field"><label for="ing-q">Cantidad por plato</label><input class="inp" id="ing-q" type="number" inputmode="decimal" min="0" step="0.005" placeholder="0,05"></div>
-        <button class="btn tint full" type="submit">Agregar ingrediente</button>${e}</form>
-        <div class="fgrid" style="margin-top:12px"><button class="btn danger full" data-act="dish-del" data-v="${d.id}">Quitar plato</button></div>`}; }
-    case 'dish-new': return {title:'Nuevo plato', form:'f-dish', ok:'Agregar', html:`<form class="fgrid" id="f-dish" novalidate>
+    case 'dish': { const bid = BID(), b = biz(bid), d = b.menu.find(x => x.id === sh.v); if (!d) return {title:'Plato', html:''};
+      const cost = dishCost(bid, d), f = foodCost(bid, d), totG = d.comp.reduce((t,c) => t + c.g, 0);
+      const opts = [...b.subs.map(x => ['r:' + x.id, `${x.name} · preparación`]), ...BY[bid].sups.flatMap(sid => productsOf(sid).filter(p => p.active).map(p => ['p:' + p.id, p.n]))];
+      return {title:esc(d.name), html:`<div class="stats"><div class="stat"><b style="font-size:19px">${money(cost)}</b><span>Costo por plato</span></div><div class="stat"><b style="font-size:19px;color:var(--${fcCls(f) === 'ok' ? 'green' : fcCls(f) === 'warn' ? 'orange' : 'red'})">${pctTxt(f)}</b><span>Se va en ingredientes</span></div><div class="stat"><b style="font-size:19px">${money(d.price / 1.08 - cost)}</b><span>Te queda por plato</span></div></div>
+        ${grp('Categoría', `<label class="row" for="dc-${d.id}"><span class="row-main"><span class="row-t">Va en</span></span><select class="ginp" style="width:auto;max-width:60%;text-align:left" id="dc-${d.id}" data-act="dcat" data-v="${d.id}">${[...new Set([dishCat(bid, d), ...b.menu.map(x => dishCat(bid, x)), ...DCATS])].map(c => `<option ${c === d.cat ? 'selected' : ''}>${esc(c)}</option>`).join('')}</select></label>`)}
+        ${grp('Precio y cuántos vendes', `<label class="row" for="dp-${d.id}"><span class="row-main"><span class="row-t">Precio en carta</span></span><input class="ginp" style="width:110px" id="dp-${d.id}" type="number" inputmode="numeric" value="${d.price}" data-act="dprice" data-v="${d.id}"></label>
+          <div class="row"><span class="row-main"><span class="row-t">${d.perDay} al día</span><span class="row-s">${d.perDay === d.base ? 'Un día normal' : d.base === 0 ? 'Plato nuevo' : `Antes ${d.base}: sus ingredientes ${d.perDay > d.base ? 'suben' : 'bajan'} en el pedido`}</span></span><span class="stepper"><button data-act="per-dec" data-v="${d.id}" aria-label="Menos">−</button><output>${d.perDay}</output><button data-act="per-inc" data-v="${d.id}" aria-label="Más">+</button></span></div>`)}
+        ${grp(`Lo que lleva · ${totG} g en el plato`, d.comp.map((c,k) => { const cc = compCost(bid, c); return `<div class="row"><span class="row-main"><span class="row-t">${esc(compName(bid, c))}${c.k === 'r' ? ' ' + tag('info','preparación') : ''}</span><span class="row-s">${money(cc)} · ${cost ? Math.round(cc / cost * 100) : 0}% del costo · <button class="link" data-act="comp-del" data-v="${d.id}" data-d="${k}">Quitar</button></span></span><input class="ginp" id="g-${d.id}-${k}" type="number" inputmode="decimal" min="0" value="${c.g}" data-act="cg" data-v="${d.id}" data-d="${k}" aria-label="Gramos de ${esc(compName(bid, c))}"><span class="row-s">g</span></div>`; }).join('') || '<div class="empty">Agrega lo primero que lleva.</div>',
+          'Pon los gramos como sale el plato. Nosotros sumamos lo que se bota al limpiar y lo que rinde cada preparación.')}
+        ${(d.miss || []).length ? grp('Sin proveedor todavía', d.miss.map((m,k) => row({t:esc(m.n), s:`${m.g} g por plato`, r:`<button class="link" data-act="miss-del" data-v="${d.id}" data-d="${k}">Quitar</button>`})).join(''), 'No suman al costo hasta que se lo compres a alguno de tus proveedores.') : ''}
+        <form class="fgrid" id="f-comp" data-v="${d.id}" novalidate style="margin-top:18px"><div class="field"><label for="cp-r">Agregar algo al plato</label>${sel('cp-r', opts, opts[0] && opts[0][0])}</div>
+          <div class="field"><label for="cp-g">Gramos por plato</label><input class="inp" id="cp-g" type="number" inputmode="decimal" min="0" placeholder="40"></div><button class="btn tint full" type="submit">Agregar</button>${e}</form>
+        <div class="fgrid" style="margin-top:12px">${d.ok ? '<p class="hint">Gramos confirmados por ti.</p>' : `<button class="btn full" data-act="dish-ok" data-v="${d.id}">Ya pesé el plato: confirmar gramos</button>`}<button class="btn danger full" data-act="dish-del" data-v="${d.id}">Quitar plato</button></div>`}; }
+    case 'ai': return {title:'Receta con IA', html:aiSheet(e)};
+    case 'dish-new': return {title:'Nuevo plato', form:'f-dish', ok:'Crear', html:`<form class="fgrid" id="f-dish" novalidate>
+      <p class="hint">Primero lo básico. Después le pones lo que lleva, con gramos.</p>
       <div class="field"><label for="dish-name">Nombre</label><input class="inp" id="dish-name" placeholder="Fit Smash"></div>
-      <div class="field"><label for="dish-per">Platos en un día normal</label><input class="inp" id="dish-per" type="number" inputmode="numeric" min="1" step="1" placeholder="20"></div>
+      <div class="two"><div class="field"><label for="dish-price">Precio en carta</label><input class="inp" id="dish-price" type="number" inputmode="numeric" placeholder="38500"></div>
+      <div class="field"><label for="dish-per">Platos en un día normal</label><input class="inp" id="dish-per" type="number" inputmode="numeric" min="1" step="1" placeholder="20"></div></div>
       <label class="row" style="border-radius:10px"><span class="row-main"><span class="row-t">Es un plato nuevo</span><span class="row-s">Todavía no se ve en mis pedidos</span></span><input id="dish-new" type="checkbox" style="width:22px;height:22px;accent-color:var(--green-b)"></label>${e}</form>`};
+    case 'sub': { const bid = BID(), x = subOf(bid, sh.v); if (!x) return {title:'Preparación', html:''};
+      const inG = x.inp.reduce((t,i) => t + i.g, 0), exp = Math.round(x.inp.reduce((t,i) => { const y = yld(bid, i.p); return t + i.g * y.ap * y.coc; }, 0)), used = biz(bid).menu.filter(d => d.comp.some(c => c.k === 'r' && c.id === x.id));
+      const opts = BY[bid].sups.flatMap(sid => productsOf(sid).filter(p => p.active).map(p => [p.id, p.n]));
+      return {title:esc(x.name), html:`<div class="stats"><div class="stat"><b style="font-size:19px">${x.out ? money(subCostG(bid, x) * 1000) : '—'}</b><span>El kilo te cuesta</span></div><div class="stat"><b style="font-size:19px">${inG ? pctTxt(x.out / inG) : '—'}</b><span>Te sale</span></div><div class="stat"><b style="font-size:19px">${tag(x.ok ? 'ok' : 'mute', x.ok ? 'Ya la pesaste' : 'Aproximada')}</b><span>${x.ok ? 'Confirmada por ti' : 'Falta pesarla'}</span></div></div>
+        ${grp(`Lo que echas · ${inG} g`, x.inp.map((i,k) => `<div class="row"><span class="row-main"><span class="row-t">${esc(PR[i.p].n)}</span><span class="row-s">${money(i.g * ppg(i.p))} · <button class="link" data-act="sinp-del" data-v="${x.id}" data-d="${k}">Quitar</button></span></span><input class="ginp" id="sg-${x.id}-${k}" type="number" inputmode="decimal" min="0" value="${i.g}" data-act="sg" data-v="${x.id}" data-d="${k}" aria-label="Gramos de ${esc(PR[i.p].n)}"><span class="row-s">g</span></div>`).join('') || '<div class="empty">Agrega lo que entra.</div>', 'Tal cual lo compras, sin limpiar.')}
+        <form class="fgrid" id="f-sinp" data-v="${x.id}" novalidate style="margin-top:14px"><div class="two"><div class="field"><label for="si-p">Ingrediente</label>${sel('si-p', opts, opts[0] && opts[0][0])}</div><div class="field"><label for="si-g">Gramos</label><input class="inp" id="si-g" type="number" inputmode="decimal" min="0" placeholder="500"></div></div><button class="btn tint full" type="submit">Agregar ingrediente</button>${e}</form>
+        ${grp('Lo que te sale', `<label class="row" for="so-${x.id}"><span class="row-main"><span class="row-t">Te salen</span><span class="row-s">Sin contar el agua, deberían salir ≈ ${exp} g</span></span><input class="ginp" style="width:90px" id="so-${x.id}" type="number" inputmode="decimal" min="0" value="${x.out}" data-act="sout" data-v="${x.id}"><span class="row-s">g</span></label>`, used.length ? `Se usa en ${used.map(d => esc(d.name)).join(', ')}.` : 'Todavía no se usa en ningún plato.')}
+        <div class="fgrid" style="margin-top:12px">${x.ok ? '<p class="hint">Ya la pesaste.</p>' : `<button class="btn full" data-act="sub-ok" data-v="${x.id}">Ya la pesé, guardar</button>`}</div>`}; }
+    case 'sub-new': return {title:'Nueva preparación', form:'f-subnew', ok:'Crear', html:`<form class="fgrid" id="f-subnew" novalidate><p class="hint">Una salsa, una base o una masa que usas en varios platos.</p>
+      <div class="field"><label for="sn-name">Nombre</label><input class="inp" id="sn-name" placeholder="Salsa BBQ fit"></div>${e}</form>`};
+    case 'ing': { const bid = BID(), pid = sh.v, p = PR[pid], y = yld(bid, pid), base = ppg(pid) * 1000, real = base / y.ap;
+      return {title:esc(p.n), html:`<div class="stats"><div class="stat"><b style="font-size:17px">${money(base)}</b><span>Pagas el kilo</span></div><div class="stat"><b style="font-size:17px">${money(real)}</b><span>El kilo limpio te sale a</span></div><div class="stat"><b style="font-size:17px;color:var(--red)">${money(mermaMes(bid, pid))}</b><span>Botas al mes</span></div></div>
+        ${grp(`${esc(sup(p.s).name)} · ${y.ok ? 'lo pesaste tú' : 'promedio de cocina'}`, `<label class="row" for="yap"><span class="row-main"><span class="row-t">Lo que usas</span><span class="row-s">Después de limpiarlo</span></span><input class="ginp" id="yap" type="number" inputmode="numeric" min="1" max="100" value="${Math.round(y.ap * 100)}" data-act="yap" data-v="${pid}"><span class="row-s">%</span></label>
+          <label class="row" for="ycoc"><span class="row-main"><span class="row-t">Al cocinarlo</span><span class="row-s">Lo que queda de lo limpio</span></span><input class="ginp" id="ycoc" type="number" inputmode="numeric" min="1" max="100" value="${Math.round(y.coc * 100)}" data-act="ycoc" data-v="${pid}"><span class="row-s">%</span></label>`, y.tip)}
+        <div class="fgrid" style="margin-top:12px"><button class="btn full" data-act="sheet" data-v="yield" data-d="${pid}">Hacer la prueba de pesaje</button></div>`}; }
+    case 'yield': { const bid = BID(), ids = kitProgress(bid).ings.sort((x,y) => PR[x].n.localeCompare(PR[y].n)), cur = sh.v && PR[sh.v] ? sh.v : ids.slice().sort((x,y) => mermaMes(bid, y) - mermaMes(bid, x))[0];
+      return {title:'Prueba de pesaje', form:'f-yield', ok:'Guardar', html:`<form class="fgrid" id="f-yield" novalidate>
+        <p class="hint">Pesa 1 kg tal cual llegó, límpialo y vuelve a pesarlo. Si lo cocinas, pésalo también cocinado.</p>
+        <div class="field"><label for="yl-p">Ingrediente</label>${sel('yl-p', ids.map(pid => [pid, PR[pid].n]), cur)}</div>
+        <div class="two"><div class="field"><label for="yl-b">Como llegó (g)</label><input class="inp" id="yl-b" type="number" inputmode="decimal" min="0" placeholder="1000"></div>
+        <div class="field"><label for="yl-l">Ya limpio (g)</label><input class="inp" id="yl-l" type="number" inputmode="decimal" min="0" placeholder="700"></div></div>
+        <div class="field"><label for="yl-c">Cocinado (g, si aplica)</label><input class="inp" id="yl-c" type="number" inputmode="decimal" min="0" placeholder="Solo si lo cocinas"></div>
+        <div id="yres">${yieldRes()}</div>${e}</form>`}; }
     case 'client': { const sid = SID(), r = buyerStats(sid).find(x => x.b.id === sh.v), t = clientToday(sid, sh.v), g = growth(sid, sh.v).slice(0,3);
       const top = {}; delivered(sh.v, sid).filter(o => o.day >= -28).forEach(o => o.items.forEach(it => top[it.p] = (top[it.p] || 0) + it.del * it.price));
-      return {title:esc(r.b.name), html:`<div class="stats"><div class="stat"><b style="font-size:17px">${money(r.sales)}</b><span>4 semanas</span></div><div class="stat"><b style="font-size:17px">${r.perWeek.toLocaleString('es-CO',{maximumFractionDigits:1})}</b><span>Pedidos por semana</span></div><div class="stat"><b style="font-size:17px">${r.seg}</b><span>Segmento</span></div></div>
-        ${grp('', row({t:'Hoy', r:tag(t.cls, t.label)}) + row({t:'Ticket promedio', r:money(r.ticket)}) + row({t:'Celular', r:`<span style="user-select:text">${fPhone(r.b.phone)}</span>`}))}
+      return {title:esc(r.b.name), html:`<div class="stats"><div class="stat"><b style="font-size:17px">${money(r.sales)}</b><span>Último mes</span></div><div class="stat"><b style="font-size:17px">${r.perWeek.toLocaleString('es-CO',{maximumFractionDigits:1})}</b><span>Pedidos por semana</span></div><div class="stat"><b style="font-size:17px">${SEGL[r.seg]}</b><span>Tipo de cliente</span></div></div>
+        ${grp('', row({t:'Hoy', r:tag(t.cls, t.label)}) + row({t:'Gasta por pedido', r:money(r.ticket)}) + row({t:'Celular', r:`<span style="user-select:text">${fPhone(r.b.phone)}</span>`}))}
         ${grp('Lo que más compra', Object.entries(top).sort((a,b) => b[1] - a[1]).slice(0,5).map(([pid,v]) => row({t:esc(PR[pid].n), r:money(v)})).join('') || '<div class="empty">Sin compras recientes.</div>')}
         ${g.length ? grp('Creciendo', g.map(x => row({t:esc(PR[x.pid].n), r:tag('ok', `+${Math.round(x.ch * 100)}%`)})).join('')) : ''}
         <div class="fgrid" style="margin-top:16px"><button class="btn full" data-act="remind" data-v="${sh.v}">Copiar recordatorio para WhatsApp</button></div>`}; }
@@ -960,6 +1371,8 @@ function sheetContent(){
       <div class="field"><label for="np-cat">Categoría</label><input class="inp" id="np-cat" list="cats" placeholder="Kéfir"><datalist id="cats">${categories(SID()).map(c => `<option value="${esc(c)}">`).join('')}</datalist></div>
       <div class="two"><div class="field"><label for="np-unit">Unidad</label>${sel('np-unit', [['und','und'],['kg','kg'],['atado','atado']], 'und')}</div><div class="field"><label for="np-price">Precio</label><input class="inp" id="np-price" type="number" inputmode="numeric" placeholder="45000"></div></div>${e}</form>`};
     case 'import': return {title:'Importar catálogo', html: importHtml()};
+    case 'news': { const items = (isB() ? buyerFeed(BID()) : supFeed(SID())).filter(x => NEWSG[x.k] === sh.v);
+      return {title: NEWS_LABEL[sh.v] || 'Novedades', html: items.length ? `<div class="newslist">${items.map(x => `<div class="fc">${tag(x.cls, x.k)}<p>${x.t}</p><div class="acts">${x.btns || (x.act ? `<button class="btn tint sm" data-act="${x.act}" data-v="${x.v ?? ''}">${x.b}</button>` : '')}</div></div>`).join('')}</div>` : '<div class="empty">Ya no hay novedades aquí.</div>'}; }
   }
   return {title:'', html:''};
 }
@@ -1024,8 +1437,8 @@ function readImportFile(file){
 }
 
 /* ---------- render ---------- */
-const TABS_B = [['prov','Proveedores','prov'],['inv','Inventario','inv'],['orders','Pedidos','orders'],['biz','Negocio','biz'],['more','Más','more']];
-const TABS_S = [['clientes','Clientes','clients'],['pedidos','Pedidos','orders'],['ofertas','Ofertas','tag'],['prev','Previsión','trend'],['more','Más','more']];
+const TABS_B = [['prov','Proveedores','prov'],['inv','Inventario','inv'],['orders','Pedidos','orders'],['kit','Cocina','chef'],['more','Más','more']];
+const TABS_S = [['clientes','Clientes','clients'],['pedidos','Pedidos','orders'],['ofertas','Ofertas','tag'],['prev','Comprar','trend'],['more','Más','more']];
 function render(){
   const app = $('app'), tb = $('tabbar'), co = $('checkout');
   co.hidden = true;
@@ -1035,7 +1448,7 @@ function render(){
     if (!isB() && k === 'pedidos') { const n = pendingOrders(SID()).filter(o => o.status === 'Recibido').length; return n ? `<span class="badge">${n}</span>` : ''; } return ''; };
   tb.hidden = false;
   tb.innerHTML = `<div class="tabbar-in">${tabs.map(([k,l,i]) => `<button class="tab" data-act="tab" data-v="${k}" ${S.tab === k ? 'aria-current="page"' : ''}>${ico(i)}${l}${badge(k)}</button>`).join('')}</div>`;
-  const views = isB() ? {prov:buyerProv, inv:buyerInv, orders:buyerOrders, biz:buyerBiz, more:moreView} : {clientes:supClientes, pedidos:supPedidos, ofertas:supOfertas, prev:supPrev, more:moreView};
+  const views = isB() ? {prov:buyerProv, inv:buyerInv, orders:buyerOrders, kit:kitView, more:moreView} : {clientes:supClientes, pedidos:supPedidos, ofertas:supOfertas, prev:supPrev, more:moreView};
   app.innerHTML = (views[S.tab] || views[tabs[0][0]])();
   if (isB() && S.tab === 'prov' && S.sid && !S.placed) {
     const c = cart(), lines = Object.entries(c.items).filter(([,q]) => q > 0);
@@ -1065,18 +1478,24 @@ document.addEventListener('submit', e => {
   else if (f === 'f-sup') { const name = $('ns-name').value.trim(), ph = digits($('ns-phone').value);
     if (!name) return fail('Escribe el nombre del proveedor.'); if (ph.length !== 10) return fail('Escribe un WhatsApp de 10 dígitos.'); if (!sh.days.length) return fail('Elige al menos un día de entrega.');
     const id = 'x' + Date.now().toString(36), colors = ['#5AC8FA','#FF9F0A','#64D2FF','#BF5AF2','#30D158'];
-    SUPPLIERS.push({id, name, kind: $('ns-kind').value.trim() || 'Proveedor', color: colors[SUPPLIERS.length % colors.length], inApp:false, owner:BID(), phone:ph, days:[...sh.days], cutoff: $('ns-cut').value || '18:00'});
+    SUPPLIERS.push({id, cat: $('ns-cat').value, name, kind: $('ns-kind').value.trim() || $('ns-cat').value, color: colors[SUPPLIERS.length % colors.length], inApp:false, owner:BID(), phone:ph, days:[...sh.days], cutoff: $('ns-cut').value || '18:00'});
     BY[BID()].sups.push(id); S.sheet = null; openSup(id); openSheet('xprod'); toast('Proveedor agregado. Carga lo que le compras.'); return render(); }
   else if (f === 'f-xprod') { const n = $('xp-name').value.trim(), pr = parsePrice($('xp-price').value);
     if (!n) return fail('Escribe el nombre del producto.'); if (productsOf(S.sid).some(p => norm(p.n) === norm(n))) return fail('Ya tienes ese producto.');
     PRODUCTS.push({id:'p' + Date.now().toString(36), n, c: sup(S.sid).kind, u: $('xp-unit').value, pr: pr > 0 ? pr : 0, s:S.sid, active:true}); syncPR(); S.err[sh.type] = ''; toast(`${n} agregado`); }
   else if (f === 'f-fix') { const v = parseFloat(String($('fix-q').value).replace(',', '.')); if (isNaN(v) || v < 0) return fail('Escribe una cantidad de 0 o más.'); applyFix(sh.v, v); S.sheet = null; }
-  else if (f === 'f-dish') { const name = $('dish-name').value.trim(), per = parseInt($('dish-per').value, 10);
-    if (!name) return fail('Escribe el nombre del plato.'); if (!(per > 0)) return fail('Escribe cuántos platos vendes en un día normal.');
-    const id = 'd' + Date.now().toString(36); biz(BID()).menu.push({id, name, perDay:per, base: $('dish-new').checked ? 0 : per, ing:[]}); S.sheet = {type:'dish', v:id}; toast('Plato agregado. Ponle sus ingredientes.'); }
-  else if (f === 'f-ing') { const d = biz(BID()).menu.find(x => x.id === e.target.dataset.v), pid = $('ing-p').value, q = parseFloat(String($('ing-q').value).replace(',', '.'));
-    if (!(q > 0)) return fail('Escribe cuánto lleva cada plato, por ejemplo 0,05.');
-    const ex = d.ing.find(i => i.p === pid); if (ex) ex.q = q; else d.ing.push({p:pid, q}); S.err[sh.type] = ''; bizChanged(); toast(`${PR[pid].n} agregado`); }
+  else if (f === 'f-dish') { const name = $('dish-name').value.trim(), per = parseInt($('dish-per').value, 10), price = parsePrice($('dish-price').value);
+    if (!name) return fail('Escribe el nombre del plato.'); if (!(price > 0)) return fail('Escribe el precio en carta.'); if (!(per > 0)) return fail('Escribe cuántos platos vendes en un día normal.');
+    const id = 'd' + Date.now().toString(36); biz(BID()).menu.push({id, name, price, perDay:per, base: $('dish-new').checked ? 0 : per, ok:false, comp:[]}); S.sheet = {type:'dish', v:id}; S.kitSeg = 'platos'; toast('Listo. Ahora ponle lo que lleva, con gramos.'); }
+  else if (f === 'f-comp') { const d = biz(BID()).menu.find(x => x.id === e.target.dataset.v), [k, id] = $('cp-r').value.split(':'), g = parseFloat(String($('cp-g').value).replace(',', '.'));
+    if (!(g > 0)) return fail('Escribe los gramos por plato.'); const ex = d.comp.find(c => c.k === k && c.id === id); if (ex) ex.g = g; else d.comp.push({k, id, g}); S.err[sh.type] = ''; bizChanged(); }
+  else if (f === 'f-sinp') { const x = subOf(BID(), e.target.dataset.v), pid = $('si-p').value, g = parseFloat(String($('si-g').value).replace(',', '.'));
+    if (!(g > 0)) return fail('Escribe los gramos.'); const ex = x.inp.find(i => i.p === pid); if (ex) ex.g = g; else x.inp.push({p:pid, g}); S.err[sh.type] = ''; bizChanged(); }
+  else if (f === 'f-subnew') { const name = $('sn-name').value.trim(); if (!name) return fail('Escribe el nombre.');
+    const id = 's' + Date.now().toString(36); biz(BID()).subs.push({id, name, inp:[], out:0}); S.sheet = {type:'sub', v:id}; S.kitSeg = 'subs'; }
+  else if (f === 'f-yield') { const pid = $('yl-p').value, b0 = parseFloat($('yl-b').value), l = parseFloat($('yl-l').value), c = parseFloat($('yl-c').value);
+    if (!(b0 > 0) || !(l > 0) || l > b0) return fail('Revisa los pesos: lo limpio no puede pesar más que como llegó.');
+    const y = biz(BID()).yields[pid] = {ap: l / b0, ok:true}; if (c > 0) y.coc = c / l; bizChanged(); S.sheet = null; S.kitSeg = 'ings'; taskDone(); toast(`${PR[pid].n}: usas el ${pctTxt(l / b0)}. Ya actualizamos costos e inventario.`); }
   else if (f === 'f-ref') { const name = $('rf-name').value.trim(), ph = digits($('rf-phone').value), R = ref(refKey());
     if (!name) return fail('Escribe el nombre del negocio.'); if (ph.length !== 10) return fail('Escribe un celular de 10 dígitos.');
     let x = R.list.find(i => i.phone === ph); if (x && x.status === 'Activo') return fail('Ese negocio ya se unió.');
@@ -1097,6 +1516,7 @@ document.addEventListener('submit', e => {
 document.addEventListener('click', e => {
   const el = e.target.closest('[data-act]'); if (!el || el.tagName === 'INPUT' || el.tagName === 'SELECT' || el.tagName === 'LABEL') return;
   const a = el.dataset.act, v = el.dataset.v;
+  if (S.sheet && S.sheet.type === 'news' && ['go-sup','go-tab','go-more','inv-add','lvl'].includes(a)) S.sheet = null;
   const bump = (k, dir, isDeal) => { const c = cart(); if (isDeal) { const d = DEALS.find(x => x.id === k), u = PR[d.p].u, key = 'deal:' + d.id, cur = c.items[key] || 0;
       if (dir > 0 && cur + STEP[u] > dealLeft(d)) { toast(`Solo quedan ${fQty(dealLeft(d), u)}`); return false; } c.items[key] = Math.max(0, cur + dir * STEP[u]); }
     else { const u = PR[k].u; c.items[k] = Math.max(0, (c.items[k] || 0) + dir * STEP[u]); } return true; };
@@ -1105,7 +1525,7 @@ document.addEventListener('click', e => {
     case 'login-back': S.login = {step:'phone', phone:S.login.phone, err:''}; break;
     case 'logout': $('toast').hidden = true; S.session = null; saveSession(); S.sid = null; S.carts = {}; S.more = null; break;
     case 'ob-cancel': S.inviteCode = null; break;
-    case 'tab': if (S.tab === v) { if (v === 'prov') S.sid = null; if (v === 'more') S.more = null; } S.tab = v; S.placed = null; window.scrollTo(0,0); break;
+    case 'tab': if (S.tab === v) { if (v === 'prov') { if (!S.sid) S.supCat = null; S.sid = null; } if (v === 'more') S.more = null; } S.tab = v; S.placed = null; window.scrollTo(0,0); break;
     case 'go-sup': openSup(v); break;
     case 'go-tab': S.tab = v; window.scrollTo(0,0); break;
     case 'go-more': S.tab = 'more'; S.more = v; window.scrollTo(0,0); break;
@@ -1118,12 +1538,45 @@ document.addEventListener('click', e => {
     case 'dl-r': S.sheet.r = v; el.parentNode.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', b === el)); return;
     case 'rf-kind': S.sheet.kind = v; el.parentNode.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', b === el)); return;
     case 'invf': S.invFilter = v; break;
+    case 'supcat': S.supCat = v || null; window.scrollTo(0,0); break;
+    case 'invcat': S.invCat = v; break;
     case 'fix-zero': applyFix(v, 0); S.sheet = null; break;
     case 'lvl': { const d = +el.dataset.d; biz(BID()).log[d] = v; bizChanged(); el.parentNode.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', b === el));
       toast(`Anotado: ${whenTxt(d)} fue ${LEVELS[v].l.toLowerCase()}. Ajustamos tu inventario y tus ${plural(DOWL[wd(d)])}.`); setTimeout(render, 220); return; }
     case 'open': { const b = biz(BID()), w = +v, has = b.open.includes(w); if (has && b.open.length === 1) { toast('Abre al menos un día'); return; } b.open = has ? b.open.filter(x => x !== w) : [...b.open, w]; bizChanged(); break; }
+    case 'kitseg': S.kitSeg = v; if (v !== 'platos') S.kitCat = null; break;
+    case 'kitcat': S.kitCat = v || null; break;
+    case 'miss-del': { biz(BID()).menu.find(x => x.id === v).miss.splice(+el.dataset.d, 1); break; }
+    case 'ai-start': openSheet('ai', null, {ai:aiNew()}); return;
+    case 'ai-ex': S.sheet.ai.name = v; S.sheet.ai.desc = ''; renderSheet(); return;
+    case 'ai-go': { const A = S.sheet.ai; A.name = $('ai-name').value.trim(); A.desc = $('ai-desc').value.trim();
+      if (!A.name) { S.err.ai = 'Escribe el nombre del plato.'; renderSheet(); return; } S.err.ai = '';
+      const key = A.name + '|' + A.desc; if (A.items.length && A.made === key) { A.step = 2; renderSheet(); return; }
+      A.thinking = true; renderSheet();
+      setTimeout(() => { if (!S.sheet || S.sheet.type !== 'ai') return; const r = aiDraft(BID(), A.name, A.desc); Object.assign(A, {items:r.items, generic:r.generic, made:key, thinking:false, step:2, open:-1, cat:'', catx:''}); renderSheet(); }, 1100); return; }
+    case 'ai-step': { const A = S.sheet.ai, to = +v;
+      if (A.step === 3) { A.price = $('ai-price').value; A.per = $('ai-per').value; A.isNew = $('ai-new').checked; }
+      if (A.step === 4) A.catx = $('ai-catx').value;
+      if (to > A.step) { if (A.step === 2 && !A.items.length) { S.err.ai = 'Agrega al menos una cosa al plato.'; renderSheet(); return; }
+        if (A.step === 3 && !(parsePrice(A.price) > 0)) { S.err.ai = 'Escribe el precio en carta.'; renderSheet(); return; }
+        if (A.step === 3 && !(parseInt(A.per, 10) > 0)) { S.err.ai = 'Escribe cuántos vendes en un día normal.'; renderSheet(); return; } }
+      S.err.ai = ''; A.step = to; renderSheet(); $('sheet-root').querySelector('.sheet-b').scrollTop = 0; return; }
+    case 'ai-del': { const A = S.sheet.ai; A.items.splice(+v, 1); A.open = -1; renderSheet(); return; }
+    case 'ai-open': { const A = S.sheet.ai; A.open = A.open === +v ? -1 : +v; renderSheet(); return; }
+    case 'ai-sdel': { S.sheet.ai.items[+v].inp.splice(+el.dataset.d, 1); renderSheet(); return; }
+    case 'ai-add': { const A = S.sheet.ai, pv = $('ai-ap').value, xn = $('ai-ax').value.trim(), g = parseFloat(String($('ai-ag').value).replace(',', '.'));
+      A.adding = true; if (!pv && !xn) { S.err.ai = 'Elige algo de la lista o escríbelo.'; renderSheet(); return; } if (!(g > 0)) { S.err.ai = 'Escribe los gramos.'; renderSheet(); return; }
+      const bid = BID(); let it;
+      if (pv) { const [k, id] = pv.split(':'); if (k === 'p') it = {k:'p', id, g}; else { const sb = subOf(bid, id); it = {k:'r', key:'', name:sb.name, inp:sb.inp.map(x => ({...x})), out:sb.out, exist:sb.id, g}; } }
+      else { const m = PRODUCTS.find(p => p.active && BY[bid].sups.includes(p.s) && norm(p.n).includes(norm(xn))); it = m ? {k:'p', id:m.id, g} : {k:'x', n:xn, g}; }
+      A.items.push(it); A.adding = false; S.err.ai = ''; renderSheet(); toast(it.k === 'x' ? `${xn} agregado. Ninguno de tus proveedores lo tiene todavía.` : 'Agregado'); return; }
+    case 'ai-cat': { const A = S.sheet.ai; A.cat = v; A.catx = ''; renderSheet(); return; }
+    case 'ai-save': { const A = S.sheet.ai; A.catx = $('ai-catx').value; aiSave(); break; }
+    case 'dish-ok': { biz(BID()).menu.find(x => x.id === v).ok = true; bizChanged(); taskDone(); break; }
+    case 'sub-ok': { subOf(BID(), v).ok = true; bizChanged(); taskDone(); break; }
+    case 'comp-del': { biz(BID()).menu.find(x => x.id === v).comp.splice(+el.dataset.d, 1); bizChanged(); break; }
+    case 'sinp-del': { subOf(BID(), v).inp.splice(+el.dataset.d, 1); bizChanged(); break; }
     case 'per-inc': case 'per-dec': { const d = biz(BID()).menu.find(x => x.id === v); d.perDay = Math.max(0, d.perDay + (a === 'per-inc' ? 1 : -1)); bizChanged(); break; }
-    case 'ing-del': { const d = biz(BID()).menu.find(x => x.id === v); d.ing.splice(+el.dataset.d, 1); bizChanged(); break; }
     case 'dish-del': { const b = biz(BID()); b.menu = b.menu.filter(x => x.id !== v); S.sheet = null; bizChanged(); toast('Plato quitado'); break; }
     case 'inv-add': { const list = inventory(BID()).filter(x => (x.cls === 'bad' || x.cls === 'warn') && !x.incoming.length), per = {};
       list.forEach(x => { if (!S.carts[x.p.s]) resetCart(x.p.s); const c = cart(x.p.s); c.items[x.pid] = Math.max(c.items[x.pid] || 0, x.need); per[x.p.s] = (per[x.p.s] || 0) + 1; });
@@ -1164,6 +1617,7 @@ document.addEventListener('click', e => {
 });
 document.addEventListener('change', e => {
   const t = e.target;
+  if (t.id === 'yl-p' && $('yres')) { $('yres').innerHTML = yieldRes(); return; }
   if (t.dataset.act === 'del') { const o = ORDERS.find(x => x.id === +t.dataset.o), it = o.items[+t.dataset.i], v = parseFloat(String(t.value).replace(',', '.')); it.del = isNaN(v) || v < 0 ? it.qty : v; render(); }
   else if (t.dataset.act === 'price') { const v = parsePrice(t.value); if (v > 0) { PR[t.dataset.p].pr = v; toast(`${PR[t.dataset.p].n}: ${money(v)}`); } else t.value = PR[t.dataset.p].pr; }
   else if (t.dataset.act === 'active') { PR[t.dataset.p].active = t.checked; render(); }
@@ -1171,8 +1625,22 @@ document.addEventListener('change', e => {
   else if (t.id === 'close-t' && t.value) { biz(BID()).close = t.value; render(); }
   else if (t.dataset.act === 'plan') { const b = biz(BID()), d = +t.dataset.d; if (t.value) b.log[d] = t.value; else delete b.log[d]; bizChanged(); toast(`${relDayC(d)}: ${t.value ? LEVELS[t.value].l.toLowerCase() : 'automático'}. Ajustamos inventario y pedidos.`); render(); }
   else if (t.id === 'imp-file' && t.files[0]) readImportFile(t.files[0]);
+  else if (/^ai-(g|sg|out|sn)$/.test(t.dataset.act || '')) { const A = S.sheet.ai, it = A.items[+t.dataset.v], a = t.dataset.act;
+    if (a === 'ai-sn') { if (t.value.trim()) it.name = t.value.trim(); renderSheet(); return; }
+    const v = parseFloat(String(t.value).replace(',', '.')); if (v >= 0) { if (a === 'ai-g') it.g = v; if (a === 'ai-sg') it.inp[+t.dataset.d].g = v; if (a === 'ai-out') it.out = v; } renderSheet(); }
+  else if (t.id === 'ai-new') S.sheet.ai.isNew = t.checked;
+  else if (t.dataset.act === 'dcat') { biz(BID()).menu.find(x => x.id === t.dataset.v).cat = t.value; S.kitCat = t.value; toast(`Movido a ${t.value}`); render(); }
+  else if (['cg','sg','sout','dprice','yap','ycoc'].includes(t.dataset.act)) { const v = parseFloat(String(t.value).replace(',', '.')), a = t.dataset.act, bid = BID();
+    if (!(v >= 0)) { render(); return; }
+    if (a === 'cg') biz(bid).menu.find(x => x.id === t.dataset.v).comp[+t.dataset.d].g = v;
+    if (a === 'dprice' && v > 0) biz(bid).menu.find(x => x.id === t.dataset.v).price = v;
+    if (a === 'sg') subOf(bid, t.dataset.v).inp[+t.dataset.d].g = v;
+    if (a === 'sout') subOf(bid, t.dataset.v).out = v;
+    if ((a === 'yap' || a === 'ycoc') && v > 0 && v <= 100) { const y = biz(bid).yields[t.dataset.v] ||= {}; y[a === 'yap' ? 'ap' : 'coc'] = v / 100; y.ok = true; taskDone(); }
+    bizChanged(); render(); }
 });
-document.addEventListener('input', e => { if (e.target.id === 'search') { S.q = e.target.value; $('catalog').innerHTML = catalogRows(); } });
+document.addEventListener('input', e => { const t = e.target; if (S.sheet && S.sheet.type === 'ai' && /^ai-(name|desc|price|per|catx)$/.test(t.id)) { S.sheet.ai[t.id.slice(3)] = t.value; if ($('ai-stats')) $('ai-stats').innerHTML = aiStats(); if (t.id === 'ai-catx') S.sheet.ai.cat = ''; }
+  if (/^yl-/.test(e.target.id) && $('yres')) $('yres').innerHTML = yieldRes(); if (e.target.id === 'search') { S.q = e.target.value; $('catalog').innerHTML = catalogRows(); } });
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && S.sheet) closeSheet(); });
 render();
 </script>
